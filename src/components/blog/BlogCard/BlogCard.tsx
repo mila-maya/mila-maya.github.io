@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
-import type { BlogPost } from '@types/contentful.types';
+import type { BlogPost } from '@/types/contentful.types';
 import styles from './BlogCard.module.css';
 
 interface BlogCardProps {

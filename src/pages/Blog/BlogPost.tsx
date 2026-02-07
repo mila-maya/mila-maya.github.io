@@ -4,9 +4,9 @@ import { format } from 'date-fns';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
-import SEO from '@components/common/SEO/SEO';
-import { getBlogPostBySlug } from '@services/contentful';
-import type { BlogPost as BlogPostType } from '@types/contentful.types';
+import SEO from '@/components/common/SEO/SEO';
+import { getBlogPostBySlug } from '@/services/contentful';
+import type { BlogPost as BlogPostType } from '@/types/contentful.types';
 import styles from './BlogPost.module.css';
 import 'highlight.js/styles/github.css';
 

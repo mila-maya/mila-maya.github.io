@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { getBlogPosts } from '@services/contentful';
-import type { BlogPost } from '@types/contentful.types';
+import { getBlogPosts } from '@/services/contentful';
+import type { BlogPost } from '@/types/contentful.types';
 
 export const useBlogPosts = (limit = 100) => {
   const [posts, setPosts] = useState<BlogPost[]>([]);

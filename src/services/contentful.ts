@@ -1,5 +1,5 @@
 import { createClient, Entry } from 'contentful';
-import type { BlogPost, Project, ContentfulImage } from '@types/contentful.types';
+import type { BlogPost, Project } from '@/types/contentful.types';
 
 // Initialize Contentful client
 const client = createClient({

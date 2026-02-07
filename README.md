@@ -1,28 +1,27 @@
 # Personal Portfolio & Blog
 
-A modern, interactive personal homepage built with React, TypeScript, and Vite. Features a CMS-powered blog, project showcase, and multi-page routing.
+A modern, interactive personal homepage built with React, TypeScript, and Vite. Features a blog, project showcase, and multi-page routing - all with **content managed directly in code** (no external CMS needed!).
 
 ## 🚀 Tech Stack
 
 - **Framework:** React 18 with TypeScript
 - **Build Tool:** Vite 5
 - **Routing:** React Router v6
-- **CMS:** Contentful
 - **Styling:** CSS Modules
 - **Deployment:** GitHub Pages (automated with GitHub Actions)
-- **Markdown:** react-markdown with syntax highlighting
+- **Content:** Managed in local TypeScript files (no database or CMS required!)
 
 ## 📦 Features
 
 - ✅ Multi-page SPA with client-side routing
-- ✅ CMS-powered blog with markdown support
+- ✅ Blog with markdown support and syntax highlighting
 - ✅ Project showcase
 - ✅ Responsive design
-- ✅ SEO optimized with react-helmet-async
-- ✅ Code syntax highlighting
+- ✅ SEO optimized
+- ✅ **Easy content management** - just edit TypeScript files!
 - ✅ Automated deployment to GitHub Pages
 
-## 🛠️ Setup Instructions
+## 🛠️ Quick Start
 
 ### 1. Install Dependencies
 
@@ -30,78 +29,7 @@ A modern, interactive personal homepage built with React, TypeScript, and Vite. 
 npm install
 ```
 
-### 2. Set Up Contentful CMS
-
-1. Create a free account at [Contentful](https://www.contentful.com/)
-2. Create a new space (e.g., "Personal Portfolio")
-3. Go to **Settings → API keys** and create a new API key
-4. Copy your **Space ID** and **Content Delivery API - access token**
-
-### 3. Create Content Models in Contentful
-
-#### Blog Post Content Model
-
-Create a content type with ID: `blogPost`
-
-Fields:
-- **Title** (Short text, required)
-- **Slug** (Short text, required, unique) - URL-friendly identifier
-- **Excerpt** (Long text, required) - Short description (200 chars)
-- **Content** (Long text, required) - Full blog post content (supports markdown)
-- **Featured Image** (Media, single file)
-- **Author** (Short text, required)
-- **Published Date** (Date & time, required)
-- **Tags** (Short text, list) - e.g., ["React", "TypeScript", "Tutorial"]
-- **Category** (Short text) - e.g., "Tutorial", "Opinion", "News"
-
-#### Project Content Model
-
-Create a content type with ID: `project`
-
-Fields:
-- **Title** (Short text, required)
-- **Slug** (Short text, required, unique)
-- **Description** (Long text, required)
-- **Technologies** (Short text, list, required) - e.g., ["React", "Node.js"]
-- **GitHub URL** (Short text) - Link to GitHub repository
-- **Live URL** (Short text) - Link to live demo
-- **Featured Image** (Media, single file)
-- **Display Order** (Integer, required) - For sorting (1, 2, 3...)
-
-### 4. Configure Environment Variables
-
-Update `.env.local` with your Contentful credentials:
-
-```env
-VITE_CONTENTFUL_SPACE_ID=your_actual_space_id
-VITE_CONTENTFUL_ACCESS_TOKEN=your_actual_delivery_token
-VITE_CONTENTFUL_ENVIRONMENT=master
-```
-
-### 5. Add Sample Content
-
-In Contentful, create:
-- 3-5 blog posts with the fields above
-- 3-5 projects with the fields above
-- Upload images for featured images
-
-### 6. Customize Personal Information
-
-Update the following files with your information:
-
-- **src/pages/Home/Home.tsx** - Update hero section text
-- **src/pages/About/About.tsx** - Update bio, skills, and description
-- **src/pages/Contact/Contact.tsx** - Update email and social links
-- **src/components/common/Footer/Footer.tsx** - Update social media links
-- **src/components/common/Header/Header.tsx** - Update name and subtitle
-
-Add your avatar image:
-- Place your photo as `public/avatar.jpg`
-- Or update the image paths in the code
-
-## 🏃 Running Locally
-
-### Development Server
+### 2. Run Development Server
 
 ```bash
 npm run dev
@@ -109,16 +37,96 @@ npm run dev
 
 Visit [http://localhost:5173](http://localhost:5173)
 
-### Build for Production
+That's it! Your portfolio is running with example content.
 
-```bash
-npm run build
+## ✏️ Adding Your Own Content
+
+### Adding Blog Posts
+
+Edit [src/data/blogPosts.ts](src/data/blogPosts.ts):
+
+```typescript
+export const blogPosts: BlogPost[] = [
+  {
+    title: "My Awesome Blog Post",
+    slug: "my-awesome-blog-post", // Used in URL: /blog/my-awesome-blog-post
+    excerpt: "A short description that appears in the blog list",
+    content: `# My Awesome Blog Post
+
+This is the full content of your blog post. You can use **markdown**!
+
+## Code Examples
+
+\`\`\`javascript
+const greeting = "Hello World!";
+console.log(greeting);
+\`\`\`
+
+It's that easy!`,
+    author: "Your Name",
+    publishedDate: "2025-02-07T10:00:00.000Z",
+    tags: ["JavaScript", "Tutorial"],
+    category: "Tutorial"
+  },
+  // Add more posts here...
+];
 ```
 
-### Preview Production Build
+### Adding Projects
 
-```bash
-npm run preview
+Edit [src/data/projects.ts](src/data/projects.ts):
+
+```typescript
+export const projects: Project[] = [
+  {
+    title: "My Cool Project",
+    slug: "my-cool-project",
+    description: "A description of what this project does",
+    technologies: ["React", "TypeScript", "Node.js"],
+    githubUrl: "https://github.com/yourusername/project",
+    liveUrl: "https://project-demo.com", // Optional
+    displayOrder: 1 // Controls the order projects are displayed
+  },
+  // Add more projects here...
+];
+```
+
+## 🎨 Customization
+
+### Update Personal Information
+
+1. **Header & Navigation** - [src/components/common/Header/Header.tsx](src/components/common/Header/Header.tsx)
+   - Update your name and tagline
+
+2. **Home Page** - [src/pages/Home/Home.tsx](src/pages/Home/Home.tsx)
+   - Update the hero section text
+
+3. **About Page** - [src/pages/About/About.tsx](src/pages/About/About.tsx)
+   - Update your bio, skills, and background
+
+4. **Contact Page** - [src/pages/Contact/Contact.tsx](src/pages/Contact/Contact.tsx)
+   - Update email and social links
+
+5. **Footer** - [src/components/common/Footer/Footer.tsx](src/components/common/Footer/Footer.tsx)
+   - Update social media links
+
+6. **Profile Photo**
+   - Add your photo as `public/avatar.jpg`
+
+### Styling
+
+- **Global styles:** [src/styles/global.css](src/styles/global.css)
+- **CSS variables (colors, spacing):** [src/styles/variables.css](src/styles/variables.css)
+- **Component styles:** Each component has its own `.module.css` file
+
+To change the color scheme, edit the CSS variables in [src/styles/variables.css](src/styles/variables.css):
+
+```css
+:root {
+  --primary-color: #007acc; /* Change this to your preferred color */
+  --primary-hover: #005fa3;
+  /* ... */
+}
 ```
 
 ## 🌐 Deployment to GitHub Pages
@@ -128,16 +136,9 @@ npm run preview
 1. Go to your repository **Settings → Pages**
 2. Under **Source**, select **GitHub Actions**
 
-### 2. Add Contentful Secrets
+### 2. Deploy
 
-Go to **Settings → Secrets and variables → Actions** and add:
-
-- `CONTENTFUL_SPACE_ID` - Your Contentful Space ID
-- `CONTENTFUL_ACCESS_TOKEN` - Your Contentful Content Delivery API token
-
-### 3. Deploy
-
-Push to the `main` branch:
+Simply push to the `main` branch:
 
 ```bash
 git add .
@@ -145,90 +146,84 @@ git commit -m "feat: initial React portfolio setup"
 git push origin main
 ```
 
-GitHub Actions will automatically build and deploy your site to `https://mila-maya.github.io`
+GitHub Actions will automatically build and deploy your site to `https://yourusername.github.io` 🚀
+
+**No secrets or API keys needed!** Since content is managed in code, the deployment is completely self-contained.
 
 ## 📁 Project Structure
 
 ```
-├── .github/
-│   └── workflows/
-│       └── deploy.yml          # GitHub Actions deployment
+├── .github/workflows/deploy.yml  # GitHub Actions deployment
 ├── public/
-│   ├── 404.html                # SPA routing fallback
-│   └── avatar.jpg              # Your profile photo
+│   ├── 404.html                  # SPA routing fallback
+│   └── avatar.jpg                # Your profile photo
 ├── src/
-│   ├── components/
-│   │   ├── common/             # Shared components (Header, Footer, SEO)
-│   │   ├── blog/               # Blog-specific components
-│   │   └── projects/           # Project-specific components
-│   ├── pages/                  # Page components (Home, About, Blog, etc.)
-│   ├── layouts/                # Layout wrappers
-│   ├── services/               # API services (Contentful)
-│   ├── hooks/                  # Custom React hooks
-│   ├── types/                  # TypeScript type definitions
-│   ├── styles/                 # Global styles and CSS variables
-│   ├── App.tsx                 # Main app with routing
-│   └── main.tsx                # App entry point
-├── .env.local                  # Local environment variables (gitignored)
-├── .env.example                # Example environment variables
-├── package.json
-├── tsconfig.json               # TypeScript configuration
-├── vite.config.ts              # Vite configuration
+│   ├── components/               # Reusable UI components
+│   ├── pages/                    # Page components (Home, About, Blog, etc.)
+│   ├── layouts/                  # Layout wrappers
+│   ├── data/                     # ⭐ YOUR CONTENT LIVES HERE
+│   │   ├── blogPosts.ts          # Blog posts
+│   │   └── projects.ts           # Projects
+│   ├── services/                 # Data fetching services
+│   ├── hooks/                    # Custom React hooks
+│   ├── types/                    # TypeScript type definitions
+│   ├── styles/                   # Global styles
+│   ├── App.tsx                   # Main app with routing
+│   └── main.tsx                  # Entry point
 └── README.md
 ```
 
-## 🎨 Customization
+## 🔧 Available Scripts
 
-### Styling
+```bash
+npm run dev      # Start development server
+npm run build    # Build for production
+npm run preview  # Preview production build locally
+npm run lint     # Run ESLint
+```
 
-- **Global styles:** `src/styles/global.css`
-- **CSS variables:** `src/styles/variables.css`
-- **Component styles:** Each component has its own `.module.css` file
+## 💡 Tips
+
+### Adding Images to Blog Posts
+
+1. Place images in the `public/images/` folder
+2. Reference them in markdown:
+
+```markdown
+![Alt text](/images/my-image.jpg)
+```
 
 ### Adding New Pages
 
-1. Create a new page component in `src/pages/`
-2. Add the route in `src/App.tsx`
-3. Add navigation link in `src/components/common/Header/Header.tsx`
+1. Create a new component in `src/pages/`
+2. Add the route in [src/App.tsx](src/App.tsx)
+3. Add navigation link in [src/components/common/Header/Header.tsx](src/components/common/Header/Header.tsx)
 
-### Updating Content
+### Markdown Tips
 
-Content is managed in Contentful. To add/update:
-1. Log in to Contentful
-2. Go to **Content** tab
-3. Create or edit entries
-4. Publish changes
+Your blog posts support:
+- **Bold**, *italic*, ~~strikethrough~~
+- [Links](https://example.com)
+- Code blocks with syntax highlighting
+- Lists, tables, and blockquotes
+- And more!
 
-Content updates appear immediately (no rebuild needed). However, for SEO and performance, you may want to trigger a rebuild via:
-- Pushing a commit to GitHub
-- Manually triggering the workflow in Actions tab
+See the example posts in [src/data/blogPosts.ts](src/data/blogPosts.ts) for reference.
 
-## 🔧 Troubleshooting
+## 🚀 Going Further
 
-### "Error loading blog posts/projects"
+Want to add more features? Here are some ideas:
 
-- Check that `.env.local` has correct Contentful credentials
-- Verify content models in Contentful match the expected structure
-- Ensure content is published (not in draft state)
-
-### Routing not working on GitHub Pages
-
-- Ensure `404.html` is in the `public/` directory
-- Check that `vite.config.ts` has `base: '/'` set correctly
-
-### Build fails in GitHub Actions
-
-- Verify repository secrets are set correctly
-- Check that all dependencies are in `package.json`
-- Review the Actions logs for specific errors
+- **Search functionality** - Add a search bar to filter blog posts
+- **Dark mode** - Add a theme toggle
+- **Analytics** - Integrate Google Analytics or Plausible
+- **Comments** - Use Utterances or Disqus for blog comments
+- **RSS feed** - Generate an RSS feed for your blog
+- **Contact form backend** - Use Formspree or EmailJS for the contact form
 
 ## 📝 License
 
 MIT License - feel free to use this project for your own portfolio!
-
-## 🤝 Contributing
-
-This is a personal portfolio project, but feel free to fork it and customize it for your own use!
 
 ---
 

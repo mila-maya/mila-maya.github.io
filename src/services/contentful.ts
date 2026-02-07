@@ -1,101 +1,40 @@
-import { createClient, Entry } from 'contentful';
 import type { BlogPost, Project } from '@/types/contentful.types';
+import { blogPosts as localBlogPosts } from '@/data/blogPosts';
+import { projects as localProjects } from '@/data/projects';
 
-// Initialize Contentful client
-const client = createClient({
-  space: import.meta.env.VITE_CONTENTFUL_SPACE_ID,
-  accessToken: import.meta.env.VITE_CONTENTFUL_ACCESS_TOKEN,
-  environment: import.meta.env.VITE_CONTENTFUL_ENVIRONMENT || 'master',
-});
-
-export const contentfulClient = client;
-
-// Helper function to extract image data
-const extractImage = (image: any): BlogPost['featuredImage'] | undefined => {
-  if (!image?.fields?.file?.url) return undefined;
-
-  return {
-    url: `https:${image.fields.file.url}`,
-    title: image.fields.title || '',
-    description: image.fields.description,
-  };
-};
+// Using local data files instead of Contentful CMS
+// To add/edit content, simply update the files in src/data/blogPosts.ts and src/data/projects.ts
 
 // Fetch all blog posts
 export const getBlogPosts = async (limit = 100): Promise<BlogPost[]> => {
-  try {
-    const entries = await client.getEntries({
-      content_type: 'blogPost',
-      order: ['-fields.publishedDate'],
-      limit,
-    });
-
-    return entries.items.map((item: Entry<any>) => ({
-      title: item.fields.title as string,
-      slug: item.fields.slug as string,
-      excerpt: item.fields.excerpt as string,
-      content: item.fields.content as string,
-      featuredImage: extractImage(item.fields.featuredImage),
-      author: item.fields.author as string,
-      publishedDate: item.fields.publishedDate as string,
-      tags: item.fields.tags as string[] | undefined,
-      category: item.fields.category as string | undefined,
-    }));
-  } catch (error) {
-    console.error('Error fetching blog posts:', error);
-    return [];
-  }
+  // Simulate async behavior (in case you want to switch to an API later)
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const posts = [...localBlogPosts]
+        .sort((a, b) => new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime())
+        .slice(0, limit);
+      resolve(posts);
+    }, 100); // Small delay to simulate loading
+  });
 };
 
 // Fetch a single blog post by slug
 export const getBlogPostBySlug = async (slug: string): Promise<BlogPost | null> => {
-  try {
-    const entries = await client.getEntries({
-      content_type: 'blogPost',
-      'fields.slug': slug,
-      limit: 1,
-    });
-
-    if (entries.items.length === 0) return null;
-
-    const item = entries.items[0];
-    return {
-      title: item.fields.title as string,
-      slug: item.fields.slug as string,
-      excerpt: item.fields.excerpt as string,
-      content: item.fields.content as string,
-      featuredImage: extractImage(item.fields.featuredImage),
-      author: item.fields.author as string,
-      publishedDate: item.fields.publishedDate as string,
-      tags: item.fields.tags as string[] | undefined,
-      category: item.fields.category as string | undefined,
-    };
-  } catch (error) {
-    console.error(`Error fetching blog post with slug ${slug}:`, error);
-    return null;
-  }
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const post = localBlogPosts.find(p => p.slug === slug) || null;
+      resolve(post);
+    }, 100);
+  });
 };
 
 // Fetch all projects
 export const getProjects = async (): Promise<Project[]> => {
-  try {
-    const entries = await client.getEntries({
-      content_type: 'project',
-      order: ['fields.displayOrder'],
-    });
-
-    return entries.items.map((item: Entry<any>) => ({
-      title: item.fields.title as string,
-      slug: item.fields.slug as string,
-      description: item.fields.description as string,
-      technologies: item.fields.technologies as string[],
-      githubUrl: item.fields.githubUrl as string | undefined,
-      liveUrl: item.fields.liveUrl as string | undefined,
-      featuredImage: extractImage(item.fields.featuredImage),
-      displayOrder: item.fields.displayOrder as number,
-    }));
-  } catch (error) {
-    console.error('Error fetching projects:', error);
-    return [];
-  }
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const projects = [...localProjects]
+        .sort((a, b) => a.displayOrder - b.displayOrder);
+      resolve(projects);
+    }, 100);
+  });
 };

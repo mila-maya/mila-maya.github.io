@@ -3,7 +3,7 @@ import type { BlogPost } from '@/types/contentful.types';
 // Add your blog posts here - just edit this file to add/update posts!
 export const blogPosts: BlogPost[] = [
   {
-    title: "How I Set Up My Master's Thesis (LaTeX + VS Code + AI)",
+    title: "The Thesis Setup I Wish I Had on Day One",
     slug: "getting-started-masters-thesis-workflow",
     excerpt: "A practical setup for a code-heavy thesis: LaTeX, VS Code, and AI tools that actually help.",
     content: `When I started my computational master's thesis, I spent the first week just figuring out tooling. LaTeX errors, broken builds, files everywhere. I wished someone had handed me a working template and said "start here."
@@ -65,13 +65,13 @@ cd presentation
 latexmk -pdf -interaction=nonstopmode presentation.tex
 ~~~
 
-## 6) How I use AI
+## 5) Using AI
 
 I use Claude and Codex in VS Code. They're genuinely helpful for:
 
 - improving outline clarity
 - rewriting paragraphs without changing meaning
-- debugging LaTeX errors when you paste the exact log
+- debugging LaTeX errors directly in your editor
 
 A few things I learned the hard way:
 

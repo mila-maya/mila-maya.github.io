@@ -36,11 +36,13 @@
 }
 
 .featuredImage {
-  width: 100%;
-  max-height: 500px;
-  object-fit: cover;
-  border-radius: var(--border-radius);
-  margin-bottom: var(--spacing-lg);
+  display: block;
+  width: auto;
+  max-width: 200px;
+  max-height: 200px;
+  object-fit: contain;
+  margin: var(--spacing-xl) auto var(--spacing-lg);
+  opacity: 0.7;
 }
 
 .tags {
@@ -51,13 +53,58 @@
 }
 
 .tag {
-  background: #f0f0f0;
+  background: #e8e8e8;
   color: var(--text-color);
   padding: 0.25rem 0.75rem;
   border-radius: var(--border-radius-sm);
   font-size: 0.875rem;
+  border: 1px solid #d0d0d0;
 }
 
+/* Table of Contents */
+.toc {
+  background: #f8f9fa;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.tocTitle {
+  font-size: 1.1rem;
+  margin: 0 0 var(--spacing-sm) 0;
+  color: var(--text-color);
+}
+
+.tocList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tocItem {
+  margin-bottom: 0.4rem;
+}
+
+.tocItem a,
+.tocSubItem a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.tocItem a:hover,
+.tocSubItem a:hover {
+  text-decoration: underline;
+}
+
+.tocSubItem {
+  margin-bottom: 0.3rem;
+  padding-left: 1.25rem;
+  font-size: 0.9rem;
+}
+
+/* Content */
 .content {
   font-size: 1.125rem;
   line-height: 1.8;
@@ -73,12 +120,14 @@
   color: var(--text-color);
 }
 
-.content h1 {
-  font-size: 2rem;
-}
-
 .content h2 {
   font-size: 1.75rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.content h1 {
+  font-size: 2rem;
 }
 
 .content h3 {
@@ -138,6 +187,24 @@
   height: auto;
   border-radius: var(--border-radius-sm);
   margin: 1.5rem 0;
+}
+
+/* Download buttons */
+.downloadButton {
+  display: inline-block;
+  background: var(--primary-color);
+  color: #fff !important;
+  padding: 0.5rem 1.1rem;
+  border-radius: var(--border-radius-sm);
+  text-decoration: none !important;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: background 0.2s;
+  margin: 0.25rem 0.5rem 0.25rem 0;
+}
+
+.downloadButton:hover {
+  background: var(--primary-hover);
 }
 
 .loading {

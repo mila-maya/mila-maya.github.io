@@ -86,14 +86,6 @@ const BlogPost = () => {
           )}
         </header>
 
-        {post.featuredImage && (
-          <img
-            src={post.featuredImage.url}
-            alt={post.featuredImage.title || post.title}
-            className={styles.featuredImage}
-          />
-        )}
-
         <div className={styles.content}>
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
@@ -102,6 +94,14 @@ const BlogPost = () => {
             {post.content}
           </ReactMarkdown>
         </div>
+
+        {post.featuredImage && (
+          <img
+            src={post.featuredImage.url}
+            alt={post.featuredImage.title || post.title}
+            className={styles.featuredImage}
+          />
+        )}
       </article>
     </>
   );

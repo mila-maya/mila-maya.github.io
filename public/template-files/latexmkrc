@@ -1,0 +1,12 @@
+$pdf_mode = 1;                # build PDF (pdflatex)
+$interaction = 'nonstopmode'; # don't stop on errors
+$file_line_error = 1;         # file:line:error format
+
+# Enable shell-escape in case you add minted later
+$pdflatex = 'pdflatex -interaction=nonstopmode -file-line-error -shell-escape %O %S';
+
+# Use BibTeX (works with natbib/\bibliographystyle + \bibliography)
+$bibtex = 'bibtex %O %B';
+
+# Clean up extra files on -c/-C
+$clean_ext = 'synctex.gz nav snm vrb run.xml bcf';

@@ -3,40 +3,29 @@ import type { BlogPost } from '@/types/contentful.types';
 // Add your blog posts here - just edit this file to add/update posts!
 export const blogPosts: BlogPost[] = [
   {
-    title: "Getting Started with Master Thesis: How I Set Up My Computational Master's Thesis (LaTeX + VS Code + Python + AI)",
+    title: "How I Set Up My Master's Thesis (LaTeX + VS Code + AI)",
     slug: "getting-started-masters-thesis-workflow",
-    excerpt: "A friendly, practical setup for a code-heavy thesis: LaTeX, VS Code, Python, reproducible figures, and safe AI usage.",
-    content: `If your thesis is code-heavy, you need a setup that feels calm and predictable.
+    excerpt: "A practical setup for a code-heavy thesis: LaTeX, VS Code, and AI tools that actually help.",
+    content: `When I started my computational master's thesis, I spent the first week just figuring out tooling. LaTeX errors, broken builds, files everywhere. I wished someone had handed me a working template and said "start here."
 
-This is the workflow I use:
-
-- one command builds the thesis PDF
-- everything is version-controlled
-- the setup is simple enough to maintain under deadline stress
+This is that guide. One command builds the PDF, everything is version-controlled, and the setup is simple enough to maintain under deadline stress.
 
 ## Direct downloads
 
 - [Download LaTeX starter template (ZIP)](/downloads/thesis-template.zip)
-- [Download starter template PDF](/downloads/thesis-template.pdf)
-- [Download starter presentation PDF](/downloads/thesis-template-presentation.pdf)
+- [Download compiled thesis PDF](/downloads/thesis-template.pdf)
+- [Download presentation PDF](/downloads/thesis-template-presentation.pdf)
 
-## 1) Minimal setup (with links)
+## 1) What you need
 
-- LaTeX distribution
-  - Windows: [MiKTeX](https://miktex.org/download)
-  - Linux/macOS: [TeX Live](https://www.tug.org/texlive/)
-- Editor: [Visual Studio Code](https://code.visualstudio.com/download)
-- Version control: [Git](https://git-scm.com/downloads)
-- Terminal: PowerShell (built in)
-- Python: [Python 3.11+](https://www.python.org/downloads/)
+- **LaTeX distribution** - Windows: [MiKTeX](https://miktex.org/download) / Linux & macOS: [TeX Live](https://www.tug.org/texlive/)
+- **Editor** - [Visual Studio Code](https://code.visualstudio.com/download)
+- **Version control** - [Git](https://git-scm.com/downloads)
+- **VS Code extension** - James-Yu.latex-workshop
 
-VS Code extensions (LaTeX-focused):
+## 2) Verify and build
 
-- James-Yu.latex-workshop (required)
-
-## 2) Verify your LaTeX toolchain early
-
-Run this first:
+Make sure these all return a version number:
 
 ~~~powershell
 pdflatex --version
@@ -44,72 +33,52 @@ latexmk -v
 bibtex --version
 ~~~
 
-If one command fails, fix that before writing chapters.
-
-## 3) Simple folder structure
-
-~~~text
-thesis_template/
-  thesis.tex
-  frontmatter/
-  chapters/
-  appendix/
-  bib/
-  figures/
-  .vscode/
-  latexmkrc
-~~~
-
-This keeps writing, references, and outputs organized without too many moving parts.
-
-## 4) Build commands
-
-Build:
+If one fails, fix it now. Then build your thesis:
 
 ~~~powershell
 latexmk -pdf -interaction=nonstopmode thesis.tex
 ~~~
 
-Clean:
+Clean up build artifacts: \`latexmk -c\`
 
-~~~powershell
-latexmk -c
-~~~
+## 3) Folder structure
 
-## 5) Build presentation directly from the thesis
+- [thesis.tex](/template-files/thesis.tex)
+- frontmatter/ — [cover.tex](/template-files/frontmatter/cover.tex), [abstracts.tex](/template-files/frontmatter/abstracts.tex)
+- chapters/ — [01-intro.tex](/template-files/chapters/01-intro.tex), [02-methods.tex](/template-files/chapters/02-methods.tex), [03-results.tex](/template-files/chapters/03-results.tex)
+- [bib/references.bib](/template-files/bib/references.bib)
+- figures/
+- appendix/
+- presentation/ — [presentation.tex](/template-files/presentation/presentation.tex)
+- [Makefile](/template-files/Makefile)
 
-You can create your slides directly from the thesis work instead of starting from scratch.
+## 4) Build your presentation from the thesis
 
-- reuse thesis figures in slides
-- reuse key tables as summary slides
-- use AI (Claude/Codex) to compress long method/result sections into clear bullet points
+No need to start slides from scratch - reuse what you already have:
 
-Build the presentation in the template:
+- thesis figures go directly into slides
+- key tables become summary slides
+- AI tools help compress long sections into bullet points
 
 ~~~powershell
 cd presentation
 latexmk -pdf -interaction=nonstopmode presentation.tex
 ~~~
 
-## 6) How I use Claude/OpenAI safely
+## 6) How I use AI
 
-AI helps best with structure and wording, not with facts.
+I use Claude and Codex in VS Code. They're genuinely helpful for:
 
-VS Code AI extensions I use:
+- improving outline clarity
+- rewriting paragraphs without changing meaning
+- debugging LaTeX errors when you paste the exact log
 
-- Claude
-- Codex
+A few things I learned the hard way:
 
-Good use:
+- AI-generated references look real but often don't exist — always verify
+- It's tempting to accept a nicely worded paragraph, but check the claims behind it too
 
-- improve outline clarity
-- rewrite paragraphs without changing meaning
-- debug LaTeX errors when you paste exact logs
-
-Never accept blindly:
-
-- references you did not verify
-- claims you did not compute or test
+Good luck with your thesis.
 `,
     featuredImage: {
       url: "/images/blog/graduation_cap.png",
@@ -118,7 +87,7 @@ Never accept blindly:
     },
     author: "Mila",
     publishedDate: "2025-02-07T10:00:00.000Z",
-    tags: ["LaTeX", "VS Code", "Python", "AI", "Thesis", "Workflow"],
+    tags: ["LaTeX", "VS Code", "AI", "Thesis", "Workflow"],
     category: "Guide"
   },
   {

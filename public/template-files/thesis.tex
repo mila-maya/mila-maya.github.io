@@ -1,0 +1,292 @@
+% Master Thesis Template (LaTeX + BibTeX)
+\documentclass[12pt,a4paper]{report}
+
+% Acronyms maintained in frontmatter/acronyms.tex 
+% Allow building from repo root or thesis_template/ dir
+\makeatletter
+\def\input@path{{./}{thesis_template/}{thesis_template/frontmatter/}{frontmatter/}{thesis_template/chapters/}{chapters/}{thesis_template/appendix/}{appendix/}{thesis_template/tables/}{tables/}}
+\makeatother
+
+% Encoding and fonts
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+% Corporate look (colors available; serif body retained)
+\usepackage[scaled]{helvet} % Helvetica for sans-serif
+\usepackage{iftex}
+\ifPDFTeX
+  \newcommand{\CoverDefaultFont}{\normalfont}
+  \newcommand{\CoverTitleFont}{\normalfont}
+\else
+  \usepackage{fontspec}
+  \newfontfamily\CoverDefaultFont{Aptos}
+  \newcommand{\CoverTitleFont}{\CoverDefaultFont}
+\fi
+\usepackage{xcolor}
+\definecolor{brandgreen}{HTML}{00AA5A}
+\definecolor{brandgray}{HTML}{333333}
+
+% ---------------------- Metadata Macros -------------------------------
+% --- Author & Program ---
+\newcommand{\AuthorPreTitles}{}
+\newcommand{\AuthorGiven}{Max}
+\newcommand{\AuthorFamily}{MUSTERMANN} % put family name in CAPS
+\newcommand{\AuthorPostTitles}{}
+
+\newcommand{\ThesisTitle}{Your Thesis Title Goes Here}
+\newcommand{\ProgramName}{Your Program Name}
+\newcommand{\DegreeName}{Master of Science} % Example degree name
+
+% --- Affiliation ---
+\newcommand{\InstituteName}{Institute of Example Studies}
+\newcommand{\DepartmentName}{Department of Example Department}
+\newcommand{\UniversityDE}{Example University}
+\newcommand{\UniversityEN}{Example University}
+
+% --- Submission details ---
+\newcommand{\SubmissionCity}{Vienna}
+\newcommand{\SubmissionMonth}{\ifcase\month\or January\or February\or March\or April\or May\or June\or July\or August\or September\or October\or November\or December\fi}
+\newcommand{\SubmissionYear}{\number\year}
+
+% --- Supervisors list (add as many as needed) ---
+%   Usage: \addsupervisor{Prof. Dr. Alice Example}{Institute of ...}{Department of ...}{Example University}
+\newcommand{\SupervisorList}{}
+\NewDocumentCommand{\addsupervisor}{m m m m}{%
+  % Append a supervisor entry where the name is a bold line
+  % and the affiliation wraps within the available column width.
+  \gappto{\SupervisorList}{%
+    \item[] {\textbf{#1}}\\[-1mm]% name on its own line
+    \parbox[t]{\linewidth}{{\small #2\\#3\\#4}}% wrapped affiliation, slightly smaller
+    \vspace{3mm}}
+}
+
+% --- Co-supervisor (single entry by default) ---
+% Provide name and affiliation lines. Optional department/university can be left empty.
+\newcommand{\CoSupervisorName}{}
+\newcommand{\CoSupervisorInstitute}{}
+\newcommand{\CoSupervisorDepartment}{}
+\newcommand{\CoSupervisorUniversity}{}
+
+% (Supervisor entries added after packages are loaded)
+
+% Internationalization and quotations
+\usepackage[english,ngerman]{babel} % main language can be selected later
+\usepackage{csquotes}
+
+% Page layout and spacing
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+
+\usepackage{pdfpages} % for embedding external PDFs
+\usepackage{pdflscape} % landscape pages (e.g., wide tables)
+% Figures and graphics
+\usepackage{graphicx}
+\usepackage{float} % for H placement (exact figure location)
+% Graphics search paths
+\graphicspath{{./}{thesis_template/}{thesis_template/figures/}{figures/}{thesis_template/assets/}{assets/}}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{siunitx}
+\usepackage{microtype}
+% Lists
+\usepackage{enumitem}
+% --- Table ---
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{tabularx}        % X columns for auto-width tables
+\usepackage{threeparttable}  % (only if you use table notes) 
+
+% Math
+\usepackage{amsmath,amssymb,amsfonts}
+% Upright Greek letters (for \upmu, etc.)
+\usepackage{upgreek}
+
+% Cross-references and links
+\usepackage[hidelinks]{hyperref}
+\usepackage{bookmark}
+\usepackage[noabbrev,nameinlink]{cleveref}
+
+% Citations via BibTeX (natbib)
+% Author-year citations with short names on first cite
+\usepackage[authoryear,round]{natbib}
+% Optional: use short author lists (et al.) on first cite for large consortium/software papers.
+% \shortcites{Doe2020,Smith2019}
+
+% JSS-style markup helpers (simplified)
+% Use a simple \texttt for inline code to avoid catcode side-effects
+\newcommand{\code}[1]{\texttt{#1}}
+\let\proglang=\textsf
+\newcommand{\pkg}[1]{{\fontseries{m}\fontseries{b}\selectfont #1}}
+
+% Acronyms (acro) and Euro symbol for imported list
+\usepackage{acro}
+\usepackage{eurosym}
+
+% Load existing acronym definitions from prior project
+\input{frontmatter/acronyms}
+
+% JSS-style code environments (fancyvrb)
+\usepackage{fancyvrb}
+\DefineVerbatimEnvironment{Code}{Verbatim}{}
+\DefineVerbatimEnvironment{CodeInput}{Verbatim}{fontshape=sl}
+\DefineVerbatimEnvironment{CodeOutput}{Verbatim}{}
+\newenvironment{CodeChunk}{}{}
+
+% Lightweight source listings for inline code excerpts
+\usepackage{listings}
+\lstset{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  columns=fullflexible,
+  keepspaces=true,
+  language=Python,
+}
+
+% xparse + etoolbox used for helper macros
+\usepackage{xparse}
+\usepackage{etoolbox}
+% Page breaks before sectioning (skip immediate subsection after a section)
+\makeatletter
+\newif\if@aftersection
+\newif\if@afterchapter
+\@aftersectionfalse
+\@afterchapterfalse
+\pretocmd{\chapter}{\global\@afterchaptertrue}{}{}
+\pretocmd{\section}{%
+  \if@afterchapter
+    \global\@afterchapterfalse
+  \else
+    \newpage
+  \fi
+  \global\@aftersectiontrue
+}{}{}
+\pretocmd{\subsection}{%
+  \if@aftersection
+    \global\@aftersectionfalse
+  \else
+    \newpage
+  \fi
+}{}{}
+\patchcmd{\@afterheading}{\@nobreakfalse}{\@nobreakfalse\global\@aftersectionfalse\global\@afterchapterfalse}{}{}
+\makeatother
+% Supervisor(s) metadata
+\addsupervisor{Prof. Dr. Erika Musterfrau}{\InstituteName}{\DepartmentName}{\UniversityDE}
+% Co-supervisor metadata (fill in as required)
+\renewcommand{\CoSupervisorName}{Dr. Max Beispiel}
+\renewcommand{\CoSupervisorInstitute}{Institute of Applied Examples}
+\renewcommand{\CoSupervisorDepartment}{Department of Example Department}
+\renewcommand{\CoSupervisorUniversity}{\UniversityDE}
+
+% TOC helpers (optional, no conflicts with report class)
+\usepackage{tocbasic}
+
+% Front matter helpers for report class builds
+\providecommand{\frontmatter}{\clearpage\pagenumbering{roman}}
+\providecommand{\mainmatter}{\clearpage\pagenumbering{arabic}}
+
+% 
+
+% --- Unicode safety shims (pdflatex) ---
+\usepackage{textcomp} % for \textmu in text, if needed
+\usepackage{siunitx}  % you already load this; keep it
+
+
+% --- Pseudocode ---
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+
+% --- Flowcharts ---
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric}
+
+% Map common pasted Unicode to math macros:
+\DeclareUnicodeCharacter{03BC}{\ensuremath{\mu}}     % μ
+\DeclareUnicodeCharacter{03B7}{\ensuremath{\eta}}    % η
+\DeclareUnicodeCharacter{03B1}{\ensuremath{\alpha}}  % α
+\DeclareUnicodeCharacter{03BB}{\ensuremath{\lambda}} % λ
+\DeclareUnicodeCharacter{00D7}{\ensuremath{\times}}  % ×
+\DeclareUnicodeCharacter{200B}{}                     % zero-width space (ZWSP) -> remove
+% Ignore CJK bracket characters that may appear in pasted text
+\DeclareUnicodeCharacter{3010}{}                     % 【
+\DeclareUnicodeCharacter{3011}{}                     % 】
+
+% Title metadata macros (legacy variables kept for compatibility)
+\newcommand{\thesislanguage}{en-UK}
+\newcommand{\thesistitle}{\ThesisTitle}
+\newcommand{\authorname}{\AuthorPreTitles\AuthorGiven\ \AuthorFamily\AuthorPostTitles}
+% If you prefer the supervisor's name rather than a link, replace the label accordingly.
+\newcommand{\supervisor}{Prof. Dr. Erika Musterfrau}
+% Programme and administrative metadata
+\newcommand{\studentid}{01234567}
+\newcommand{\degreeprogram}{\ProgramName}
+\newcommand{\department}{\InstituteName}
+\newcommand{\place}{\SubmissionCity}
+
+% PDF metadata
+\hypersetup{
+  pdftitle={\thesistitle},
+  pdfauthor={\authorname},
+  pdfkeywords={thesis, template, example}
+}
+
+% (Optional XMP metadata via filecontents removed to avoid group warnings.)
+
+% Metadata
+\usepackage{titling}
+\title{\thesistitle}
+\author{\authorname}
+\date{\today}
+
+%
+
+\begin{document}
+
+% Title page (generated from LaTeX metadata in frontmatter/cover.tex)
+% \includepdf[pages=-]{frontmatter/cover_thesis_template.pdf}
+\input{frontmatter/cover}
+
+% Affidavit and start of front matter
+\input{frontmatter/affidavit}
+
+% Abstracts (English & German)
+\input{frontmatter/abstracts}
+
+\input{frontmatter/acknowledgments}
+
+% (no global caption macros required)
+
+\tableofcontents
+\listoffigures
+\listoftables
+
+% Acronyms list
+\printacronyms[display=all, heading=chapter*, name=Acronyms]
+% Nomenclature (symbols, physical quantities)
+\input{frontmatter/nomenclature}
+
+% Main matter
+\mainmatter
+
+\input{chapters/01-intro}
+% Methods
+\input{chapters/02-methods}
+% Results, Discussion, Conclusion
+\input{chapters/03-results}
+
+% References (BibTeX)
+\clearpage
+% JSS bibliography style
+% Add bibliography to TOC and create a hyperlink target
+\phantomsection
+\addcontentsline{toc}{chapter}{References}
+\bibliographystyle{styles/jss}
+\bibliography{bib/references}
+
+% Appendices
+\appendix
+\input{appendix/A-appendix}
+
+\end{document}

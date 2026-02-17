@@ -3,52 +3,123 @@ import type { BlogPost } from '@/types/contentful.types';
 // Add your blog posts here - just edit this file to add/update posts!
 export const blogPosts: BlogPost[] = [
   {
-    title: "Getting Started with React and TypeScript",
-    slug: "getting-started-react-typescript",
-    excerpt: "Learn how to set up a modern React project with TypeScript, covering the basics of type-safe component development.",
-    content: `# Getting Started with React and TypeScript
+    title: "Getting Started with Master Thesis: How I Set Up My Computational Master's Thesis (LaTeX + VS Code + Python + AI)",
+    slug: "getting-started-masters-thesis-workflow",
+    excerpt: "A friendly, practical setup for a code-heavy thesis: LaTeX, VS Code, Python, reproducible figures, and safe AI usage.",
+    content: `If your thesis is code-heavy, you need a setup that feels calm and predictable.
 
-TypeScript has become an essential tool for React developers. In this post, we'll explore how to set up and use TypeScript in your React projects.
+This is the workflow I use:
 
-## Why TypeScript?
+- one command builds the thesis PDF
+- everything is version-controlled
+- the setup is simple enough to maintain under deadline stress
 
-TypeScript provides:
-- **Type Safety**: Catch errors at compile time
-- **Better IDE Support**: Autocomplete and IntelliSense
-- **Improved Refactoring**: Rename and refactor with confidence
+## Direct downloads
 
-## Setting Up
+- [Download LaTeX starter template (ZIP)](/downloads/thesis-template.zip)
+- [Download starter template PDF](/downloads/thesis-template.pdf)
+- [Download starter presentation PDF](/downloads/thesis-template-presentation.pdf)
 
-First, create a new React + TypeScript project:
+## 1) Minimal setup (with links)
 
-\`\`\`bash
-npm create vite@latest my-app -- --template react-ts
-cd my-app
-npm install
-\`\`\`
+- LaTeX distribution
+  - Windows: [MiKTeX](https://miktex.org/download)
+  - Linux/macOS: [TeX Live](https://www.tug.org/texlive/)
+- Editor: [Visual Studio Code](https://code.visualstudio.com/download)
+- Version control: [Git](https://git-scm.com/downloads)
+- Terminal: PowerShell (built in)
+- Python: [Python 3.11+](https://www.python.org/downloads/)
 
-## Creating Components
+VS Code extensions (LaTeX-focused):
 
-Here's a simple typed component:
+- James-Yu.latex-workshop (required)
 
-\`\`\`tsx
-interface ButtonProps {
-  label: string;
-  onClick: () => void;
-}
+## 2) Verify your LaTeX toolchain early
 
-const Button = ({ label, onClick }: ButtonProps) => {
-  return <button onClick={onClick}>{label}</button>;
-};
-\`\`\`
+Run this first:
 
-## Conclusion
+~~~powershell
+pdflatex --version
+latexmk -v
+bibtex --version
+~~~
 
-TypeScript and React work great together, providing a robust development experience!`,
+If one command fails, fix that before writing chapters.
+
+## 3) Simple folder structure
+
+~~~text
+thesis_template/
+  thesis.tex
+  frontmatter/
+  chapters/
+  appendix/
+  bib/
+  figures/
+  .vscode/
+  latexmkrc
+~~~
+
+This keeps writing, references, and outputs organized without too many moving parts.
+
+## 4) Build commands
+
+Build:
+
+~~~powershell
+latexmk -pdf -interaction=nonstopmode thesis.tex
+~~~
+
+Clean:
+
+~~~powershell
+latexmk -c
+~~~
+
+## 5) Build presentation directly from the thesis
+
+You can create your slides directly from the thesis work instead of starting from scratch.
+
+- reuse thesis figures in slides
+- reuse key tables as summary slides
+- use AI (Claude/Codex) to compress long method/result sections into clear bullet points
+
+Build the presentation in the template:
+
+~~~powershell
+cd presentation
+latexmk -pdf -interaction=nonstopmode presentation.tex
+~~~
+
+## 6) How I use Claude/OpenAI safely
+
+AI helps best with structure and wording, not with facts.
+
+VS Code AI extensions I use:
+
+- Claude
+- Codex
+
+Good use:
+
+- improve outline clarity
+- rewrite paragraphs without changing meaning
+- debug LaTeX errors when you paste exact logs
+
+Never accept blindly:
+
+- references you did not verify
+- claims you did not compute or test
+`,
+    featuredImage: {
+      url: "/images/blog/graduation_cap.png",
+      title: "Graduation cap",
+      description: "Graduation cap icon for thesis workflow post"
+    },
     author: "Mila",
     publishedDate: "2025-02-07T10:00:00.000Z",
-    tags: ["React", "TypeScript", "Tutorial"],
-    category: "Tutorial"
+    tags: ["LaTeX", "VS Code", "Python", "AI", "Thesis", "Workflow"],
+    category: "Guide"
   },
   {
     title: "Building a Personal Portfolio with GitHub Pages",

@@ -1,0 +1,37 @@
+% ---------------------- Cover Page Macro ------------------------------
+\newcommand{\makecoverpage}{%%
+  \begingroup
+  \CoverDefaultFont
+  \thispagestyle{empty}
+  % University logo (left-aligned)
+  \noindent\begin{minipage}{\textwidth}
+    \raggedright
+    \includegraphics[height=3.2cm]{assets/logo.png}
+  \end{minipage}\par\vspace{6mm}
+  \begin{center}
+    {\CoverDefaultFont\fontsize{26pt}{30pt}\selectfont Master Thesis}\\[8mm]
+    {\CoverTitleFont\fontsize{20pt}{24pt}\selectfont\parbox{0.9\textwidth}{\centering \ThesisTitle}}\\[12mm]
+    {\CoverDefaultFont\fontsize{12pt}{14pt}\selectfont submitted by}\\[1mm]
+    {\CoverDefaultFont\fontsize{16pt}{19pt}\selectfont \authorname}\\[6mm]
+    {\CoverDefaultFont\fontsize{12pt}{14pt}\selectfont in the framework of the Master programme}\\[1mm]
+    {\CoverDefaultFont\fontsize{16pt}{19pt}\selectfont \ProgramName}\\[6mm]
+    {\CoverDefaultFont\fontsize{12pt}{14pt}\selectfont in partial fulfilment of the requirements for the academic degree}\\[1mm]
+    {\CoverDefaultFont\fontsize{16pt}{19pt}\selectfont \DegreeName}\\[19pt]
+    {\SubmissionCity, \SubmissionMonth\ \SubmissionYear}\\[16mm]
+    % Supervisor (single column)
+    {\CoverDefaultFont\fontsize{10pt}{12pt}\selectfont
+    \begin{minipage}[t]{0.6\textwidth}
+      \raggedright
+      Supervisor\\[1mm]
+      \let\bfseries\mdseries
+      \begin{description}[leftmargin=0pt,labelwidth=0pt,labelsep=0pt,itemsep=0pt,parsep=0pt]
+        \SupervisorList
+      \end{description}
+    \end{minipage}}\\[6mm]
+  \end{center}
+  \endgroup
+  \clearpage
+}
+
+% Render the cover page
+\makecoverpage

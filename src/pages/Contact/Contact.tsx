@@ -111,7 +111,7 @@ const Contact = () => {
               GitHub
             </a>
             <a
-              href="https://linkedin.com/in/yourusername"
+              href="https://www.linkedin.com/in/mila-lettmayer/"
               target="_blank"
               rel="noopener noreferrer"
               className={styles.socialLink}

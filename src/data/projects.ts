@@ -1,30 +1,43 @@
 import type { Project } from '@/types/contentful.types';
 
-// Add your projects here - just edit this file to add/update projects!
+// Portfolio projects shown on the home and projects pages.
 export const projects: Project[] = [
   {
-    title: "React Portfolio Website",
-    slug: "react-portfolio",
-    description: "A modern, interactive personal portfolio built with React, TypeScript, and Vite. Features multi-page routing, responsive design, and automated deployment.",
-    technologies: ["React", "TypeScript", "Vite", "CSS Modules"],
-    githubUrl: "https://github.com/mila-maya/mila-maya.github.io",
-    liveUrl: "https://mila-maya.github.io",
+    title: 'Automated Taylorgram Processing for Nanoparticle Size Characterization',
+    slug: 'automated-taylorgram-processing',
+    description:
+      'Master thesis project at BOKU and RNAnalytics: automated Taylor dispersion analysis with peak detection, multi-Gaussian fitting, diameter estimation, and validity checks for robust nanoparticle sizing.',
+    technologies: [
+      'Python',
+      'Taylor Dispersion Analysis',
+      'Signal Processing',
+      'Data Validation',
+      'Scientific Computing'
+    ],
     displayOrder: 1
   },
   {
-    title: "Example Project 2",
-    slug: "example-project-2",
-    description: "This is a placeholder for your second project. Replace this with your actual project description.",
-    technologies: ["JavaScript", "Node.js", "Express"],
-    githubUrl: "https://github.com/yourusername/project",
+    title: 'Scientific Analysis Workflow for RNAnalytics Platform',
+    slug: 'rnanalytics-scientific-analysis-workflow',
+    description:
+      'Production workflow combining Python analysis services, Dash evaluation UI, automated QC checks, and Django + React cloud platform integration for batch processing and standardized reporting.',
+    technologies: ['Python', 'Dash', 'Django', 'React', 'REST APIs', 'GitHub'],
     displayOrder: 2
   },
   {
-    title: "Example Project 3",
-    slug: "example-project-3",
-    description: "Another example project. You can add as many projects as you want by adding more objects to this array.",
-    technologies: ["Python", "Django", "PostgreSQL"],
-    liveUrl: "https://example.com",
+    title: 'Bioinformatic Toolbox',
+    slug: 'bioinformatic-toolbox',
+    description:
+      'Flask + SQLite web app for sequence and protein workflows: NCBI search, nucleotide translation, structure prediction via ESM Atlas API, and PDB exploration with exportable outputs.',
+    technologies: ['Python', 'Flask', 'SQLite', 'HTML', 'CSS', 'NCBI API'],
     displayOrder: 3
+  },
+  {
+    title: 'From Nucleotide Sequence to Protein (CS50P Final Project)',
+    slug: 'from-nucleotide-sequence-to-protein',
+    description:
+      'Command-line Python tool that detects potential coding regions, translates nucleotide sequences, and optionally matches candidate proteins against NCBI references.',
+    technologies: ['Python', 'CLI', 'Bioinformatics'],
+    displayOrder: 4
   }
 ];

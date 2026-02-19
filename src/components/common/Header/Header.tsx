@@ -7,7 +7,9 @@ const Header = () => {
       <div className={styles.container}>
         <div className={styles.headerContent}>
           <h1 className={styles.title}>Mila</h1>
-          <p className={styles.subtitle}>Software Engineer | Open Source Enthusiast | Blogger</p>
+          <p className={styles.subtitle}>
+            Scientific Software Engineer | Bioinformatics | ML and AI Development
+          </p>
           <nav className={styles.nav}>
             <NavLink
               to="/"

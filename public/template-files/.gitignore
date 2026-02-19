@@ -1,0 +1,30 @@
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.lof
+*.lot
+*.out
+*.synctex.gz
+*.toc
+*.xmpdata
+*.nav
+*.snm
+
+# PDF output (can regenerate)
+*.pdf
+
+# macOS
+.DS_Store
+*.swp
+*.swo
+
+# IDE
+.vscode/
+.idea/
+
+# Zone identifier files
+*.Zone.Identifier

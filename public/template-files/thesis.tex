@@ -2,9 +2,9 @@
 \documentclass[12pt,a4paper]{report}
 
 % Acronyms maintained in frontmatter/acronyms.tex 
-% Allow building from repo root or thesis_template/ dir
+% Allow building from repo root, thesis-template/ dir, or content/thesis-template/ dir
 \makeatletter
-\def\input@path{{./}{thesis_template/}{thesis_template/frontmatter/}{frontmatter/}{thesis_template/chapters/}{chapters/}{thesis_template/appendix/}{appendix/}{thesis_template/tables/}{tables/}}
+\def\input@path{{./}{thesis-template/}{thesis-template/frontmatter/}{thesis-template/chapters/}{thesis-template/appendix/}{thesis-template/tables/}{content/thesis-template/}{content/thesis-template/frontmatter/}{frontmatter/}{content/thesis-template/chapters/}{chapters/}{content/thesis-template/appendix/}{appendix/}{content/thesis-template/tables/}{tables/}}
 \makeatother
 
 % Encoding and fonts
@@ -84,7 +84,7 @@
 \usepackage{graphicx}
 \usepackage{float} % for H placement (exact figure location)
 % Graphics search paths
-\graphicspath{{./}{thesis_template/}{thesis_template/figures/}{figures/}{thesis_template/assets/}{assets/}}
+\graphicspath{{./}{thesis-template/}{thesis-template/figures/}{thesis-template/assets/}{content/thesis-template/}{content/thesis-template/figures/}{figures/}{content/thesis-template/assets/}{assets/}}
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{siunitx}

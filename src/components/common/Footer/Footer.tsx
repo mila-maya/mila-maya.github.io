@@ -6,7 +6,7 @@ const Footer = () => {
   return (
     <footer className={styles.footer}>
       <div className={styles.container}>
-        <p className={styles.copyright}>© {currentYear} Mila. All rights reserved.</p>
+        <p className={styles.copyright}>(c) {currentYear} Mila. All rights reserved.</p>
         <div className={styles.links}>
           <a
             href="https://github.com/mila-maya"
@@ -17,20 +17,12 @@ const Footer = () => {
             GitHub
           </a>
           <a
-            href="https://linkedin.com/in/yourusername"
+            href="https://www.linkedin.com/in/mila-lettmayer/"
             target="_blank"
             rel="noopener noreferrer"
             className={styles.link}
           >
             LinkedIn
-          </a>
-          <a
-            href="https://twitter.com/yourusername"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.link}
-          >
-            Twitter
           </a>
         </div>
       </div>

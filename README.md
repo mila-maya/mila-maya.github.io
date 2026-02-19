@@ -180,6 +180,8 @@ npm run dev      # Start development server
 npm run build    # Build for production
 npm run preview  # Preview production build locally
 npm run lint     # Run ESLint
+npm run sync:thesis        # Sync thesis source to public assets (skip missing PDFs)
+npm run sync:thesis:strict # Same sync, but requires compiled thesis PDFs in source
 ```
 
 ## 💡 Tips

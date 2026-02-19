@@ -15,9 +15,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
           className={styles.image}
         />
       ) : (
-        <div className={styles.imagePlaceholder}>
-          {project.title.charAt(0)}
-        </div>
+        <div className={styles.imagePlaceholder}>{project.title.charAt(0)}</div>
       )}
 
       <h3 className={styles.title}>{project.title}</h3>
@@ -41,7 +39,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
             rel="noopener noreferrer"
             className={styles.link}
           >
-            View on GitHub →
+            View on GitHub {'->'}
           </a>
         )}
         {project.liveUrl && (
@@ -51,7 +49,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
             rel="noopener noreferrer"
             className={styles.link}
           >
-            Live Demo →
+            Live Demo {'->'}
           </a>
         )}
       </div>

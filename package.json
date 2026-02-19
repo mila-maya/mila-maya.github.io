@@ -5,9 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "npm run sync:thesis && tsc && vite build",
     "preview": "vite preview",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "sync:thesis": "node scripts/sync-thesis-template.mjs --skip-pdfs",
+    "sync:thesis:strict": "node scripts/sync-thesis-template.mjs"
   },
   "dependencies": {
     "contentful": "^11.10.3",

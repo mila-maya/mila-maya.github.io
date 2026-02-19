@@ -19,7 +19,7 @@ This is that guide. One command builds the PDF, everything is version-controlled
 ## 1) What you need
 
 - **LaTeX distribution** - Windows: [MiKTeX](https://miktex.org/download) / Linux & macOS: [TeX Live](https://www.tug.org/texlive/)
-- **Editor** - [Visual Studio Code](https://code.visualstudio.com/download)
+- **Editor** - [Visual Studio Code](https://code.visualstudio.com/download) or [Windsurf](https://codeium.com/windsurf)
 - **Version control** - [Git](https://git-scm.com/downloads)
 - **VS Code extension** - James-Yu.latex-workshop
 
@@ -39,6 +39,12 @@ If one fails, fix it now. Then build your thesis:
 latexmk -pdf -interaction=nonstopmode thesis.tex
 ~~~
 
+Build the presentation:
+
+~~~powershell
+cd presentation && latexmk -pdf -interaction=nonstopmode presentation.tex && cd ..
+~~~
+
 Clean up build artifacts: \`latexmk -c\`
 
 ## 3) Folder structure
@@ -52,31 +58,18 @@ Clean up build artifacts: \`latexmk -c\`
 - presentation/ — [presentation.tex](/template-files/presentation/presentation.tex)
 - [Makefile](/template-files/Makefile)
 
-## 4) Build your presentation from the thesis
+## 4) Using AI
 
-No need to start slides from scratch - reuse what you already have:
+- **ChatGPT Projects** — uploaded literature papers to summarize key points, find gaps, and consult with the literature while writing
+- **Codex in VS Code** — fixing LaTeX errors, organizing files, and building the presentation from thesis figures, tables, and content
+- **Claude in VS Code** — rewriting and summarizing text in a fluent, friendly tone
+- **Claude in Windsurf** — improving structure, removing repetition, and making content leaner
 
-- thesis figures go directly into slides
-- key tables become summary slides
-- AI tools help compress long sections into bullet points
+The editor-based tools — Codex and Claude — see your entire project, not just a single file or snippet. For rewriting, I preferred Claude over ChatGPT. ChatGPT tends to produce stiff, bullet-heavy text, while Claude reads more naturally.
 
-~~~powershell
-cd presentation
-latexmk -pdf -interaction=nonstopmode presentation.tex
-~~~
+For the presentation, I let Codex generate slides directly from thesis content — figures, tables, and key points. No need to start from scratch.
 
-## 5) Using AI
-
-I use Claude and Codex in VS Code. They're genuinely helpful for:
-
-- improving outline clarity
-- rewriting paragraphs without changing meaning
-- debugging LaTeX errors directly in your editor
-
-A few things I learned the hard way:
-
-- AI-generated references look real but often don't exist — always verify
-- It's tempting to accept a nicely worded paragraph, but check the claims behind it too
+One thing to watch out for: AI will confidently make up references and citations. Always verify.
 
 Good luck with your thesis.
 `,

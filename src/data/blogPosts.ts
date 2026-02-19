@@ -23,8 +23,6 @@ This is that guide. One command builds the PDF, everything is version-controlled
 - **Version control** - [Git](https://git-scm.com/downloads)
 - **VS Code extension** - James-Yu.latex-workshop
 
-## 2) Verify and build
-
 Make sure these all return a version number:
 
 ~~~powershell
@@ -33,7 +31,20 @@ latexmk -v
 bibtex --version
 ~~~
 
-If one fails, fix it now. Then build your thesis:
+## 2) Folder structure
+
+- [thesis.tex](/template-files/thesis.tex)
+- frontmatter/ — [cover.tex](/template-files/frontmatter/cover.tex), [abstracts.tex](/template-files/frontmatter/abstracts.tex)
+- chapters/ — [01-intro.tex](/template-files/chapters/01-intro.tex), [02-methods.tex](/template-files/chapters/02-methods.tex), [03-results.tex](/template-files/chapters/03-results.tex)
+- [bib/references.bib](/template-files/bib/references.bib)
+- figures/
+- appendix/
+- presentation/ — [presentation.tex](/template-files/presentation/presentation.tex)
+- [Makefile](/template-files/Makefile)
+
+## 3) Build
+
+Build your thesis:
 
 ~~~powershell
 latexmk -pdf -interaction=nonstopmode thesis.tex
@@ -46,17 +57,6 @@ cd presentation && latexmk -pdf -interaction=nonstopmode presentation.tex && cd 
 ~~~
 
 Clean up build artifacts: \`latexmk -c\`
-
-## 3) Folder structure
-
-- [thesis.tex](/template-files/thesis.tex)
-- frontmatter/ — [cover.tex](/template-files/frontmatter/cover.tex), [abstracts.tex](/template-files/frontmatter/abstracts.tex)
-- chapters/ — [01-intro.tex](/template-files/chapters/01-intro.tex), [02-methods.tex](/template-files/chapters/02-methods.tex), [03-results.tex](/template-files/chapters/03-results.tex)
-- [bib/references.bib](/template-files/bib/references.bib)
-- figures/
-- appendix/
-- presentation/ — [presentation.tex](/template-files/presentation/presentation.tex)
-- [Makefile](/template-files/Makefile)
 
 ## 4) Using AI
 

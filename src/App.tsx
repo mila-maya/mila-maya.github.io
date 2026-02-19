@@ -6,6 +6,7 @@ import Projects from '@pages/Projects/Projects';
 import Blog from '@pages/Blog/Blog';
 import BlogPost from '@pages/Blog/BlogPost';
 import Contact from '@pages/Contact/Contact';
+import BioinformaticToolbox from '@pages/BioinformaticToolbox/BioinformaticToolbox';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/projects" element={<Projects />} />
+          <Route path="/projects/bioinformatic-toolbox" element={<BioinformaticToolbox />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/contact" element={<Contact />} />

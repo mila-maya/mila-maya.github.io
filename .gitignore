@@ -31,3 +31,6 @@ dist-ssr
 # Build output
 dist/
 build/
+
+# Local project workspace
+project/

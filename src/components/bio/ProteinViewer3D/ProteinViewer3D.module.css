@@ -1,0 +1,28 @@
+.wrapper {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.viewer {
+  width: 100%;
+  min-height: 240px;
+  border: 1px solid #bfd0dc;
+  border-radius: var(--border-radius-sm);
+  background: #ffffff;
+  overflow: hidden;
+  position: relative;
+}
+
+.info {
+  color: var(--text-light);
+  font-size: 0.85rem;
+}
+
+.error {
+  color: #b00020;
+  background: #ffe9ec;
+  border: 1px solid #ffbdc8;
+  border-radius: var(--border-radius-sm);
+  padding: 0.35rem 0.5rem;
+  font-size: 0.85rem;
+}

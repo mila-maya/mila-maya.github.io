@@ -10,9 +10,25 @@
   flex-direction: column;
 }
 
+.clickableCard {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
 .card:hover {
   transform: translateY(-5px);
   box-shadow: var(--shadow-md);
+}
+
+.clickableCard:hover {
+  color: inherit;
+  text-decoration: none;
+}
+
+.clickableCard:focus-visible {
+  outline: 3px solid rgba(0, 122, 204, 0.45);
+  outline-offset: 3px;
 }
 
 .image {

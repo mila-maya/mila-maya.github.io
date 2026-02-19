@@ -21,6 +21,8 @@ export interface Project {
   technologies: string[];
   githubUrl?: string;
   liveUrl?: string;
+  cardUrl?: string;
+  hideLinks?: boolean;
   featuredImage?: {
     url: string;
     title: string;

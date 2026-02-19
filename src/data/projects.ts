@@ -28,8 +28,10 @@ export const projects: Project[] = [
     title: 'Bioinformatic Toolbox',
     slug: 'bioinformatic-toolbox',
     description:
-      'Flask + SQLite web app for sequence and protein workflows: NCBI search, nucleotide translation, structure prediction via ESM Atlas API, and PDB exploration with exportable outputs.',
-    technologies: ['Python', 'Flask', 'SQLite', 'HTML', 'CSS', 'NCBI API'],
+      'React one-page migration of the original Flask app: NCBI search, nucleotide translation, ESMFold prediction, and PDB retrieval with browser-based history and file exports.',
+    technologies: ['React', 'TypeScript', 'Vite', 'Web APIs', 'Bioinformatics'],
+    cardUrl: '/projects/bioinformatic-toolbox',
+    hideLinks: true,
     displayOrder: 3
   },
   {

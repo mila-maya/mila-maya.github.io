@@ -3,6 +3,41 @@
   gap: 0.45rem;
 }
 
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.toolbarLabel {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-light);
+}
+
+.styleButton,
+.styleButtonActive {
+  border: 1px solid #bfd0dc;
+  border-radius: var(--border-radius-sm);
+  padding: 0.24rem 0.52rem;
+  background: #fff;
+  color: var(--text-color);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.styleButton:hover {
+  background: #f4f8fb;
+}
+
+.styleButtonActive {
+  background: #0d4f7e;
+  border-color: #0d4f7e;
+  color: #fff;
+}
+
 .viewer {
   width: 100%;
   min-height: 240px;

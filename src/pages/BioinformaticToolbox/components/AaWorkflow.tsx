@@ -40,7 +40,7 @@ const AaWorkflow = () => {
       setStages({ prediction: 'done' });
 
       const seqPreview = validatedProtein.slice(0, 30) + (validatedProtein.length > 30 ? '...' : '');
-      addEntry(seqPreview, `${validatedProtein.length} aa`, { sequence: validatedProtein });
+      addEntry(seqPreview, `${validatedProtein.length} aa`, { sequence: validatedProtein, predictedPdb: pdb });
     } catch (predictionError) {
       const message = predictionError instanceof Error ? predictionError.message : 'Prediction failed.';
       setError(message);
@@ -69,8 +69,14 @@ const AaWorkflow = () => {
 
   const handleHistorySelect = useCallback((entry: HistoryEntry) => {
     const sequence = entry.data.sequence as string;
+    const savedPdb = entry.data.predictedPdb as string | undefined;
     if (sequence) {
       setAaInput(sequence);
+    }
+    if (savedPdb) {
+      setPredictedPdb(savedPdb);
+      setStages({ prediction: 'done' });
+      setError(null);
     }
   }, []);
 

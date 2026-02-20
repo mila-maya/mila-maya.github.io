@@ -135,7 +135,23 @@ const NcbiWorkflow = () => {
       addEntry(
         ncbi.accession,
         `${selected.label} (${selected.length} aa)`,
-        { accession: ncbi.accession }
+        {
+          accession: ncbi.accession,
+          pipeline: {
+            sourceLabel: `NCBI ${ncbi.accession}`,
+            ncbi,
+            nucleotideSequence: analysis.sequence,
+            nucleotideType: analysis.type,
+            rnaSequence,
+            candidates,
+            candidateBaseProtein: selected.sequence,
+            selectedCandidateId: selected.id,
+            selectedProtein: selected.sequence,
+            predictedPdb,
+            structureSource: 'esmfold',
+            structureSourceLabel: 'ESMFold prediction (NCBI annotated protein)'
+          }
+        }
       );
     } catch (workflowError) {
       const message = workflowError instanceof Error ? workflowError.message : 'Workflow failed.';
@@ -205,9 +221,12 @@ const NcbiWorkflow = () => {
   }, [pipeline?.predictedPdb, pipeline?.structureSource]);
 
   const handleHistorySelect = useCallback((entry: HistoryEntry) => {
-    const accession = entry.data.accession as string;
-    if (accession) {
-      setAccessionInput(accession);
+    const savedPipeline = entry.data.pipeline as NcbiPipelineData | undefined;
+    if (savedPipeline) {
+      setPipeline(savedPipeline);
+      setAccessionInput(savedPipeline.ncbi.accession);
+      setStages({ source: 'done', prediction: savedPipeline.predictedPdb ? 'done' : 'idle' });
+      setError(null);
     }
   }, []);
 

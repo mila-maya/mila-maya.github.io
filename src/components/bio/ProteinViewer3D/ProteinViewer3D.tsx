@@ -22,6 +22,8 @@ interface ProteinViewer3DProps {
   spin?: boolean;
 }
 
+type ViewerStyle = 'current' | 'sticks';
+
 const THREE_DMOL_SCRIPT = 'https://3Dmol.org/build/3Dmol-min.js';
 let scriptLoadPromise: Promise<void> | null = null;
 
@@ -81,6 +83,7 @@ const ProteinViewer3D = ({
   const viewerRef = useRef<any | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [viewerStyle, setViewerStyle] = useState<ViewerStyle>('current');
 
   useEffect(() => {
     let cancelled = false;
@@ -116,20 +119,28 @@ const ProteinViewer3D = ({
           throw new Error('No atoms parsed from PDB data.');
         }
 
-        // Match the original Flask viewer: rainbow cartoon + semi-transparent white surface.
-        viewer.setStyle({}, {
-          cartoon: { color: 'spectrum', colorscheme: 'spectrum' }
-        });
+        if (viewerStyle === 'sticks') {
+          // Older React style: cartoon + sticks, without the semi-transparent surface.
+          viewer.setStyle({}, {
+            cartoon: { colorscheme: 'spectrum' },
+            stick: { radius: 0.18 }
+          });
+        } else {
+          // Current style: Flask-like rainbow cartoon + semi-transparent white surface.
+          viewer.setStyle({}, {
+            cartoon: { color: 'spectrum', colorscheme: 'spectrum' }
+          });
 
-        const surfaceType = window.$3Dmol?.SurfaceType?.SAS ?? window.$3Dmol?.SurfaceType?.VDW;
-        if (surfaceType !== undefined) {
-          try {
-            viewer.addSurface(surfaceType, {
-              opacity: 0.7,
-              color: 'white'
-            });
-          } catch {
-            // Surface generation can fail on some large structures; keep cartoon rendering.
+          const surfaceType = window.$3Dmol?.SurfaceType?.SAS ?? window.$3Dmol?.SurfaceType?.VDW;
+          if (surfaceType !== undefined) {
+            try {
+              viewer.addSurface(surfaceType, {
+                opacity: 0.7,
+                color: 'white'
+              });
+            } catch {
+              // Surface generation can fail on some large structures; keep cartoon rendering.
+            }
           }
         }
 
@@ -192,10 +203,27 @@ const ProteinViewer3D = ({
         containerRef.current.innerHTML = '';
       }
     };
-  }, [pdbData, height, backgroundColor, spin]);
+  }, [pdbData, height, backgroundColor, spin, viewerStyle]);
 
   return (
     <div className={styles.wrapper}>
+      <div className={styles.toolbar}>
+        <span className={styles.toolbarLabel}>Style:</span>
+        <button
+          type="button"
+          className={viewerStyle === 'current' ? styles.styleButtonActive : styles.styleButton}
+          onClick={() => setViewerStyle('current')}
+        >
+          Cartoon
+        </button>
+        <button
+          type="button"
+          className={viewerStyle === 'sticks' ? styles.styleButtonActive : styles.styleButton}
+          onClick={() => setViewerStyle('sticks')}
+        >
+          Sticks
+        </button>
+      </div>
       <div
         ref={containerRef}
         className={styles.viewer}

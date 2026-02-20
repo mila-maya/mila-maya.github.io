@@ -24,7 +24,7 @@ const PdbSearch = () => {
       addEntry(
         result.pdbId.toUpperCase(),
         result.title.slice(0, 50) + (result.title.length > 50 ? '...' : ''),
-        { pdbId: result.pdbId }
+        { pdbId: result.pdbId, pdbResult: result }
       );
     } catch (searchError) {
       const message = searchError instanceof Error ? searchError.message : 'PDB request failed.';
@@ -42,9 +42,11 @@ const PdbSearch = () => {
   }, [pdbResult]);
 
   const handleHistorySelect = useCallback((entry: HistoryEntry) => {
-    const pdbId = entry.data.pdbId as string;
-    if (pdbId) {
-      setPdbInput(pdbId);
+    const savedResult = entry.data.pdbResult as PdbSearchResult | undefined;
+    if (savedResult) {
+      setPdbResult(savedResult);
+      setPdbInput(savedResult.pdbId);
+      setPdbError(null);
     }
   }, []);
 

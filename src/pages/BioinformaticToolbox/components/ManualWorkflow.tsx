@@ -136,12 +136,33 @@ const ManualWorkflow = () => {
       setStages({ source: 'done', translation: 'done', prediction: 'idle' });
 
       if (selected) {
-        await runPrediction(selected.sequence);
+        const validatedProtein = validateProteinSequence(selected.sequence, ESMFOLD_MIN_SEQUENCE_LENGTH);
+        const predictedPdb = await predictProteinStructure(validatedProtein);
+
+        const completePipeline: ManualPipelineData = {
+          sourceLabel: 'Manual sequence',
+          nucleotideType: analysis.type,
+          nucleotideSequence: analysis.sequence,
+          rnaSequence,
+          readingFrames,
+          candidates,
+          candidateBaseProtein: selected.sequence,
+          selectedCandidateId: selected.id,
+          selectedProtein: selected.sequence,
+          selectedMatureFragmentIndex: null,
+          predictedPdb,
+          structureSource: 'esmfold',
+          structureSourceLabel: 'ESMFold prediction (ORF analysis)'
+        };
+
+        setPipeline(completePipeline);
+        setStages({ source: 'done', translation: 'done', prediction: 'done' });
+
         const seqPreview = analysis.sequence.slice(0, 30) + (analysis.sequence.length > 30 ? '...' : '');
         addEntry(
           seqPreview,
           `${candidates.length} ORF(s), ${selected.label}`,
-          { sequence: analysis.sequence, cutoff: proteinCutoff }
+          { pipeline: completePipeline }
         );
       }
     } catch (workflowError) {
@@ -249,13 +270,16 @@ const ManualWorkflow = () => {
   }, [pipeline?.predictedPdb, pipeline?.structureSource]);
 
   const handleHistorySelect = useCallback((entry: HistoryEntry) => {
-    const sequence = entry.data.sequence as string;
-    const cutoff = entry.data.cutoff as number;
-    if (sequence) {
-      setManualNucleotideInput(sequence);
-    }
-    if (cutoff) {
-      setProteinCutoff(cutoff);
+    const savedPipeline = entry.data.pipeline as ManualPipelineData | undefined;
+    if (savedPipeline) {
+      setPipeline(savedPipeline);
+      setManualNucleotideInput(savedPipeline.nucleotideSequence);
+      setStages({
+        source: 'done',
+        translation: 'done',
+        prediction: savedPipeline.predictedPdb ? 'done' : 'idle'
+      });
+      setError(null);
     }
   }, []);
 

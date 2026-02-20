@@ -106,11 +106,66 @@
   gap: 0.72rem;
 }
 
-.workflowSelector {
-  display: flex;
-  gap: 0.55rem;
-  flex-wrap: wrap;
+.tabBar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
   margin-bottom: var(--spacing-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  background: #f4f7fa;
+}
+
+.tab,
+.tabActive {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+  padding: 0.9rem 1rem;
+  border: none;
+  border-right: 1px solid var(--border-color);
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition-fast), box-shadow var(--transition-fast);
+  position: relative;
+}
+
+.tab:last-child,
+.tabActive:last-child {
+  border-right: none;
+}
+
+.tab:hover {
+  background: #eaf1f8;
+}
+
+.tabActive {
+  background: #fff;
+  box-shadow: inset 0 -3px 0 var(--primary-color);
+}
+
+.tabLabel {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.tabActive .tabLabel {
+  color: var(--primary-color);
+}
+
+.tabDescription {
+  font-size: 0.78rem;
+  color: var(--text-light);
+  line-height: 1.35;
+}
+
+.workflowContent {
+  min-height: 200px;
 }
 
 .sourceToggle {
@@ -126,6 +181,7 @@
   padding: 0.44rem 0.7rem;
   font: inherit;
   font-weight: 700;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
 }
 
 .activeSource {
@@ -137,6 +193,11 @@
 .inactiveSource {
   background: #fff;
   color: var(--text-color);
+}
+
+.inactiveSource:hover {
+  background: #f0f5fa;
+  border-color: #a8bfcf;
 }
 
 .fieldGroup {
@@ -183,6 +244,15 @@
   font-weight: 700;
   padding: 0.56rem 0.85rem;
   justify-self: start;
+  transition: background var(--transition-fast), transform 0.1s ease;
+}
+
+.runButton:hover:not(:disabled) {
+  background: #0a3f65;
+}
+
+.runButton:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 .runButton:disabled {
@@ -356,22 +426,6 @@
   cursor: not-allowed;
 }
 
-.note {
-  margin-top: var(--spacing-md);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-sm);
-  background: #fff;
-  padding: var(--spacing-sm);
-}
-
-.note h3 {
-  font-size: 1rem;
-  margin-bottom: 0.3rem;
-}
-
-.note p {
-  color: var(--text-light);
-}
 
 @media (max-width: 900px) {
   .resultsGrid {
@@ -388,11 +442,29 @@
     padding: var(--spacing-xl) var(--spacing-sm);
   }
 
+  .tabBar {
+    grid-template-columns: 1fr;
+  }
+
+  .tab,
+  .tabActive {
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .tab:last-child,
+  .tabActive:last-child {
+    border-bottom: none;
+  }
+
+  .tabActive {
+    box-shadow: inset 3px 0 0 var(--primary-color);
+  }
+
   .hero,
   .workflowCard,
   .panel,
-  .panelWide,
-  .note {
+  .panelWide {
     padding: var(--spacing-sm);
   }
 

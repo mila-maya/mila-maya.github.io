@@ -33,49 +33,56 @@ const PdbSearch = () => {
   }, [pdbResult]);
 
   return (
-    <section className={styles.workflowCard}>
-      <h3>PDB Database Search</h3>
-      <p>Search an existing PDB structure by ID and visualize it here.</p>
-      <form onSubmit={handleSearchPdb} className={styles.form}>
-        <div className={styles.fieldRow}>
-          <div className={styles.fieldGroup}>
-            <label htmlFor="pdb-id">PDB ID</label>
-            <input
-              id="pdb-id"
-              type="text"
-              value={pdbInput}
-              onChange={(event) => setPdbInput(event.target.value)}
-              placeholder="1a7f"
-              required
-            />
+    <>
+      <section className={styles.workflowCard}>
+        <h2>PDB Structure Lookup</h2>
+        <p>Enter a 4-character PDB ID to fetch and visualize its 3D structure from RCSB.</p>
+        <form onSubmit={handleSearchPdb} className={styles.form}>
+          <div className={styles.fieldRow}>
+            <div className={styles.fieldGroup}>
+              <label htmlFor="pdb-id">PDB ID</label>
+              <input
+                id="pdb-id"
+                type="text"
+                value={pdbInput}
+                onChange={(event) => setPdbInput(event.target.value)}
+                placeholder="1a7f"
+                required
+              />
+            </div>
           </div>
-        </div>
-        <button type="submit" className={styles.runButton} disabled={pdbLoading}>
-          {pdbLoading ? 'Searching PDB...' : 'Search PDB'}
-        </button>
-      </form>
-
-      {pdbError && <p className={styles.error}>{pdbError}</p>}
+          <button type="submit" className={styles.runButton} disabled={pdbLoading}>
+            {pdbLoading ? 'Searching PDB...' : 'Search PDB'}
+          </button>
+        </form>
+        {pdbError && <p className={styles.error}>{pdbError}</p>}
+      </section>
 
       {pdbResult && (
-        <>
-          <p><strong>PDB ID:</strong> {pdbResult.pdbId}</p>
-          <p><strong>Title:</strong> {pdbResult.title}</p>
-          <a
-            href={`https://www.rcsb.org/structure/${pdbResult.pdbId}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Open in RCSB
-          </a>
-          <ProteinViewer3D pdbData={pdbResult.pdbText} height={380} />
-          <details className={styles.details}>
-            <summary>Show PDB preview</summary>
-            <pre className={styles.code}>{pdbPreview}</pre>
-          </details>
-        </>
+        <section className={styles.resultsGrid}>
+          <article className={styles.panel}>
+            <h3>Structure Info</h3>
+            <p><strong>PDB ID:</strong> {pdbResult.pdbId}</p>
+            <p><strong>Title:</strong> {pdbResult.title}</p>
+            <a
+              href={`https://www.rcsb.org/structure/${pdbResult.pdbId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Open in RCSB
+            </a>
+          </article>
+          <article className={styles.panel}>
+            <h3>3D Viewer</h3>
+            <ProteinViewer3D pdbData={pdbResult.pdbText} height={380} />
+            <details className={styles.details}>
+              <summary>Show PDB preview</summary>
+              <pre className={styles.code}>{pdbPreview}</pre>
+            </details>
+          </article>
+        </section>
       )}
-    </section>
+    </>
   );
 };
 

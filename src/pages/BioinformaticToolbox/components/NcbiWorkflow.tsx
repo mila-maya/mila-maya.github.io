@@ -1,10 +1,15 @@
 import { FormEvent, useMemo, useState } from 'react';
-import { fetchNcbiSequence } from '@services/bioinformaticsApi';
-import { createSequenceAnalysis } from '@utils/bioinformatics';
+import ProteinViewer3D from '@components/bio/ProteinViewer3D/ProteinViewer3D';
+import { fetchNcbiSequence, predictProteinStructure } from '@services/bioinformaticsApi';
+import {
+  createSequenceAnalysis,
+  extractPlddtStatsFromPdb,
+  validateProteinSequence,
+  ESMFOLD_MIN_SEQUENCE_LENGTH
+} from '@utils/bioinformatics';
 import type { NcbiPipelineData, ProteinCandidate, StageStatus } from '../types';
 import { CANDIDATE_SOURCE_LABEL } from '../types';
 import { buildNcbiAnnotatedCandidates, stageClass } from '../helpers';
-import PredictionPanel from './PredictionPanel';
 import styles from '../BioinformaticToolbox.module.css';
 
 interface NcbiStages {
@@ -38,12 +43,12 @@ const NcbiWorkflow = () => {
       const candidates = buildNcbiAnnotatedCandidates(ncbi);
 
       if (candidates.length === 0) {
-        throw new Error('No annotated protein translation found in this NCBI record. Use manual workflow for ORF analysis.');
+        throw new Error('No annotated protein translation found in this NCBI record. Use the Sequence to Protein workflow for ORF analysis.');
       }
 
       const selected = candidates[0];
 
-      setPipeline({
+      const newPipeline: NcbiPipelineData = {
         sourceLabel: `NCBI ${ncbi.accession}`,
         nucleotideType: analysis.type,
         nucleotideSequence: analysis.sequence,
@@ -56,25 +61,43 @@ const NcbiWorkflow = () => {
         structureSource: null,
         structureSourceLabel: null,
         ncbi
-      });
+      };
 
-      setStages({ source: 'done', prediction: 'idle' });
+      setPipeline(newPipeline);
+      setStages({ source: 'done', prediction: 'running' });
+
+      const validatedProtein = validateProteinSequence(selected.sequence, ESMFOLD_MIN_SEQUENCE_LENGTH);
+      const predictedPdb = await predictProteinStructure(validatedProtein);
+
+      setPipeline((prev) => prev ? {
+        ...prev,
+        predictedPdb,
+        structureSource: 'esmfold',
+        structureSourceLabel: 'ESMFold prediction (NCBI annotated protein)'
+      } : prev);
+      setStages({ source: 'done', prediction: 'done' });
     } catch (workflowError) {
       const message = workflowError instanceof Error ? workflowError.message : 'Workflow failed.';
       setError(message);
-      setStages({ source: 'failed', prediction: 'idle' });
+      setStages((prev) => {
+        if (prev.source === 'running') {
+          return { source: 'failed', prediction: 'idle' };
+        }
+        return { ...prev, prediction: 'failed' };
+      });
     } finally {
       setIsWorkflowRunning(false);
     }
   };
 
-  const selectProteinCandidate = (candidate: ProteinCandidate) => {
-    if (!pipeline) {
+  const selectProteinCandidate = async (candidate: ProteinCandidate) => {
+    if (!pipeline || isBusy) {
       return;
     }
 
     setError(null);
-    setStages((prev) => ({ ...prev, prediction: 'idle' }));
+    setIsWorkflowRunning(true);
+
     setPipeline({
       ...pipeline,
       candidateBaseProtein: candidate.sequence,
@@ -84,6 +107,26 @@ const NcbiWorkflow = () => {
       structureSource: null,
       structureSourceLabel: null
     });
+    setStages((prev) => ({ ...prev, prediction: 'running' }));
+
+    try {
+      const validatedProtein = validateProteinSequence(candidate.sequence, ESMFOLD_MIN_SEQUENCE_LENGTH);
+      const predictedPdb = await predictProteinStructure(validatedProtein);
+
+      setPipeline((prev) => prev ? {
+        ...prev,
+        predictedPdb,
+        structureSource: 'esmfold',
+        structureSourceLabel: 'ESMFold prediction (NCBI annotated protein)'
+      } : prev);
+      setStages((prev) => ({ ...prev, prediction: 'done' }));
+    } catch (predictionError) {
+      const message = predictionError instanceof Error ? predictionError.message : 'Prediction failed.';
+      setError(message);
+      setStages((prev) => ({ ...prev, prediction: 'failed' }));
+    } finally {
+      setIsWorkflowRunning(false);
+    }
   };
 
   const selectedCandidate = useMemo(() => {
@@ -93,7 +136,19 @@ const NcbiWorkflow = () => {
     return pipeline.candidates.find((c) => c.id === pipeline.selectedCandidateId) ?? null;
   }, [pipeline]);
 
-  const predictionKey = pipeline?.selectedCandidateId ?? 'none';
+  const predictedPlddt = useMemo(() => {
+    if (!pipeline?.predictedPdb || pipeline.structureSource !== 'esmfold') {
+      return null;
+    }
+    return extractPlddtStatsFromPdb(pipeline.predictedPdb);
+  }, [pipeline?.predictedPdb, pipeline?.structureSource]);
+
+  const predictedPreview = useMemo(() => {
+    if (!pipeline?.predictedPdb) {
+      return '';
+    }
+    return pipeline.predictedPdb.split(/\r?\n/).slice(0, 24).join('\n');
+  }, [pipeline?.predictedPdb]);
 
   return (
     <>
@@ -101,14 +156,15 @@ const NcbiWorkflow = () => {
         <div className={`${styles.statusItem} ${stageClass(stages.source, styles)}`}>
           1. NCBI Extract
         </div>
-        <div className={styles.arrow}>to</div>
+        <div className={styles.arrow}>&rarr;</div>
         <div className={`${styles.statusItem} ${stageClass(stages.prediction, styles)}`}>
-          2. Structure
+          2. ESMFold Prediction
         </div>
       </section>
 
       <section className={styles.workflowCard}>
-        <h2>NCBI Annotation Workflow</h2>
+        <h2>NCBI Search</h2>
+        <p>Enter an accession number to fetch the annotated protein and automatically predict its 3D structure.</p>
         <form onSubmit={runWorkflow} className={styles.form}>
           <div className={styles.fieldGroup}>
             <label htmlFor="accession">NCBI accession</label>
@@ -122,16 +178,16 @@ const NcbiWorkflow = () => {
             />
           </div>
           <button type="submit" className={styles.runButton} disabled={isBusy}>
-            {isWorkflowRunning ? 'Running workflow...' : 'Run NCBI Workflow'}
+            {isWorkflowRunning ? 'Running...' : 'Fetch & Predict'}
           </button>
         </form>
         {error && <p className={styles.error}>{error}</p>}
       </section>
 
       {pipeline && (
-        <section className={styles.resultsGrid}>
-          <article className={styles.panel}>
-            <h3>NCBI Extract: DNA/RNA/Protein</h3>
+        <>
+          <article className={styles.workflowCard}>
+            <h3>NCBI Record</h3>
             <p>
               <strong>Source:</strong>{' '}
               <a
@@ -142,9 +198,8 @@ const NcbiWorkflow = () => {
                 {pipeline.ncbi.accession}
               </a>
             </p>
-            <p><strong>Detected type:</strong> {pipeline.nucleotideType}</p>
-            <p><strong>Length:</strong> {pipeline.nucleotideSequence.length} nt</p>
-            <p><strong>Extraction mode:</strong> use GenBank/NCBI annotated protein directly (no ORF conversion).</p>
+            <p><strong>Type:</strong> {pipeline.nucleotideType} &middot; <strong>Length:</strong> {pipeline.nucleotideSequence.length} nt</p>
+            {pipeline.ncbi.description && <p><strong>Description:</strong> {pipeline.ncbi.description}</p>}
             {selectedCandidate?.proteinId && (
               <p>
                 <strong>Protein ID:</strong>{' '}
@@ -157,7 +212,6 @@ const NcbiWorkflow = () => {
                 </a>
               </p>
             )}
-            {pipeline.ncbi.description && <p><strong>Description:</strong> {pipeline.ncbi.description}</p>}
 
             {pipeline.candidates.length > 1 && (
               <div className={styles.chips}>
@@ -177,62 +231,63 @@ const NcbiWorkflow = () => {
 
             {selectedCandidate && (
               <div className={styles.candidateMeta}>
-                <p><strong>Protein selected for prediction:</strong> {selectedCandidate.label} ({selectedCandidate.length} aa)</p>
+                <p><strong>Protein:</strong> {selectedCandidate.label} ({selectedCandidate.length} aa)</p>
                 <p><strong>Source:</strong> {CANDIDATE_SOURCE_LABEL[selectedCandidate.source]}</p>
                 {selectedCandidate.gene && <p><strong>Gene:</strong> {selectedCandidate.gene}</p>}
                 {selectedCandidate.product && <p><strong>Product:</strong> {selectedCandidate.product}</p>}
                 {selectedCandidate.cdsLocation && <p><strong>CDS location:</strong> {selectedCandidate.cdsLocation}</p>}
               </div>
             )}
+
             <details className={styles.details}>
-              <summary>Show NCBI sequence outputs</summary>
+              <summary>Show sequences</summary>
               <p><strong>DNA/RNA:</strong></p>
               <pre className={styles.code}>{pipeline.nucleotideSequence}</pre>
               <p><strong>RNA:</strong></p>
               <pre className={styles.code}>{pipeline.rnaSequence}</pre>
-              <p><strong>Protein used for structure prediction:</strong></p>
+              <p><strong>Protein:</strong></p>
               <pre className={styles.code}>{pipeline.selectedProtein}</pre>
             </details>
           </article>
 
-          <PredictionPanel
-            key={predictionKey}
-            selectedProtein={pipeline.selectedProtein}
-            predictedPdb={pipeline.predictedPdb}
-            structureSource={pipeline.structureSource}
-            structureSourceLabel={pipeline.structureSourceLabel}
-            predictionStatus={stages.prediction}
-            isBusy={isBusy}
-            selectedLabel="Use NCBI protein"
-            runningHint="ESMFold prediction is running for the extracted NCBI protein."
-            idleHint="Run ESMFold on the extracted NCBI protein to generate the 3D structure."
-            failedHint="ESMFold prediction failed for the extracted NCBI protein. Retry from this step."
-            sourceLabel="ESMFold prediction (NCBI annotated protein)"
-            panelTitle="Predict Structure (ESMFold)"
-            panelClassName={styles.panel}
-            onPredictionStart={() => {
-              setStages((prev) => ({ ...prev, prediction: 'running' }));
-              setPipeline((prev) => prev ? {
-                ...prev,
-                predictedPdb: null,
-                structureSource: null,
-                structureSourceLabel: null
-              } : prev);
-            }}
-            onPredictionComplete={(pdb, label) => {
-              setPipeline((prev) => prev ? {
-                ...prev,
-                predictedPdb: pdb,
-                structureSource: 'esmfold',
-                structureSourceLabel: label
-              } : prev);
-              setStages((prev) => ({ ...prev, prediction: 'done' }));
-            }}
-            onPredictionFail={() => {
-              setStages((prev) => ({ ...prev, prediction: 'failed' }));
-            }}
-          />
-        </section>
+          <article className={styles.workflowCard}>
+            <h3>3D Structure</h3>
+            {stages.prediction === 'running' && (
+              <p className={styles.stageHint}>ESMFold prediction is running&hellip;</p>
+            )}
+            {stages.prediction === 'failed' && !pipeline.predictedPdb && (
+              <p className={styles.stageHint}>Prediction failed. Select a different candidate or retry.</p>
+            )}
+            {pipeline.predictedPdb && (
+              <>
+                {pipeline.structureSourceLabel && (
+                  <p className={styles.structureSource}>
+                    <strong>Source:</strong> {pipeline.structureSourceLabel}
+                  </p>
+                )}
+                {predictedPlddt && (
+                  <div className={styles.confidenceCard}>
+                    <p><strong>ESMFold confidence (pLDDT)</strong></p>
+                    <p>
+                      Mean: {predictedPlddt.mean.toFixed(1)} | Min: {predictedPlddt.min.toFixed(1)} | Max: {predictedPlddt.max.toFixed(1)}
+                    </p>
+                    <p>
+                      Residues: {predictedPlddt.residueCount} | Atoms: {predictedPlddt.atomCount}
+                    </p>
+                    <p>
+                      {'>=90'}: {predictedPlddt.veryHigh} | 70-89: {predictedPlddt.confident} | 50-69: {predictedPlddt.low} | {'<'}50: {predictedPlddt.veryLow}
+                    </p>
+                  </div>
+                )}
+                <ProteinViewer3D pdbData={pipeline.predictedPdb} height={420} />
+                <details className={styles.details}>
+                  <summary>Show PDB preview</summary>
+                  <pre className={styles.code}>{predictedPreview}</pre>
+                </details>
+              </>
+            )}
+          </article>
+        </>
       )}
     </>
   );

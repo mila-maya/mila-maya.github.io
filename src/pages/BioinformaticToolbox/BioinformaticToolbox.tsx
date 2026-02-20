@@ -7,6 +7,18 @@ import ManualWorkflow from './components/ManualWorkflow';
 import PdbSearch from './components/PdbSearch';
 import styles from './BioinformaticToolbox.module.css';
 
+interface WorkflowTab {
+  id: SourceMode;
+  label: string;
+  description: string;
+}
+
+const WORKFLOW_TABS: WorkflowTab[] = [
+  { id: 'ncbi', label: 'NCBI Search', description: 'Fetch annotated proteins from GenBank records' },
+  { id: 'manual', label: 'Sequence to Protein', description: 'Six-frame ORF scan from raw DNA / RNA' },
+  { id: 'pdb', label: 'PDB Search', description: 'Look up known 3D structures by PDB ID' }
+];
+
 const BioinformaticToolbox = () => {
   const [sourceMode, setSourceMode] = useState<SourceMode>('ncbi');
 
@@ -14,48 +26,42 @@ const BioinformaticToolbox = () => {
     <>
       <SEO
         title="Bioinformatic Toolbox"
-        description="Separated NCBI and manual workflows from sequence source to protein candidates and 3D structure prediction."
+        description="Three independent bioinformatics workflows: NCBI annotation search, manual sequence-to-protein translation, and PDB structure lookup."
       />
 
       <div className={styles.page}>
         <header className={styles.hero}>
-          <p className={styles.kicker}>One Connected Workflow</p>
-          <h1 className={styles.title}>DNA to RNA to Protein to 3D Structure</h1>
+          <p className={styles.kicker}>Bioinformatic Toolbox</p>
+          <h1 className={styles.title}>DNA &rarr; RNA &rarr; Protein &rarr; 3D Structure</h1>
           <p className={styles.subtitle}>
-            NCBI mode is annotation-driven. Manual mode is ORF-driven. The flows are intentionally separated.
+            Three independent workflows for protein analysis — from sequence retrieval to structure prediction.
           </p>
           <Link to="/projects" className={styles.backLink}>
-            Back to Projects
+            &larr; Back to Projects
           </Link>
         </header>
 
-        <div className={styles.workflowSelector}>
-          <button
-            type="button"
-            className={sourceMode === 'ncbi' ? styles.activeSource : styles.inactiveSource}
-            onClick={() => setSourceMode('ncbi')}
-          >
-            NCBI Annotation Workflow
-          </button>
-          <button
-            type="button"
-            className={sourceMode === 'manual' ? styles.activeSource : styles.inactiveSource}
-            onClick={() => setSourceMode('manual')}
-          >
-            Manual ORF Workflow
-          </button>
+        <nav className={styles.tabBar} role="tablist">
+          {WORKFLOW_TABS.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              role="tab"
+              aria-selected={sourceMode === tab.id}
+              className={sourceMode === tab.id ? styles.tabActive : styles.tab}
+              onClick={() => setSourceMode(tab.id)}
+            >
+              <span className={styles.tabLabel}>{tab.label}</span>
+              <span className={styles.tabDescription}>{tab.description}</span>
+            </button>
+          ))}
+        </nav>
+
+        <div className={styles.workflowContent}>
+          {sourceMode === 'ncbi' && <NcbiWorkflow />}
+          {sourceMode === 'manual' && <ManualWorkflow />}
+          {sourceMode === 'pdb' && <PdbSearch />}
         </div>
-
-        {sourceMode === 'ncbi' ? <NcbiWorkflow /> : <ManualWorkflow />}
-
-        <PdbSearch />
-
-        <section className={styles.note}>
-          <h3>Workflow Split</h3>
-          <p>
-            NCBI mode uses only annotated proteins from GenBank/NCBI records. Manual mode uses six-frame ORF analysis from raw DNA/RNA.
-          </p>
-        </section>
       </div>
     </>
   );

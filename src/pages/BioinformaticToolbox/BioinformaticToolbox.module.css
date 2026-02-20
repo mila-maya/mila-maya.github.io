@@ -106,6 +106,13 @@
   gap: 0.72rem;
 }
 
+.workflowSelector {
+  display: flex;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+  margin-bottom: var(--spacing-md);
+}
+
 .sourceToggle {
   display: flex;
   gap: 0.55rem;

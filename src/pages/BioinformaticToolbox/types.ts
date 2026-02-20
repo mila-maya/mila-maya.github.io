@@ -1,7 +1,7 @@
 import type { NcbiSearchResult } from '@services/bioinformaticsApi';
 import type { SequenceType } from '@utils/bioinformatics';
 
-export type SourceMode = 'ncbi' | 'manual' | 'pdb';
+export type SourceMode = 'ncbi' | 'manual' | 'aa' | 'pdb';
 export type StageStatus = 'idle' | 'running' | 'done' | 'failed';
 export type PredictionInputMode = 'selected' | 'custom';
 export type ProteinCandidateSource = 'cds_translation' | 'ncbi_translation' | 'orf_frame';

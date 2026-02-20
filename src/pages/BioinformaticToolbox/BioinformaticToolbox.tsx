@@ -4,6 +4,7 @@ import SEO from '@components/common/SEO/SEO';
 import type { SourceMode } from './types';
 import NcbiWorkflow from './components/NcbiWorkflow';
 import ManualWorkflow from './components/ManualWorkflow';
+import AaWorkflow from './components/AaWorkflow';
 import PdbSearch from './components/PdbSearch';
 import styles from './BioinformaticToolbox.module.css';
 
@@ -16,6 +17,7 @@ interface WorkflowTab {
 const WORKFLOW_TABS: WorkflowTab[] = [
   { id: 'ncbi', label: 'NCBI Search', description: 'Fetch annotated proteins from GenBank records' },
   { id: 'manual', label: 'Sequence to Protein', description: 'Six-frame ORF scan from raw DNA / RNA' },
+  { id: 'aa', label: 'Protein to Structure', description: 'Predict 3D structure from amino acid sequence' },
   { id: 'pdb', label: 'PDB Search', description: 'Look up known 3D structures by PDB ID' }
 ];
 
@@ -60,6 +62,7 @@ const BioinformaticToolbox = () => {
         <div className={styles.workflowContent}>
           {sourceMode === 'ncbi' && <NcbiWorkflow />}
           {sourceMode === 'manual' && <ManualWorkflow />}
+          {sourceMode === 'aa' && <AaWorkflow />}
           {sourceMode === 'pdb' && <PdbSearch />}
         </div>
       </div>

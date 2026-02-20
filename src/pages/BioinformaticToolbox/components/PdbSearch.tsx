@@ -59,28 +59,61 @@ const PdbSearch = () => {
       </section>
 
       {pdbResult && (
-        <section className={styles.resultsGrid}>
-          <article className={styles.panel}>
+        <>
+          <article className={styles.workflowCard}>
             <h3>Structure Info</h3>
-            <p><strong>PDB ID:</strong> {pdbResult.pdbId}</p>
+            <p>
+              <strong>PDB ID:</strong> {pdbResult.pdbId.toUpperCase()} &middot;{' '}
+              <a
+                href={`https://www.rcsb.org/structure/${pdbResult.pdbId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Open in RCSB
+              </a>
+            </p>
             <p><strong>Title:</strong> {pdbResult.title}</p>
-            <a
-              href={`https://www.rcsb.org/structure/${pdbResult.pdbId}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Open in RCSB
-            </a>
+            {pdbResult.classification && (
+              <p><strong>Classification:</strong> {pdbResult.classification}</p>
+            )}
+            {pdbResult.organism && (
+              <p><strong>Organism:</strong> <em>{pdbResult.organism}</em></p>
+            )}
+            {pdbResult.experimentMethod && (
+              <p><strong>Method:</strong> {pdbResult.experimentMethod}</p>
+            )}
+            {pdbResult.resolution && (
+              <p><strong>Resolution:</strong> {pdbResult.resolution}</p>
+            )}
+            {(pdbResult.depositionDate || pdbResult.releaseDate) && (
+              <p>
+                {pdbResult.depositionDate && <><strong>Deposited:</strong> {pdbResult.depositionDate}</>}
+                {pdbResult.depositionDate && pdbResult.releaseDate && ' · '}
+                {pdbResult.releaseDate && <><strong>Released:</strong> {pdbResult.releaseDate}</>}
+              </p>
+            )}
+            {pdbResult.chains.length > 0 && (
+              <details className={styles.details}>
+                <summary>Show amino acid sequences ({pdbResult.chains.length} chain{pdbResult.chains.length > 1 ? 's' : ''})</summary>
+                {pdbResult.chains.map((chain) => (
+                  <div key={chain.chainId}>
+                    <p><strong>Chain {chain.chainId}:</strong> {chain.sequence.length} aa</p>
+                    <pre className={styles.code}>{chain.sequence}</pre>
+                  </div>
+                ))}
+              </details>
+            )}
           </article>
-          <article className={styles.panel}>
+
+          <article className={styles.workflowCard}>
             <h3>3D Viewer</h3>
-            <ProteinViewer3D pdbData={pdbResult.pdbText} height={380} />
+            <ProteinViewer3D pdbData={pdbResult.pdbText} height={420} />
             <details className={styles.details}>
               <summary>Show PDB preview</summary>
               <pre className={styles.code}>{pdbPreview}</pre>
             </details>
           </article>
-        </section>
+        </>
       )}
     </>
   );

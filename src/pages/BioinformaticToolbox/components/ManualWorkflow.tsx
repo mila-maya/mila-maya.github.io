@@ -1,13 +1,17 @@
 import { FormEvent, useMemo, useState } from 'react';
+import ProteinViewer3D from '@components/bio/ProteinViewer3D/ProteinViewer3D';
+import { predictProteinStructure } from '@services/bioinformaticsApi';
 import {
   buildMaturePeptideReport,
   createSequenceAnalysis,
-  generateReadingFrames
+  extractPlddtStatsFromPdb,
+  generateReadingFrames,
+  validateProteinSequence,
+  ESMFOLD_MIN_SEQUENCE_LENGTH
 } from '@utils/bioinformatics';
 import type { ManualPipelineData, ProteinCandidate, StageStatus } from '../types';
 import { CANDIDATE_SOURCE_LABEL } from '../types';
 import { buildManualOrfCandidates, stageClass } from '../helpers';
-import PredictionPanel from './PredictionPanel';
 import styles from '../BioinformaticToolbox.module.css';
 
 interface ManualStages {
@@ -25,6 +29,25 @@ const ManualWorkflow = () => {
   const [isWorkflowRunning, setIsWorkflowRunning] = useState(false);
 
   const isBusy = isWorkflowRunning;
+
+  const runPrediction = async (proteinSequence: string) => {
+    setStages((prev) => ({ ...prev, prediction: 'running' }));
+    try {
+      const validatedProtein = validateProteinSequence(proteinSequence, ESMFOLD_MIN_SEQUENCE_LENGTH);
+      const predictedPdb = await predictProteinStructure(validatedProtein);
+      setPipeline((prev) => prev ? {
+        ...prev,
+        predictedPdb,
+        structureSource: 'esmfold',
+        structureSourceLabel: 'ESMFold prediction (ORF candidate)'
+      } : prev);
+      setStages((prev) => ({ ...prev, prediction: 'done' }));
+    } catch (predictionError) {
+      const message = predictionError instanceof Error ? predictionError.message : 'Prediction failed.';
+      setError(message);
+      setStages((prev) => ({ ...prev, prediction: 'failed' }));
+    }
+  };
 
   const runWorkflow = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -60,15 +83,16 @@ const ManualWorkflow = () => {
       });
 
       setStages({ source: 'done', translation: 'done', prediction: 'idle' });
+
+      if (selected) {
+        await runPrediction(selected.sequence);
+      }
     } catch (workflowError) {
       const message = workflowError instanceof Error ? workflowError.message : 'Workflow failed.';
       setError(message);
       setStages((prev) => {
         if (prev.source === 'running') {
           return { source: 'failed', translation: 'idle', prediction: 'idle' };
-        }
-        if (prev.translation === 'running') {
-          return { ...prev, translation: 'failed', prediction: 'idle' };
         }
         return prev;
       });
@@ -77,13 +101,14 @@ const ManualWorkflow = () => {
     }
   };
 
-  const selectProteinCandidate = (candidate: ProteinCandidate) => {
-    if (!pipeline) {
+  const selectProteinCandidate = async (candidate: ProteinCandidate) => {
+    if (!pipeline || isBusy) {
       return;
     }
 
     setError(null);
-    setStages((prev) => ({ ...prev, prediction: 'idle' }));
+    setIsWorkflowRunning(true);
+
     setPipeline({
       ...pipeline,
       candidateBaseProtein: candidate.sequence,
@@ -94,15 +119,19 @@ const ManualWorkflow = () => {
       structureSource: null,
       structureSourceLabel: null
     });
+
+    await runPrediction(candidate.sequence);
+    setIsWorkflowRunning(false);
   };
 
-  const selectMatureFragment = (fragmentSequence: string, fragmentIndex: number) => {
-    if (!pipeline) {
+  const selectMatureFragment = async (fragmentSequence: string, fragmentIndex: number) => {
+    if (!pipeline || isBusy) {
       return;
     }
 
     setError(null);
-    setStages((prev) => ({ ...prev, prediction: 'idle' }));
+    setIsWorkflowRunning(true);
+
     setPipeline({
       ...pipeline,
       selectedProtein: fragmentSequence,
@@ -111,6 +140,9 @@ const ManualWorkflow = () => {
       structureSource: null,
       structureSourceLabel: null
     });
+
+    await runPrediction(fragmentSequence);
+    setIsWorkflowRunning(false);
   };
 
   const selectedCandidate = useMemo(() => {
@@ -152,26 +184,39 @@ const ManualWorkflow = () => {
     ].join('\n');
   }, [matureReport]);
 
-  const predictionKey = `${pipeline?.selectedCandidateId ?? 'none'}-${pipeline?.selectedMatureFragmentIndex ?? 'base'}`;
+  const predictedPlddt = useMemo(() => {
+    if (!pipeline?.predictedPdb || pipeline.structureSource !== 'esmfold') {
+      return null;
+    }
+    return extractPlddtStatsFromPdb(pipeline.predictedPdb);
+  }, [pipeline?.predictedPdb, pipeline?.structureSource]);
+
+  const predictedPreview = useMemo(() => {
+    if (!pipeline?.predictedPdb) {
+      return '';
+    }
+    return pipeline.predictedPdb.split(/\r?\n/).slice(0, 24).join('\n');
+  }, [pipeline?.predictedPdb]);
 
   return (
     <>
       <section className={styles.statusBar}>
         <div className={`${styles.statusItem} ${stageClass(stages.source, styles)}`}>
-          1. Source
+          1. Parse
         </div>
-        <div className={styles.arrow}>to</div>
+        <div className={styles.arrow}>&rarr;</div>
         <div className={`${styles.statusItem} ${stageClass(stages.translation, styles)}`}>
-          2. Translation
+          2. ORF Scan
         </div>
-        <div className={styles.arrow}>to</div>
+        <div className={styles.arrow}>&rarr;</div>
         <div className={`${styles.statusItem} ${stageClass(stages.prediction, styles)}`}>
-          3. Structure
+          3. ESMFold
         </div>
       </section>
 
       <section className={styles.workflowCard}>
-        <h2>Manual ORF Workflow</h2>
+        <h2>Sequence to Protein</h2>
+        <p>Enter a DNA or RNA sequence to find ORF candidates and predict their 3D structure.</p>
         <form onSubmit={runWorkflow} className={styles.form}>
           <div className={styles.fieldGroup}>
             <label htmlFor="manual-sequence">DNA or RNA sequence</label>
@@ -179,14 +224,14 @@ const ManualWorkflow = () => {
               id="manual-sequence"
               value={manualNucleotideInput}
               onChange={(event) => setManualNucleotideInput(event.target.value)}
-              rows={6}
+              rows={5}
               placeholder="ATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAG"
               required
             />
           </div>
           <div className={styles.fieldRow}>
             <div className={styles.fieldGroup}>
-              <label htmlFor="cutoff">ORF candidate cutoff length</label>
+              <label htmlFor="cutoff">Min ORF length (aa)</label>
               <input
                 id="cutoff"
                 type="number"
@@ -197,22 +242,19 @@ const ManualWorkflow = () => {
             </div>
           </div>
           <button type="submit" className={styles.runButton} disabled={isBusy}>
-            {isWorkflowRunning ? 'Running workflow...' : 'Run Manual Workflow'}
+            {isWorkflowRunning ? 'Running...' : 'Analyze & Predict'}
           </button>
         </form>
         {error && <p className={styles.error}>{error}</p>}
       </section>
 
       {pipeline && (
-        <section className={styles.resultsGrid}>
-          <article className={styles.panel}>
-            <h3>Stage 1 Output: Manual Sequence Context</h3>
-            <p><strong>Source:</strong> {pipeline.sourceLabel}</p>
-            <p><strong>Detected type:</strong> {pipeline.nucleotideType}</p>
-            <p><strong>Length:</strong> {pipeline.nucleotideSequence.length} nt</p>
-            <p><strong>Translation mode:</strong> six-frame ORF scan from manual sequence.</p>
+        <>
+          <article className={styles.workflowCard}>
+            <h3>Sequence Info</h3>
+            <p><strong>Type:</strong> {pipeline.nucleotideType} &middot; <strong>Length:</strong> {pipeline.nucleotideSequence.length} nt</p>
             <details className={styles.details}>
-              <summary>Show manual sequence outputs</summary>
+              <summary>Show sequences</summary>
               <p><strong>DNA/RNA:</strong></p>
               <pre className={styles.code}>{pipeline.nucleotideSequence}</pre>
               <p><strong>RNA:</strong></p>
@@ -228,113 +270,103 @@ const ManualWorkflow = () => {
             </details>
           </article>
 
-          <article className={styles.panel}>
-            <h3>Stage 2 Output: ORF Protein Candidates</h3>
-            <p>
-              {pipeline.candidates.length > 0
-                ? 'Candidates are ranked from manual six-frame ORF analysis.'
-                : 'No protein candidates found for this workflow.'}
-            </p>
-
+          <article className={styles.workflowCard}>
+            <h3>ORF Candidates</h3>
             {pipeline.candidates.length > 0 ? (
-              <div className={styles.chips}>
-                {pipeline.candidates.slice(0, 14).map((candidate) => (
-                  <button
-                    key={candidate.id}
-                    type="button"
-                    className={pipeline.selectedCandidateId === candidate.id ? styles.chipActive : styles.chip}
-                    onClick={() => selectProteinCandidate(candidate)}
-                    disabled={isBusy}
-                  >
-                    {candidate.label} ({candidate.length} aa)
-                  </button>
-                ))}
-              </div>
-            ) : null}
-
-            {selectedCandidate && (
-              <div className={styles.candidateMeta}>
-                <p><strong>Selected source:</strong> {CANDIDATE_SOURCE_LABEL[selectedCandidate.source]}</p>
-                {selectedCandidate.gene && <p><strong>Gene:</strong> {selectedCandidate.gene}</p>}
-                {selectedCandidate.product && <p><strong>Product:</strong> {selectedCandidate.product}</p>}
-                {selectedCandidate.proteinId && <p><strong>Protein ID:</strong> {selectedCandidate.proteinId}</p>}
-                {selectedCandidate.cdsLocation && <p><strong>CDS location:</strong> {selectedCandidate.cdsLocation}</p>}
-                <p><strong>Evidence:</strong> {selectedCandidate.evidence}</p>
-              </div>
-            )}
-
-            {matureFragments.length > 0 && (
               <>
-                <p className={styles.matureLead}>
-                  Mature fragment candidates from selected precursor
-                </p>
+                <p>Select an ORF candidate to predict its structure:</p>
                 <div className={styles.chips}>
-                  {matureFragments.map((fragment, index) => (
+                  {pipeline.candidates.slice(0, 14).map((candidate) => (
                     <button
-                      key={`${index}-${fragment.start}-${fragment.end}`}
+                      key={candidate.id}
                       type="button"
-                      className={pipeline.selectedMatureFragmentIndex === index ? styles.chipMatureActive : styles.chipMature}
-                      onClick={() => selectMatureFragment(fragment.sequence, index)}
+                      className={pipeline.selectedCandidateId === candidate.id ? styles.chipActive : styles.chip}
+                      onClick={() => selectProteinCandidate(candidate)}
                       disabled={isBusy}
                     >
-                      Frag {index + 1} ({fragment.start}-{fragment.end}, {fragment.length} aa)
+                      {candidate.label} ({candidate.length} aa)
                     </button>
                   ))}
                 </div>
+
+                {selectedCandidate && (
+                  <div className={styles.candidateMeta}>
+                    <p><strong>Selected:</strong> {selectedCandidate.label} ({selectedCandidate.length} aa)</p>
+                    <p><strong>Source:</strong> {CANDIDATE_SOURCE_LABEL[selectedCandidate.source]}</p>
+                  </div>
+                )}
+
+                {matureFragments.length > 0 && (
+                  <>
+                    <p className={styles.matureLead}>Mature fragment candidates:</p>
+                    <div className={styles.chips}>
+                      {matureFragments.map((fragment, index) => (
+                        <button
+                          key={`${index}-${fragment.start}-${fragment.end}`}
+                          type="button"
+                          className={pipeline.selectedMatureFragmentIndex === index ? styles.chipMatureActive : styles.chipMature}
+                          onClick={() => selectMatureFragment(fragment.sequence, index)}
+                          disabled={isBusy}
+                        >
+                          Frag {index + 1} ({fragment.length} aa)
+                        </button>
+                      ))}
+                    </div>
+                    <details className={styles.details}>
+                      <summary>Show cleavage report</summary>
+                      <pre className={styles.code}>{cleavageReportPreview}</pre>
+                    </details>
+                  </>
+                )}
+
                 <details className={styles.details}>
-                  <summary>Show cleavage report with coordinates</summary>
-                  <pre className={styles.code}>{cleavageReportPreview}</pre>
+                  <summary>Show selected protein sequence</summary>
+                  <pre className={styles.code}>{pipeline.selectedProtein}</pre>
+                </details>
+              </>
+            ) : (
+              <p>No ORF candidates found above the minimum length threshold.</p>
+            )}
+          </article>
+
+          <article className={styles.workflowCard}>
+            <h3>3D Structure</h3>
+            {stages.prediction === 'running' && (
+              <p className={styles.stageHint}>ESMFold prediction is running&hellip;</p>
+            )}
+            {stages.prediction === 'failed' && !pipeline.predictedPdb && (
+              <p className={styles.stageHint}>Prediction failed. Try a different candidate.</p>
+            )}
+            {pipeline.predictedPdb && (
+              <>
+                {pipeline.structureSourceLabel && (
+                  <p className={styles.structureSource}>
+                    <strong>Source:</strong> {pipeline.structureSourceLabel}
+                  </p>
+                )}
+                {predictedPlddt && (
+                  <div className={styles.confidenceCard}>
+                    <p><strong>ESMFold confidence (pLDDT)</strong></p>
+                    <p>
+                      Mean: {predictedPlddt.mean.toFixed(1)} | Min: {predictedPlddt.min.toFixed(1)} | Max: {predictedPlddt.max.toFixed(1)}
+                    </p>
+                    <p>
+                      Residues: {predictedPlddt.residueCount} | Atoms: {predictedPlddt.atomCount}
+                    </p>
+                    <p>
+                      {'>=90'}: {predictedPlddt.veryHigh} | 70-89: {predictedPlddt.confident} | 50-69: {predictedPlddt.low} | {'<'}50: {predictedPlddt.veryLow}
+                    </p>
+                  </div>
+                )}
+                <ProteinViewer3D pdbData={pipeline.predictedPdb} height={420} />
+                <details className={styles.details}>
+                  <summary>Show PDB preview</summary>
+                  <pre className={styles.code}>{predictedPreview}</pre>
                 </details>
               </>
             )}
-
-            <p><strong>Selected protein for Stage 3:</strong></p>
-            {pipeline.selectedMatureFragmentIndex !== null && (
-              <p className={styles.selectionHint}>
-                Using mature fragment {pipeline.selectedMatureFragmentIndex + 1} from the selected precursor.
-              </p>
-            )}
-            <pre className={styles.code}>{pipeline.selectedProtein}</pre>
           </article>
-
-          <PredictionPanel
-            key={predictionKey}
-            selectedProtein={pipeline.selectedProtein}
-            predictedPdb={pipeline.predictedPdb}
-            structureSource={pipeline.structureSource}
-            structureSourceLabel={pipeline.structureSourceLabel}
-            predictionStatus={stages.prediction}
-            isBusy={isBusy}
-            selectedLabel="Use selected candidate"
-            runningHint="ESMFold prediction is running for the selected protein."
-            idleHint="Run ESMFold on the selected protein to generate the 3D structure."
-            failedHint="ESMFold prediction failed for the selected protein. Retry from this step."
-            sourceLabel="ESMFold prediction (manual ORF candidate)"
-            panelTitle="Stage 3 Output: Predicted 3D Structure"
-            panelClassName={styles.panelWide}
-            onPredictionStart={() => {
-              setStages((prev) => ({ ...prev, prediction: 'running' }));
-              setPipeline((prev) => prev ? {
-                ...prev,
-                predictedPdb: null,
-                structureSource: null,
-                structureSourceLabel: null
-              } : prev);
-            }}
-            onPredictionComplete={(pdb, label) => {
-              setPipeline((prev) => prev ? {
-                ...prev,
-                predictedPdb: pdb,
-                structureSource: 'esmfold',
-                structureSourceLabel: label
-              } : prev);
-              setStages((prev) => ({ ...prev, prediction: 'done' }));
-            }}
-            onPredictionFail={() => {
-              setStages((prev) => ({ ...prev, prediction: 'failed' }));
-            }}
-          />
-        </section>
+        </>
       )}
     </>
   );

@@ -21,10 +21,22 @@ export interface NcbiSearchResult {
   rawGenBank: string;
 }
 
+export interface PdbChainSequence {
+  chainId: string;
+  sequence: string;
+}
+
 export interface PdbSearchResult {
   pdbId: string;
   title: string;
   pdbText: string;
+  organism: string | null;
+  classification: string | null;
+  experimentMethod: string | null;
+  resolution: string | null;
+  releaseDate: string | null;
+  depositionDate: string | null;
+  chains: PdbChainSequence[];
 }
 
 export interface ClosestPdbStructureResult extends PdbSearchResult {
@@ -278,6 +290,91 @@ function parsePdbTitle(pdbText: string): string {
   return titleLines.join(' ');
 }
 
+function parsePdbSource(pdbText: string): string | null {
+  const sourceLines = pdbText
+    .split(/\r?\n/)
+    .filter((line) => line.startsWith('SOURCE'));
+  
+  for (const line of sourceLines) {
+    const orgMatch = line.match(/ORGANISM_SCIENTIFIC:\s*([^;]+)/i);
+    if (orgMatch?.[1]) {
+      return orgMatch[1].trim();
+    }
+  }
+  
+  const combinedSource = sourceLines
+    .map((line) => line.slice(10).trim())
+    .join(' ');
+  const orgMatch = combinedSource.match(/ORGANISM_SCIENTIFIC:\s*([^;]+)/i);
+  return orgMatch?.[1]?.trim() ?? null;
+}
+
+function parsePdbClassification(pdbText: string): string | null {
+  const headerLine = pdbText.split(/\r?\n/).find((line) => line.startsWith('HEADER'));
+  if (!headerLine) {
+    return null;
+  }
+  const classification = headerLine.slice(10, 50).trim();
+  return classification || null;
+}
+
+function parsePdbExperiment(pdbText: string): string | null {
+  const expdtaLine = pdbText.split(/\r?\n/).find((line) => line.startsWith('EXPDTA'));
+  if (!expdtaLine) {
+    return null;
+  }
+  return expdtaLine.slice(10).trim() || null;
+}
+
+function parsePdbResolution(pdbText: string): string | null {
+  const lines = pdbText.split(/\r?\n/);
+  for (const line of lines) {
+    if (line.startsWith('REMARK   2 RESOLUTION.')) {
+      const match = line.match(/RESOLUTION\.\s+([\d.]+)\s+ANGSTROMS/);
+      if (match?.[1]) {
+        return `${match[1]} Å`;
+      }
+    }
+  }
+  return null;
+}
+
+function parsePdbSeqres(pdbText: string): PdbChainSequence[] {
+  const seqresLines = pdbText
+    .split(/\r?\n/)
+    .filter((line) => line.startsWith('SEQRES'));
+  
+  const chainMap = new Map<string, string[]>();
+  
+  for (const line of seqresLines) {
+    const chainId = line.slice(11, 12).trim() || 'A';
+    const residues = line.slice(19).trim().split(/\s+/);
+    
+    if (!chainMap.has(chainId)) {
+      chainMap.set(chainId, []);
+    }
+    chainMap.get(chainId)!.push(...residues);
+  }
+  
+  const threeToOne: Record<string, string> = {
+    ALA: 'A', ARG: 'R', ASN: 'N', ASP: 'D', CYS: 'C',
+    GLN: 'Q', GLU: 'E', GLY: 'G', HIS: 'H', ILE: 'I',
+    LEU: 'L', LYS: 'K', MET: 'M', PHE: 'F', PRO: 'P',
+    SER: 'S', THR: 'T', TRP: 'W', TYR: 'Y', VAL: 'V',
+    SEC: 'U', PYL: 'O'
+  };
+  
+  const chains: PdbChainSequence[] = [];
+  for (const [chainId, residues] of chainMap) {
+    const sequence = residues
+      .map((r) => threeToOne[r.toUpperCase()] ?? 'X')
+      .join('');
+    chains.push({ chainId, sequence });
+  }
+  
+  return chains;
+}
+
 export async function fetchNcbiSequence(accessionId: string): Promise<NcbiSearchResult> {
   const sequenceId = accessionId.trim();
 
@@ -316,6 +413,27 @@ export async function fetchNcbiSequence(accessionId: string): Promise<NcbiSearch
   };
 }
 
+interface RcsbEntryResponse {
+  rcsb_id?: string;
+  struct?: { title?: string };
+  rcsb_accession_info?: {
+    deposit_date?: string;
+    initial_release_date?: string;
+  };
+  exptl?: Array<{ method?: string }>;
+  rcsb_entry_info?: {
+    resolution_combined?: number[];
+  };
+  polymer_entities?: Array<{
+    rcsb_polymer_entity?: {
+      pdbx_description?: string;
+    };
+    rcsb_entity_source_organism?: Array<{
+      ncbi_scientific_name?: string;
+    }>;
+  }>;
+}
+
 export async function fetchPdbStructure(pdbIdRaw: string): Promise<PdbSearchResult> {
   const pdbId = pdbIdRaw.trim().toLowerCase();
 
@@ -323,18 +441,62 @@ export async function fetchPdbStructure(pdbIdRaw: string): Promise<PdbSearchResu
     throw new Error('Provide a 4-character alphanumeric PDB ID.');
   }
 
-  const response = await fetchWithTimeout(`https://files.rcsb.org/download/${pdbId}.pdb`);
+  const [pdbResponse, metaResponse] = await Promise.all([
+    fetchWithTimeout(`https://files.rcsb.org/download/${pdbId}.pdb`),
+    fetchWithTimeout(`https://data.rcsb.org/rest/v1/core/entry/${pdbId}`).catch(() => null)
+  ]);
 
-  if (!response.ok) {
+  if (!pdbResponse.ok) {
     throw new Error('Provided protein ID was not found in the PDB database.');
   }
 
-  const pdbText = await response.text();
+  const pdbText = await pdbResponse.text();
+  const chains = parsePdbSeqres(pdbText);
+  
+  let organism: string | null = parsePdbSource(pdbText);
+  let releaseDate: string | null = null;
+  let depositionDate: string | null = null;
+  let experimentMethod: string | null = parsePdbExperiment(pdbText);
+  let resolution: string | null = parsePdbResolution(pdbText);
+  
+  if (metaResponse?.ok) {
+    try {
+      const meta = await metaResponse.json() as RcsbEntryResponse;
+      
+      if (!organism && meta.polymer_entities?.[0]?.rcsb_entity_source_organism?.[0]?.ncbi_scientific_name) {
+        organism = meta.polymer_entities[0].rcsb_entity_source_organism[0].ncbi_scientific_name;
+      }
+      
+      if (meta.rcsb_accession_info?.initial_release_date) {
+        releaseDate = meta.rcsb_accession_info.initial_release_date.split('T')[0];
+      }
+      if (meta.rcsb_accession_info?.deposit_date) {
+        depositionDate = meta.rcsb_accession_info.deposit_date.split('T')[0];
+      }
+      
+      if (meta.exptl?.[0]?.method) {
+        experimentMethod = meta.exptl[0].method;
+      }
+      
+      if (meta.rcsb_entry_info?.resolution_combined?.[0]) {
+        resolution = `${meta.rcsb_entry_info.resolution_combined[0].toFixed(2)} Å`;
+      }
+    } catch {
+      // Metadata fetch failed, use PDB-parsed values
+    }
+  }
 
   return {
     pdbId,
     title: parsePdbTitle(pdbText),
-    pdbText
+    pdbText,
+    organism,
+    classification: parsePdbClassification(pdbText),
+    experimentMethod,
+    resolution,
+    releaseDate,
+    depositionDate,
+    chains
   };
 }
 

@@ -181,6 +181,205 @@ export function proteinsFromReadingFrames(frames: string[], minLength = 50): str
   return proteins.sort((a, b) => b.length - a.length);
 }
 
+const DIBASIC_CLEAVAGE_PATTERN = /(?:RR|KR|RK|KK)+/;
+
+export interface CleavageSite {
+  motif: string;
+  start: number;
+  end: number;
+}
+
+export interface MaturePeptideFragment {
+  sequence: string;
+  start: number;
+  end: number;
+  length: number;
+  precedingCleavage: string | null;
+  followingCleavage: string | null;
+}
+
+export interface MaturePeptideReport {
+  precursorLength: number;
+  rule: string;
+  cleavageSites: CleavageSite[];
+  fragments: MaturePeptideFragment[];
+}
+
+export function buildMaturePeptideReport(rawProteinSequence: string, minLength = 8): MaturePeptideReport {
+  const sequence = normalizeSequence(rawProteinSequence);
+
+  if (!sequence) {
+    return {
+      precursorLength: 0,
+      rule: 'Dibasic cleavage motifs (KR, RR, RK, KK)',
+      cleavageSites: [],
+      fragments: []
+    };
+  }
+
+  const cleavageSites: CleavageSite[] = [];
+  const fragments: MaturePeptideFragment[] = [];
+  const cleavageRegex = new RegExp(DIBASIC_CLEAVAGE_PATTERN.source, 'g');
+
+  let segmentStart = 0;
+  let previousCleavage: string | null = null;
+  let match: RegExpExecArray | null;
+
+  while ((match = cleavageRegex.exec(sequence)) !== null) {
+    const motif = match[0];
+    const cleavageStart = match.index;
+    const cleavageEndExclusive = match.index + motif.length;
+    const fragment = sequence.slice(segmentStart, cleavageStart);
+
+    cleavageSites.push({
+      motif,
+      start: cleavageStart + 1,
+      end: cleavageEndExclusive
+    });
+
+    if (fragment.length >= minLength) {
+      fragments.push({
+        sequence: fragment,
+        start: segmentStart + 1,
+        end: cleavageStart,
+        length: fragment.length,
+        precedingCleavage: previousCleavage,
+        followingCleavage: motif
+      });
+    }
+
+    segmentStart = cleavageEndExclusive;
+    previousCleavage = motif;
+  }
+
+  const terminalFragment = sequence.slice(segmentStart);
+  if (terminalFragment.length >= minLength) {
+    fragments.push({
+      sequence: terminalFragment,
+      start: segmentStart + 1,
+      end: sequence.length,
+      length: terminalFragment.length,
+      precedingCleavage: previousCleavage,
+      followingCleavage: null
+    });
+  }
+
+  return {
+    precursorLength: sequence.length,
+    rule: 'Dibasic cleavage motifs (KR, RR, RK, KK)',
+    cleavageSites,
+    fragments
+  };
+}
+
+export function maturePeptidesFromProprotein(rawProteinSequence: string, minLength = 8): string[] {
+  const report = buildMaturePeptideReport(rawProteinSequence, minLength);
+
+  if (report.cleavageSites.length === 0 || report.fragments.length <= 1) {
+    return [];
+  }
+
+  const uniqueFragments: string[] = [];
+
+  for (const fragment of report.fragments) {
+    if (!uniqueFragments.includes(fragment.sequence)) {
+      uniqueFragments.push(fragment.sequence);
+    }
+  }
+
+  return uniqueFragments;
+}
+
+export interface PlddtStats {
+  atomCount: number;
+  residueCount: number;
+  mean: number;
+  min: number;
+  max: number;
+  veryHigh: number;
+  confident: number;
+  low: number;
+  veryLow: number;
+}
+
+export function extractPlddtStatsFromPdb(pdbText: string): PlddtStats | null {
+  const lines = pdbText.split(/\r?\n/);
+  const residueMap = new Map<string, { sum: number; count: number }>();
+  let atomCount = 0;
+
+  for (const line of lines) {
+    if (!line.startsWith('ATOM')) {
+      continue;
+    }
+
+    const bFactorText = line.slice(60, 66).trim();
+    const bFactor = Number.parseFloat(bFactorText);
+    if (!Number.isFinite(bFactor)) {
+      continue;
+    }
+
+    const chainId = line.slice(21, 22).trim() || '_';
+    const residueNumber = line.slice(22, 26).trim();
+    const insertionCode = line.slice(26, 27).trim();
+    const residueKey = `${chainId}:${residueNumber}:${insertionCode}`;
+
+    const current = residueMap.get(residueKey);
+    if (current) {
+      current.sum += bFactor;
+      current.count += 1;
+    } else {
+      residueMap.set(residueKey, { sum: bFactor, count: 1 });
+    }
+
+    atomCount += 1;
+  }
+
+  if (residueMap.size === 0) {
+    return null;
+  }
+
+  const residueValues = Array.from(residueMap.values()).map((value) => value.sum / value.count);
+  let sum = 0;
+  let min = Number.POSITIVE_INFINITY;
+  let max = Number.NEGATIVE_INFINITY;
+  let veryHigh = 0;
+  let confident = 0;
+  let low = 0;
+  let veryLow = 0;
+
+  for (const score of residueValues) {
+    sum += score;
+    if (score < min) {
+      min = score;
+    }
+    if (score > max) {
+      max = score;
+    }
+
+    if (score >= 90) {
+      veryHigh += 1;
+    } else if (score >= 70) {
+      confident += 1;
+    } else if (score >= 50) {
+      low += 1;
+    } else {
+      veryLow += 1;
+    }
+  }
+
+  return {
+    atomCount,
+    residueCount: residueValues.length,
+    mean: sum / residueValues.length,
+    min,
+    max,
+    veryHigh,
+    confident,
+    low,
+    veryLow
+  };
+}
+
 export function validateProteinSequence(rawSequence: string, minLength = 1): string {
   const sequence = normalizeSequence(rawSequence);
 

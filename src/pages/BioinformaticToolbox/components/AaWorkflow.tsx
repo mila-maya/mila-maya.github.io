@@ -1,11 +1,15 @@
-import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, useCallback, useMemo, useState } from 'react';
 import ProteinViewer3D from '@components/bio/ProteinViewer3D/ProteinViewer3D';
 import { predictProteinStructure } from '@services/bioinformaticsApi';
 import {
+  buildTimestamp,
+  downloadFile,
   extractPlddtStatsFromPdb,
   validateProteinSequence,
   ESMFOLD_MIN_SEQUENCE_LENGTH
 } from '@utils/bioinformatics';
+import { useWorkflowHistory, type HistoryEntry } from '../hooks/useWorkflowHistory';
+import HistoryPanel from './HistoryPanel';
 import type { StageStatus } from '../types';
 import { stageClass } from '../helpers';
 import styles from '../BioinformaticToolbox.module.css';
@@ -20,6 +24,7 @@ const AaWorkflow = () => {
   const [predictedPdb, setPredictedPdb] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isRunning, setIsRunning] = useState(false);
+  const { history, addEntry, removeEntry, clearHistory } = useWorkflowHistory('aa');
 
   const runPrediction = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -33,6 +38,9 @@ const AaWorkflow = () => {
       const pdb = await predictProteinStructure(validatedProtein);
       setPredictedPdb(pdb);
       setStages({ prediction: 'done' });
+
+      const seqPreview = validatedProtein.slice(0, 30) + (validatedProtein.length > 30 ? '...' : '');
+      addEntry(seqPreview, `${validatedProtein.length} aa`, { sequence: validatedProtein });
     } catch (predictionError) {
       const message = predictionError instanceof Error ? predictionError.message : 'Prediction failed.';
       setError(message);
@@ -57,6 +65,49 @@ const AaWorkflow = () => {
   }, [predictedPdb]);
 
   const normalizedLength = aaInput.replace(/\s+/g, '').length;
+  const normalizedSequence = aaInput.replace(/\s+/g, '').toUpperCase();
+
+  const handleHistorySelect = useCallback((entry: HistoryEntry) => {
+    const sequence = entry.data.sequence as string;
+    if (sequence) {
+      setAaInput(sequence);
+    }
+  }, []);
+
+  const handleDownloadReport = useCallback(() => {
+    if (!predictedPdb) return;
+    const lines = [
+      '=== Protein Structure Prediction Report ===',
+      `Generated: ${buildTimestamp()}`,
+      '',
+      '--- Input ---',
+      `Sequence Length: ${normalizedLength} aa`,
+      '',
+      '--- Sequence ---',
+      normalizedSequence,
+      ''
+    ];
+
+    if (predictedPlddt) {
+      lines.push(
+        '--- ESMFold Confidence (pLDDT) ---',
+        `Mean: ${predictedPlddt.mean.toFixed(1)}`,
+        `Min: ${predictedPlddt.min.toFixed(1)}`,
+        `Max: ${predictedPlddt.max.toFixed(1)}`,
+        `Residues: ${predictedPlddt.residueCount}`,
+        `>=90: ${predictedPlddt.veryHigh} | 70-89: ${predictedPlddt.confident} | 50-69: ${predictedPlddt.low} | <50: ${predictedPlddt.veryLow}`,
+        ''
+      );
+    }
+
+    lines.push('--- PDB Structure ---', predictedPdb);
+    downloadFile(lines.join('\n'), `aa_prediction_${Date.now()}.txt`, 'text/plain');
+  }, [predictedPdb, predictedPlddt, normalizedLength, normalizedSequence]);
+
+  const handleDownloadPdb = useCallback(() => {
+    if (!predictedPdb) return;
+    downloadFile(predictedPdb, `aa_structure_${Date.now()}.pdb`, 'chemical/x-pdb');
+  }, [predictedPdb]);
 
   return (
     <>
@@ -111,6 +162,14 @@ const AaWorkflow = () => {
             <summary>Show PDB preview</summary>
             <pre className={styles.code}>{predictedPreview}</pre>
           </details>
+          <div className={styles.downloadBar}>
+            <button type="button" className={styles.secondaryButton} onClick={handleDownloadReport}>
+              Download Report (.txt)
+            </button>
+            <button type="button" className={styles.secondaryButton} onClick={handleDownloadPdb}>
+              Download Structure (.pdb)
+            </button>
+          </div>
         </article>
       )}
 
@@ -120,6 +179,13 @@ const AaWorkflow = () => {
           <p className={styles.stageHint}>ESMFold prediction is running&hellip;</p>
         </article>
       )}
+
+      <HistoryPanel
+        history={history}
+        onSelect={handleHistorySelect}
+        onRemove={removeEntry}
+        onClear={clearHistory}
+      />
     </>
   );
 };

@@ -1,6 +1,9 @@
-import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, useCallback, useMemo, useState } from 'react';
 import ProteinViewer3D from '@components/bio/ProteinViewer3D/ProteinViewer3D';
 import { fetchPdbStructure, type PdbSearchResult } from '@services/bioinformaticsApi';
+import { buildTimestamp, downloadFile } from '@utils/bioinformatics';
+import { useWorkflowHistory, type HistoryEntry } from '../hooks/useWorkflowHistory';
+import HistoryPanel from './HistoryPanel';
 import styles from '../BioinformaticToolbox.module.css';
 
 const PdbSearch = () => {
@@ -8,6 +11,7 @@ const PdbSearch = () => {
   const [pdbResult, setPdbResult] = useState<PdbSearchResult | null>(null);
   const [pdbLoading, setPdbLoading] = useState(false);
   const [pdbError, setPdbError] = useState<string | null>(null);
+  const { history, addEntry, removeEntry, clearHistory } = useWorkflowHistory('pdb');
 
   const handleSearchPdb = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -17,6 +21,11 @@ const PdbSearch = () => {
     try {
       const result = await fetchPdbStructure(pdbInput);
       setPdbResult(result);
+      addEntry(
+        result.pdbId.toUpperCase(),
+        result.title.slice(0, 50) + (result.title.length > 50 ? '...' : ''),
+        { pdbId: result.pdbId }
+      );
     } catch (searchError) {
       const message = searchError instanceof Error ? searchError.message : 'PDB request failed.';
       setPdbError(message);
@@ -30,6 +39,47 @@ const PdbSearch = () => {
       return '';
     }
     return pdbResult.pdbText.split(/\r?\n/).slice(0, 24).join('\n');
+  }, [pdbResult]);
+
+  const handleHistorySelect = useCallback((entry: HistoryEntry) => {
+    const pdbId = entry.data.pdbId as string;
+    if (pdbId) {
+      setPdbInput(pdbId);
+    }
+  }, []);
+
+  const handleDownloadReport = useCallback(() => {
+    if (!pdbResult) return;
+    const lines = [
+      '=== PDB Structure Report ===',
+      `Generated: ${buildTimestamp()}`,
+      '',
+      '--- Structure Info ---',
+      `PDB ID: ${pdbResult.pdbId.toUpperCase()}`,
+      `Title: ${pdbResult.title}`,
+      `Classification: ${pdbResult.classification ?? 'N/A'}`,
+      `Organism: ${pdbResult.organism ?? 'N/A'}`,
+      `Method: ${pdbResult.experimentMethod ?? 'N/A'}`,
+      `Resolution: ${pdbResult.resolution ?? 'N/A'}`,
+      `Deposited: ${pdbResult.depositionDate ?? 'N/A'}`,
+      `Released: ${pdbResult.releaseDate ?? 'N/A'}`,
+      ''
+    ];
+
+    if (pdbResult.chains.length > 0) {
+      lines.push('--- Amino Acid Sequences ---');
+      pdbResult.chains.forEach((chain) => {
+        lines.push(`Chain ${chain.chainId} (${chain.sequence.length} aa):`, chain.sequence, '');
+      });
+    }
+
+    lines.push('--- PDB Structure ---', pdbResult.pdbText);
+    downloadFile(lines.join('\n'), `pdb_${pdbResult.pdbId}_report.txt`, 'text/plain');
+  }, [pdbResult]);
+
+  const handleDownloadPdb = useCallback(() => {
+    if (!pdbResult) return;
+    downloadFile(pdbResult.pdbText, `${pdbResult.pdbId}.pdb`, 'chemical/x-pdb');
   }, [pdbResult]);
 
   return (
@@ -112,9 +162,24 @@ const PdbSearch = () => {
               <summary>Show PDB preview</summary>
               <pre className={styles.code}>{pdbPreview}</pre>
             </details>
+            <div className={styles.downloadBar}>
+              <button type="button" className={styles.secondaryButton} onClick={handleDownloadReport}>
+                Download Report (.txt)
+              </button>
+              <button type="button" className={styles.secondaryButton} onClick={handleDownloadPdb}>
+                Download Structure (.pdb)
+              </button>
+            </div>
           </article>
         </>
       )}
+
+      <HistoryPanel
+        history={history}
+        onSelect={handleHistorySelect}
+        onRemove={removeEntry}
+        onClear={clearHistory}
+      />
     </>
   );
 };

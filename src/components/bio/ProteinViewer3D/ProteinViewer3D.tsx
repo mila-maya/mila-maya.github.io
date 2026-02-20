@@ -5,6 +5,12 @@ declare global {
   interface Window {
     $3Dmol?: {
       createViewer: (element: HTMLElement, config?: Record<string, unknown>) => any;
+      SurfaceType?: {
+        VDW?: unknown;
+        MS?: unknown;
+        SAS?: unknown;
+        SES?: unknown;
+      };
     };
   }
 }
@@ -110,10 +116,23 @@ const ProteinViewer3D = ({
           throw new Error('No atoms parsed from PDB data.');
         }
 
+        // Match the original Flask viewer: rainbow cartoon + semi-transparent white surface.
         viewer.setStyle({}, {
-          cartoon: { colorscheme: 'spectrum' },
-          stick: { radius: 0.18 }
+          cartoon: { color: 'spectrum', colorscheme: 'spectrum' }
         });
+
+        const surfaceType = window.$3Dmol?.SurfaceType?.SAS ?? window.$3Dmol?.SurfaceType?.VDW;
+        if (surfaceType !== undefined) {
+          try {
+            viewer.addSurface(surfaceType, {
+              opacity: 0.7,
+              color: 'white'
+            });
+          } catch {
+            // Surface generation can fail on some large structures; keep cartoon rendering.
+          }
+        }
+
         viewer.zoomTo();
         viewer.render();
         viewer.resize();
@@ -127,7 +146,8 @@ const ProteinViewer3D = ({
           viewerRef.current.render();
 
           if (spin) {
-            viewerRef.current.spin(true);
+            // Flask version used data-spin='axis:y; speed:2'
+            viewerRef.current.spin('y', 2);
           }
         });
 

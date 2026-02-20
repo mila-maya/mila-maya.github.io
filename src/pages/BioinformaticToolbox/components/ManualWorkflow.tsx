@@ -1,18 +1,68 @@
-import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, useCallback, useMemo, useState } from 'react';
 import ProteinViewer3D from '@components/bio/ProteinViewer3D/ProteinViewer3D';
 import { predictProteinStructure } from '@services/bioinformaticsApi';
 import {
   buildMaturePeptideReport,
+  buildTimestamp,
   createSequenceAnalysis,
+  downloadFile,
   extractPlddtStatsFromPdb,
   generateReadingFrames,
   validateProteinSequence,
   ESMFOLD_MIN_SEQUENCE_LENGTH
 } from '@utils/bioinformatics';
+import { useWorkflowHistory, type HistoryEntry } from '../hooks/useWorkflowHistory';
+import HistoryPanel from './HistoryPanel';
 import type { ManualPipelineData, ProteinCandidate, StageStatus } from '../types';
 import { CANDIDATE_SOURCE_LABEL } from '../types';
 import { buildManualOrfCandidates, stageClass } from '../helpers';
 import styles from '../BioinformaticToolbox.module.css';
+
+function buildManualReport(
+  pipeline: ManualPipelineData,
+  selectedCandidate: ProteinCandidate | null,
+  plddt: ReturnType<typeof extractPlddtStatsFromPdb> | null
+): string {
+  const lines: string[] = [
+    '=== Sequence to Protein Report ===',
+    `Generated: ${buildTimestamp()}`,
+    '',
+    '--- Source ---',
+    `Input Type: ${pipeline.nucleotideType}`,
+    `Nucleotide Length: ${pipeline.nucleotideSequence.length} nt`,
+    `ORF Candidates Found: ${pipeline.candidates.length}`,
+    '',
+    '--- Selected Protein ---',
+    `Label: ${selectedCandidate?.label ?? 'N/A'}`,
+    `Length: ${selectedCandidate?.length ?? 0} aa`,
+    '',
+    '--- Sequences ---',
+    'Input Sequence:',
+    pipeline.nucleotideSequence,
+    '',
+    'Protein:',
+    pipeline.selectedProtein,
+    ''
+  ];
+
+  if (plddt) {
+    lines.push(
+      '--- ESMFold Confidence (pLDDT) ---',
+      `Mean: ${plddt.mean.toFixed(1)}`,
+      `Min: ${plddt.min.toFixed(1)}`,
+      `Max: ${plddt.max.toFixed(1)}`,
+      `Residues: ${plddt.residueCount}`,
+      `>=90: ${plddt.veryHigh} | 70-89: ${plddt.confident} | 50-69: ${plddt.low} | <50: ${plddt.veryLow}`,
+      ''
+    );
+  }
+
+  if (pipeline.predictedPdb) {
+    lines.push('--- PDB Structure ---', pipeline.predictedPdb);
+  }
+
+  return lines.join('\n');
+}
 
 interface ManualStages {
   source: StageStatus;
@@ -27,6 +77,7 @@ const ManualWorkflow = () => {
   const [pipeline, setPipeline] = useState<ManualPipelineData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isWorkflowRunning, setIsWorkflowRunning] = useState(false);
+  const { history, addEntry, removeEntry, clearHistory } = useWorkflowHistory('manual');
 
   const isBusy = isWorkflowRunning;
 
@@ -86,6 +137,12 @@ const ManualWorkflow = () => {
 
       if (selected) {
         await runPrediction(selected.sequence);
+        const seqPreview = analysis.sequence.slice(0, 30) + (analysis.sequence.length > 30 ? '...' : '');
+        addEntry(
+          seqPreview,
+          `${candidates.length} ORF(s), ${selected.label}`,
+          { sequence: analysis.sequence, cutoff: proteinCutoff }
+        );
       }
     } catch (workflowError) {
       const message = workflowError instanceof Error ? workflowError.message : 'Workflow failed.';
@@ -190,6 +247,30 @@ const ManualWorkflow = () => {
     }
     return extractPlddtStatsFromPdb(pipeline.predictedPdb);
   }, [pipeline?.predictedPdb, pipeline?.structureSource]);
+
+  const handleHistorySelect = useCallback((entry: HistoryEntry) => {
+    const sequence = entry.data.sequence as string;
+    const cutoff = entry.data.cutoff as number;
+    if (sequence) {
+      setManualNucleotideInput(sequence);
+    }
+    if (cutoff) {
+      setProteinCutoff(cutoff);
+    }
+  }, []);
+
+  const handleDownloadReport = useCallback(() => {
+    if (!pipeline) return;
+    const report = buildManualReport(pipeline, selectedCandidate, predictedPlddt);
+    const filename = `manual_sequence_${Date.now()}.txt`;
+    downloadFile(report, filename, 'text/plain');
+  }, [pipeline, selectedCandidate, predictedPlddt]);
+
+  const handleDownloadPdb = useCallback(() => {
+    if (!pipeline?.predictedPdb) return;
+    const filename = `manual_structure_${Date.now()}.pdb`;
+    downloadFile(pipeline.predictedPdb, filename, 'chemical/x-pdb');
+  }, [pipeline]);
 
   const predictedPreview = useMemo(() => {
     if (!pipeline?.predictedPdb) {
@@ -363,11 +444,26 @@ const ManualWorkflow = () => {
                   <summary>Show PDB preview</summary>
                   <pre className={styles.code}>{predictedPreview}</pre>
                 </details>
+                <div className={styles.downloadBar}>
+                  <button type="button" className={styles.secondaryButton} onClick={handleDownloadReport}>
+                    Download Report (.txt)
+                  </button>
+                  <button type="button" className={styles.secondaryButton} onClick={handleDownloadPdb}>
+                    Download Structure (.pdb)
+                  </button>
+                </div>
               </>
             )}
           </article>
         </>
       )}
+
+      <HistoryPanel
+        history={history}
+        onSelect={handleHistorySelect}
+        onRemove={removeEntry}
+        onClear={clearHistory}
+      />
     </>
   );
 };

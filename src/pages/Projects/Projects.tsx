@@ -3,6 +3,9 @@ import ProjectCard from '@components/projects/ProjectCard/ProjectCard';
 import { useProjects } from '@hooks/useProjects';
 import styles from './Projects.module.css';
 
+const PROJECTS_DESCRIPTION =
+  'A collection of my work including web applications, open-source contributions, and personal projects.';
+
 const Projects = () => {
   const { projects, loading, error } = useProjects();
 
@@ -10,16 +13,13 @@ const Projects = () => {
     <>
       <SEO
         title="Projects"
-        description="Explore my portfolio of web applications, open-source projects, and software development work."
+        description={PROJECTS_DESCRIPTION}
       />
 
       <div className={styles.container}>
         <header className={styles.header}>
           <h1 className={styles.title}>My Projects</h1>
-          <p className={styles.description}>
-            A collection of my work including web applications, open-source
-            contributions, and personal projects.
-          </p>
+          <p className={styles.description}>{PROJECTS_DESCRIPTION}</p>
         </header>
 
         {loading ? (

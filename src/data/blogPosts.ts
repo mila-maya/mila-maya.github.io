@@ -3,225 +3,113 @@ import type { BlogPost } from '@/types/contentful.types';
 // Add your blog posts here - just edit this file to add/update posts!
 export const blogPosts: BlogPost[] = [
   {
-    title: "Peak Finding by Area Gain on a Synthetic Chromatogram",
+    title: "Automatic Peak Detection and Fitting for Overlapping Peaks in Chromatograms",
     slug: "peak-finding-area-gain-synthetic-chromatogram",
-    excerpt: "A runnable 3-step demo: generate overlapping peaks, select relevant peaks by area gain, then initialize multi-Gaussian fitting.",
-    content: `This post shows a minimal, runnable workflow for basic peak analysis:
+    excerpt: "A runnable 3-step workflow for automatic peak detection and multi-Gaussian fitting of overlapping chromatographic peaks.",
+    content: `This post is structured as three linked steps.  
+For each step you get: theory with formulas -> short algorithm -> embedded runnable playground.
+The workflow follows chromatography automation ideas used in MOCCA (original + later expanded version) and iterative multivariate deconvolution for overlapping peaks [<a href="#pf-ref-1">1</a>,<a href="#pf-ref-2">2</a>,<a href="#pf-ref-3">3</a>].
 
-1. Create a synthetic chromatogram with overlapping peaks.
-2. Run area-gain peak finding to keep relevant peaks.
-3. Fit a multi-Gaussian model using detected peaks as initial guesses.
+## Step 1 - Build a synthetic chromatogram (overlapping peaks)
 
-Run the three code windows in order in the same Python session.
+**Theory**
 
-Prefer a notebook-like UI in the browser? Open the interactive playground in My Projects: [Peak Finding Playground](/projects/peak-finding).
+Model the signal as baseline plus Gaussian components:
 
-## 1) Create a synthetic chromatogram (overlapping peaks)
+<i>S</i>(<i>t</i>) = <i>B</i>(<i>t</i>) + &Sigma;<sub>i</sub> <i>A</i><sub>i</sub> exp(-(<i>t</i> - <i>t</i><sub>0,i</sub>)<sup>2</sup> / (2 <i>&sigma;</i><sub>i</sub><sup>2</sup>))
 
-~~~python
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy.signal import find_peaks
-from scipy.optimize import curve_fit
+- <i>B</i>(<i>t</i>): baseline drift
+- <i>A</i><sub>i</sub>: amplitude of component <i>i</i>
+- <i>t</i><sub>0,i</sub>: center time of component <i>i</i>
+- <i>&sigma;</i><sub>i</sub>: width of component <i>i</i>
 
-rng = np.random.default_rng(5)
-t = np.linspace(0.0, 120.0, 2400)
+<details>
+<summary><strong>Algorithm (toggle)</strong></summary>
 
-def gauss_height(x, A, t0, sigma):
-    return A * np.exp(-0.5 * ((x - t0) / sigma) ** 2)
+- Create time axis <i>t</i>.
+- Define baseline <i>B</i>(<i>t</i>).
+- Add multiple overlapping Gaussian components.
+- Add random noise to emulate measured data.
+</details>
 
-baseline = 0.025 + 0.00025 * t + 0.008 * np.sin(t / 11.0)
-true_components = [
-    (0.42, 38.0, 5.2),
-    (0.55, 49.5, 4.0),
-    (0.35, 58.0, 6.6),
-]
+<peak-finding-playground-step-1></peak-finding-playground-step-1>
 
-y_clean = baseline.copy()
-for A, t0, sigma in true_components:
-    y_clean += gauss_height(t, A, t0, sigma)
+## Step 2 - Detect peaks by area gain
 
-noise = rng.normal(0.0, 0.012, size=t.size)
-y = y_clean + noise
+**Theory**
 
-plt.figure(figsize=(10, 4))
-plt.plot(t, y, color="#1f4fba", lw=1.2, label="Synthetic chromatogram")
-for i, (A, t0, sigma) in enumerate(true_components, start=1):
-    plt.plot(t, gauss_height(t, A, t0, sigma) + baseline, "--", lw=1.0, label=f"True component {i}")
-plt.xlabel("Time")
-plt.ylabel("Signal (a.u.)")
-plt.title("Synthetic chromatogram with overlapping peaks")
-plt.legend(ncol=2, fontsize=9)
-plt.tight_layout()
-plt.show()
-~~~
+For each seed peak, expand a symmetric window step-by-step directly on the measured signal <i>S</i>(<i>t</i>).
+Let <i>Q</i><sub>k</sub> be area at expansion step <i>k</i>:
 
-## 2) Peak finding by area gain
+<i>Q</i><sub>k</sub> = &int; <i>S</i>(<i>t</i>) d<i>t</i>
 
-Area-gain idea: expand each seed peak window symmetrically and monitor relative area increase.  
-Stop expansion when additional area gain drops below a threshold.
+Relative area gain:
 
-~~~python
-# Baseline correction (simple edge-line model)
-edge = (t <= 10.0) | (t >= 110.0)
-pb = np.polyfit(t[edge], y[edge], 1)
-baseline_hat = np.polyval(pb, t)
-y0 = np.clip(y - baseline_hat, 0.0, None)
+<i>g</i><sub>k</sub> = (<i>Q</i><sub>k</sub> - <i>Q</i><sub>k-1</sub>) / <i>Q</i><sub>k-1</sub>
 
-def grow_region_by_area_gain(x, signal, center_idx, gain_thresh=0.02, min_half_width=8, max_half_width=260):
-    n = len(signal)
-    prev_area = None
-    best_left = max(0, center_idx - min_half_width)
-    best_right = min(n - 1, center_idx + min_half_width)
+Stop when <i>g</i><sub>k</sub> drops below threshold.  
+Then keep only peaks with meaningful relative area and spacing, consistent with practical chromatographic integration logic [<a href="#pf-ref-4">4</a>].
 
-    for half_width in range(min_half_width, max_half_width + 1):
-        left = max(0, center_idx - half_width)
-        right = min(n - 1, center_idx + half_width)
-        area = np.trapz(signal[left:right + 1], x[left:right + 1])
+Parameter initialization from accepted windows:
 
-        if prev_area is not None and prev_area > 0:
-            gain = (area - prev_area) / prev_area
-            if gain < gain_thresh:
-                break
+- <i>t</i><sub>0,i</sub>: center time of detected peak <i>i</i>
+- <i>A</i><sub>i</sub>: signal at <i>t</i><sub>0,i</sub>
+- <i>&sigma;</i><sub>i</sub> &asymp; (<i>t</i><sub>right,i</sub> - <i>t</i><sub>left,i</sub>) / 6
 
-        best_left, best_right = left, right
-        prev_area = area
+<details>
+<summary><strong>Algorithm (toggle)</strong></summary>
 
-    final_area = np.trapz(signal[best_left:best_right + 1], x[best_left:best_right + 1])
-    return best_left, best_right, final_area
+- Find seed maxima (prominence, distance) on the measured signal.
+- Grow each seed window symmetrically and monitor area gain.
+- Stop growth when gain threshold is crossed.
+- Filter candidates by relative area and spacing.
+- Build initial guesses (<i>A</i><sub>i</sub>, <i>t</i><sub>0,i</sub>, <i>&sigma;</i><sub>i</sub>) from detected center and window bounds.
+</details>
 
-# Seed candidates (mild settings)
-seed_idx, _ = find_peaks(y0, prominence=0.03, distance=85)
+<peak-finding-playground-step-2></peak-finding-playground-step-2>
 
-regions = []
-for idx in seed_idx:
-    left, right, area = grow_region_by_area_gain(t, y0, idx, gain_thresh=0.02)
-    regions.append({"idx": int(idx), "left": int(left), "right": int(right), "area": float(area)})
+## Step 3 - Fit multi-Gaussian model from detected guesses
 
-total_area = sum(r["area"] for r in regions) or 1.0
-for r in regions:
-    r["relative_area"] = r["area"] / total_area
+**Theory**
 
-# Keep peaks with meaningful contribution
-candidates = [r for r in regions if r["relative_area"] >= 0.08]
+Fit the measured signal with Gaussian sum plus linear baseline:
 
-# Greedy spacing by area (largest first)
-candidates = sorted(candidates, key=lambda r: r["area"], reverse=True)
-kept = []
-for r in candidates:
-    t0 = t[r["idx"]]
-    if all(abs(t0 - t[k["idx"]]) >= 6.0 for k in kept):
-        kept.append(r)
-kept = sorted(kept, key=lambda r: r["idx"])
+<i>S</i>(<i>t</i>) = &Sigma;<sub>i</sub> <i>A</i><sub>i</sub> exp(-(<i>t</i> - <i>t</i><sub>0,i</sub>)<sup>2</sup> / (2 <i>&sigma;</i><sub>i</sub><sup>2</sup>)) + <i>c</i><sub>0</sub> + <i>c</i><sub>1</sub>(<i>t</i> - mean(<i>t</i>))
 
-plt.figure(figsize=(10, 4))
-plt.plot(t, y0, color="#2c3e50", lw=1.2, label="Baseline-corrected signal")
-plt.plot(t[seed_idx], y0[seed_idx], "o", ms=5, color="#ff8c00", label="Seed maxima")
-for i, r in enumerate(kept, start=1):
-    plt.axvspan(t[r["left"]], t[r["right"]], color="#8fd19e", alpha=0.25)
-    plt.text(t[r["idx"]], y0[r["idx"]] + 0.015, f"P{i}", ha="center", fontsize=9)
-plt.xlabel("Time")
-plt.ylabel("Signal above baseline")
-plt.title("Peak finding by area gain")
-plt.legend()
-plt.tight_layout()
-plt.show()
+Use step-2 guesses as initial values.  
+Evaluate fit quality with:
 
-# Initial guesses for fitting window (next step)
-peak_guesses = []
-for r in kept:
-    sigma_i = max((t[r["right"]] - t[r["left"]]) / 6.0, 0.8)  # ~ +/-3 sigma coverage
-    peak_guesses.append(
-        {
-            "A_i": float(y0[r["idx"]]),
-            "t0_i": float(t[r["idx"]]),
-            "sigma_i": float(sigma_i),
-        }
-    )
+<i>R</i><sup>2</sup> = 1 - SS<sub>res</sub> / SS<sub>tot</sub>
 
-print("Detected peak guesses:")
-for i, g in enumerate(peak_guesses, start=1):
-    print(f"{i}: A_i={g['A_i']:.3f}, t0_i={g['t0_i']:.2f}, sigma_i={g['sigma_i']:.2f}")
-~~~
+For overlapping signals, the fit is refined as a multi-component deconvolution problem [<a href="#pf-ref-3">3</a>].
 
-## 3) Multi-Gaussian fitting with detected peaks as start guesses
+<details>
+<summary><strong>Algorithm (toggle)</strong></summary>
 
-~~~python
-if len(peak_guesses) == 0:
-    raise RuntimeError("No peaks passed area-gain filtering. Relax thresholds in window 2.")
+- Build initial parameter vector from peak guesses.
+- Set lower and upper bounds.
+- Add baseline parameters.
+- Run nonlinear least-squares (curve_fit).
+- Report component parameters and <i>R</i><sup>2</sup>.
+</details>
 
-def multi_gauss_with_baseline(x, *params):
-    # params = [A1, t01, sigma1, A2, t02, sigma2, ..., c0, c1]
-    n_comp = (len(params) - 2) // 3
-    c0, c1 = params[-2], params[-1]
-    y_fit = c0 + c1 * (x - np.mean(x))
-    for i in range(n_comp):
-        A_i, t0_i, sigma_i = params[3 * i : 3 * i + 3]
-        y_fit += gauss_height(x, A_i, t0_i, sigma_i)
-    return y_fit
+<peak-finding-playground-step-3></peak-finding-playground-step-3>
 
-# Build initial vector + bounds from detected peaks
-p0, lower, upper = [], [], []
-for g in peak_guesses:
-    p0.extend([g["A_i"], g["t0_i"], g["sigma_i"]])
-    lower.extend([0.0, t.min(), 0.4])
-    upper.extend([2.0, t.max(), 25.0])
+## Literature
 
-# Linear baseline parameters
-p0.extend([float(np.median(y)), 0.0])   # c0, c1
-lower.extend([y.min() - 0.2, -0.02])
-upper.extend([y.max() + 0.2, 0.02])
-
-popt, _ = curve_fit(
-    multi_gauss_with_baseline,
-    t,
-    y,
-    p0=p0,
-    bounds=(lower, upper),
-    maxfev=120000,
-)
-
-y_fit = multi_gauss_with_baseline(t, *popt)
-ss_res = float(np.sum((y - y_fit) ** 2))
-ss_tot = float(np.sum((y - np.mean(y)) ** 2))
-r2 = 1.0 - ss_res / ss_tot if ss_tot > 0 else float("nan")
-
-n_comp = (len(popt) - 2) // 3
-c0, c1 = popt[-2], popt[-1]
-baseline_fit = c0 + c1 * (t - np.mean(t))
-
-plt.figure(figsize=(10, 4))
-plt.plot(t, y, color="#1f4fba", lw=1.1, label="Data")
-plt.plot(t, y_fit, color="#2ca02c", lw=2.0, label="Multi-Gaussian fit")
-for i in range(n_comp):
-    A_i, t0_i, sigma_i = popt[3 * i : 3 * i + 3]
-    comp_i = gauss_height(t, A_i, t0_i, sigma_i) + baseline_fit
-    plt.plot(t, comp_i, "--", lw=1.2, label=f"Component {i+1}")
-plt.xlabel("Time")
-plt.ylabel("Signal (a.u.)")
-plt.title(f"Multi-Gaussian fit initialized from area-gain peaks (R^2 = {r2:.4f})")
-plt.legend(ncol=2, fontsize=9)
-plt.tight_layout()
-plt.show()
-
-print("Fitted parameters:")
-for i in range(n_comp):
-    A_i, t0_i, sigma_i = popt[3 * i : 3 * i + 3]
-    print(f"Component {i+1}: A_i={A_i:.3f}, t0_i={t0_i:.2f}, sigma_i={sigma_i:.2f}")
-print(f"Baseline: c0={c0:.4f}, c1={c1:.6f}")
-~~~
-
-This gives a compact, practical bridge from detection to fitting:
-area-gain regions define relevant peaks, and those peaks become stable initialization for multi-Gaussian fitting.
+1. <span id="pf-ref-1"></span>Haas, C. P., Luebbesmeyer, M., Jin, E. H., McDonald, M. A., Koscher, B. A., Guimond, N., Di Rocco, L., Kayser, H., Leweke, S., Niedenfuehr, S., Nicholls, R., Greeves, E., Barber, D. M., Hillenbrand, J., Volpin, G., & Jensen, K. F. (2023). *Open-source chromatographic data analysis for reaction optimization and screening*. ACS Central Science, 9(2), 307-317. https://doi.org/10.1021/acscentsci.2c01042
+2. <span id="pf-ref-2"></span>Oboril, J., Haas, C. P., Luebbesmeyer, M., Nicholls, R., Gressling, T., Jensen, K. F., Volpin, G., & Hillenbrand, J. (2024). *Automated processing of chromatograms: a comprehensive Python package with a GUI for intelligent peak identification and deconvolution in chemical reaction analysis*. Digital Discovery, 3(10), 2041-2051. https://doi.org/10.1039/D4DD00214H
+3. <span id="pf-ref-3"></span>Erny, G. L., Moeenfard, M., & Alves, A. (2021). *Iterative multivariate peaks fitting-A robust approach for the analysis of non-baseline resolved chromatographic peaks*. Separations, 8(10), 178. https://doi.org/10.3390/separations8100178
+4. <span id="pf-ref-4"></span>Snow, N. H. (2019). *From detector to decision, part IV: demystifying peak integration*. LCGC North America. https://www.chromatographyonline.com/view/detector-decision-part-iv-demystifying-peak-integration
 `,
     featuredImage: {
       url: "/images/blog/tda-theory/gaussian-fitting.svg",
-      title: "Peak finding by area gain",
+      title: "Automatic peak detection and fitting",
       description: "Synthetic overlapping peaks, area-gain detection, and multi-Gaussian fitting"
     },
     author: "Mila",
     publishedDate: "2026-02-23T18:00:00.000Z",
-    tags: ["Peak Finding", "Chromatography", "Gaussian Fitting", "Python", "TDA"],
+    tags: ["Peak Detection", "Gaussian Fitting", "Chromatography", "Python"],
     category: "Science"
   },
   {

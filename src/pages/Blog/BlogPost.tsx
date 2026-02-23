@@ -7,6 +7,7 @@ import rehypeHighlight from 'rehype-highlight';
 import rehypeSlug from 'rehype-slug';
 import rehypeRaw from 'rehype-raw';
 import SEO from '@/components/common/SEO/SEO';
+import PeakFindingPlayground from '@pages/PeakFindingPlayground/PeakFindingPlayground';
 import { getBlogPostBySlug } from '@/services/contentful';
 import type { BlogPost as BlogPostType } from '@/types/contentful.types';
 import styles from './BlogPost.module.css';
@@ -35,6 +36,10 @@ const markdownComponents = {
     }
     return <a href={href} {...props}>{children}</a>;
   },
+  'peak-finding-playground': () => <PeakFindingPlayground embedded />,
+  'peak-finding-playground-step-1': () => <PeakFindingPlayground embedded focusStep={1} />,
+  'peak-finding-playground-step-2': () => <PeakFindingPlayground embedded focusStep={2} />,
+  'peak-finding-playground-step-3': () => <PeakFindingPlayground embedded focusStep={3} />,
 };
 
 const BlogPost = () => {
@@ -93,7 +98,7 @@ const BlogPost = () => {
 
       <article className={styles.container}>
         <Link to="/blog" className={styles.backLink}>
-          ← Back to Blog
+          {'<-'} Back to Blog
         </Link>
 
         <header className={styles.header}>
@@ -101,9 +106,9 @@ const BlogPost = () => {
 
           <div className={styles.meta}>
             <span>{post.author}</span>
-            {formattedDate && <span>• {formattedDate}</span>}
-            {post.category && <span>• {post.category}</span>}
-            <span>• {readingTime} min read</span>
+            {formattedDate && <span>| {formattedDate}</span>}
+            {post.category && <span>| {post.category}</span>}
+            <span>| {readingTime} min read</span>
           </div>
 
           {post.tags && post.tags.length > 0 && (

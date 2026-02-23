@@ -37,6 +37,7 @@ interface FitParams {
   minSigma: number;
   maxSigma: number;
   maxIterations: number;
+  targetR2: number;
 }
 
 interface SyntheticResult {
@@ -62,7 +63,7 @@ interface KeptPeak {
 }
 
 interface PeakResult {
-  y0: number[];
+  signal: number[];
   seedIdx: number[];
   kept: KeptPeak[];
   peakGuesses: PeakGuess[];
@@ -80,6 +81,7 @@ interface FitResult {
   baselineFit: number[];
   components: FitComponent[];
   r2: number;
+  targetR2: number;
 }
 
 interface PyodideGlobals {
@@ -104,6 +106,8 @@ interface PlotLine {
   color: string;
   y: number[];
   dash?: string;
+  points?: Array<{ x: number; y: number }>;
+  strokeWidth?: number;
 }
 
 const DEFAULT_SYNTHETIC: SyntheticParams = {
@@ -135,6 +139,7 @@ const DEFAULT_FIT: FitParams = {
   minSigma: 0.4,
   maxSigma: 25,
   maxIterations: 120000,
+  targetR2: 0.996,
 };
 
 const COLORS = ['#1f4fba', '#2ca02c', '#ff7f0e', '#9467bd', '#17a2b8', '#d62728'];
@@ -197,9 +202,9 @@ def generate_synthetic(payload):
         "components": [curve.tolist() for curve in component_curves],
     }
 
-def _grow_region_by_gain(x, y0, center_idx, gain_threshold=0.02, min_half=8, max_half=260):
+def _grow_region_by_gain(x, signal, center_idx, gain_threshold=0.02, min_half=8, max_half=260):
     center = int(center_idx)
-    n = len(y0)
+    n = len(signal)
     previous_area = None
     best_left = max(0, center - min_half)
     best_right = min(n - 1, center + min_half)
@@ -207,7 +212,7 @@ def _grow_region_by_gain(x, y0, center_idx, gain_threshold=0.02, min_half=8, max
     for half in range(min_half, max_half + 1):
         left = max(0, center - half)
         right = min(n - 1, center + half)
-        area = float(np.trapz(y0[left:right + 1], x[left:right + 1]))
+        area = float(np.trapz(signal[left:right + 1], x[left:right + 1]))
         if previous_area is not None and previous_area > 0:
             gain = (area - previous_area) / previous_area
             if gain < gain_threshold:
@@ -216,7 +221,7 @@ def _grow_region_by_gain(x, y0, center_idx, gain_threshold=0.02, min_half=8, max
         best_right = right
         previous_area = area
 
-    best_area = float(np.trapz(y0[best_left:best_right + 1], x[best_left:best_right + 1]))
+    best_area = float(np.trapz(signal[best_left:best_right + 1], x[best_left:best_right + 1]))
     return best_left, best_right, best_area
 
 def find_peaks_area_gain(payload):
@@ -225,14 +230,7 @@ def find_peaks_area_gain(payload):
 
     t = _state["t"]
     y = _state["y"]
-
-    edge_n = max(int(len(t) * 0.08), 4)
-    edge_mask = np.zeros_like(t, dtype=bool)
-    edge_mask[:edge_n] = True
-    edge_mask[-edge_n:] = True
-    baseline_poly = np.polyfit(t[edge_mask], y[edge_mask], 1)
-    baseline = np.polyval(baseline_poly, t)
-    y0 = np.clip(y - baseline, 0.0, None)
+    signal = np.asarray(y, dtype=float)
 
     prominence = max(float(payload.get("prominence", 0.03)), 1e-6)
     distance = max(int(payload.get("distance", 85)), 1)
@@ -240,10 +238,10 @@ def find_peaks_area_gain(payload):
     relative_area_min = max(float(payload.get("relativeAreaMin", 0.08)), 0.0)
     min_spacing = max(float(payload.get("minSpacing", 6.0)), 0.0)
 
-    seed_idx, _ = find_peaks(y0, prominence=prominence, distance=distance)
+    seed_idx, _ = find_peaks(signal, prominence=prominence, distance=distance)
     regions = []
     for idx in seed_idx.tolist():
-        left, right, area = _grow_region_by_gain(t, y0, idx, gain_threshold=gain_threshold)
+        left, right, area = _grow_region_by_gain(t, signal, idx, gain_threshold=gain_threshold)
         regions.append({
             "idx": int(idx),
             "t0": float(t[idx]),
@@ -277,7 +275,7 @@ def find_peaks_area_gain(payload):
         center_idx = max(0, min(center_idx, len(t) - 1))
         sigma = max((float(t[right_idx]) - float(t[left_idx])) / 6.0, 0.2)
         peak_guesses.append({
-            "A_i": float(y0[center_idx]),
+            "A_i": float(signal[center_idx]),
             "t0_i": float(region["t0"]),
             "sigma_i": float(sigma),
         })
@@ -285,7 +283,7 @@ def find_peaks_area_gain(payload):
     _state["peak_guesses"] = peak_guesses
 
     return {
-        "y0": y0.tolist(),
+        "signal": signal.tolist(),
         "seedIdx": [int(value) for value in seed_idx.tolist()],
         "kept": kept,
         "peakGuesses": peak_guesses,
@@ -300,20 +298,7 @@ def _multi_gauss_with_baseline(x, *params):
         y = y + _gauss(x, A_i, t0_i, sigma_i)
     return y
 
-def fit_multi_gaussian(payload):
-    if "t" not in _state or "y" not in _state:
-        raise RuntimeError("Run step 1 first.")
-
-    t = _state["t"]
-    y = _state["y"]
-    guesses = _state.get("peak_guesses", [])
-    if len(guesses) == 0:
-        raise RuntimeError("Run step 2 first. No peak guesses available.")
-
-    min_sigma = max(float(payload.get("minSigma", 0.4)), 0.05)
-    max_sigma = max(float(payload.get("maxSigma", 25.0)), min_sigma + 0.05)
-    max_iterations = max(int(payload.get("maxIterations", 120000)), 10000)
-
+def _fit_with_guesses(t, y, guesses, min_sigma, max_sigma, max_iterations):
     p0 = []
     lower = []
     upper = []
@@ -330,22 +315,69 @@ def fit_multi_gaussian(payload):
     lower.extend([float(np.min(y)) - 0.5, -0.05])
     upper.extend([float(np.max(y)) + 0.5, 0.05])
 
-    try:
-        popt, _ = curve_fit(
-            _multi_gauss_with_baseline,
-            t,
-            y,
-            p0=p0,
-            bounds=(lower, upper),
-            maxfev=max_iterations,
-        )
-    except Exception as exc:
-        raise RuntimeError("curve_fit failed: " + str(exc))
-
+    popt, _ = curve_fit(
+        _multi_gauss_with_baseline,
+        t,
+        y,
+        p0=p0,
+        bounds=(lower, upper),
+        maxfev=max_iterations,
+    )
     y_fit = _multi_gauss_with_baseline(t, *popt)
     ss_res = float(np.sum((y - y_fit) ** 2))
     ss_tot = float(np.sum((y - np.mean(y)) ** 2))
     r2 = 1.0 - (ss_res / ss_tot) if ss_tot > 0 else float("nan")
+    return popt, y_fit, float(r2)
+
+def fit_multi_gaussian(payload):
+    if "t" not in _state or "y" not in _state:
+        raise RuntimeError("Run step 1 first.")
+
+    t = _state["t"]
+    y = _state["y"]
+    guesses = _state.get("peak_guesses", [])
+    if len(guesses) == 0:
+        raise RuntimeError("Run step 2 first. No peak guesses available.")
+
+    min_sigma = max(float(payload.get("minSigma", 0.4)), 0.05)
+    max_sigma = max(float(payload.get("maxSigma", 25.0)), min_sigma + 0.05)
+    max_iterations = max(int(payload.get("maxIterations", 120000)), 10000)
+    target_r2 = float(payload.get("targetR2", 0.996))
+    target_r2 = min(max(target_r2, 0.0), 0.999999)
+
+    sorted_by_amplitude = sorted(guesses, key=lambda value: float(value["A_i"]), reverse=True)
+    best_model = None
+    selected_model = None
+
+    for n_components in range(1, len(sorted_by_amplitude) + 1):
+        trial_guesses = sorted(sorted_by_amplitude[:n_components], key=lambda value: float(value["t0_i"]))
+        try:
+            popt, y_fit, r2 = _fit_with_guesses(
+                t,
+                y,
+                trial_guesses,
+                min_sigma,
+                max_sigma,
+                max_iterations,
+            )
+        except Exception:
+            continue
+
+        trial = {"popt": popt, "yFit": y_fit, "r2": float(r2)}
+        if best_model is None or trial["r2"] > best_model["r2"]:
+            best_model = trial
+        if trial["r2"] >= target_r2:
+            selected_model = trial
+            break
+
+    if selected_model is None:
+        selected_model = best_model
+    if selected_model is None:
+        raise RuntimeError("curve_fit failed for all tested component counts.")
+
+    popt = selected_model["popt"]
+    y_fit = selected_model["yFit"]
+    r2 = selected_model["r2"]
 
     c0, c1 = popt[-2], popt[-1]
     baseline_fit = c0 + c1 * (t - np.mean(t))
@@ -366,12 +398,29 @@ def fit_multi_gaussian(payload):
         "baselineFit": baseline_fit.tolist(),
         "components": components,
         "r2": float(r2),
+        "targetR2": float(target_r2),
     }
 `;
 
 const toNumber = (value: string, fallback: number): number => {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : fallback;
+};
+
+const nearestIndex = (x: number[], value: number): number => {
+  if (x.length === 0) {
+    return 0;
+  }
+  let bestIdx = 0;
+  let bestDist = Math.abs(x[0] - value);
+  for (let i = 1; i < x.length; i += 1) {
+    const distance = Math.abs(x[i] - value);
+    if (distance < bestDist) {
+      bestDist = distance;
+      bestIdx = i;
+    }
+  }
+  return bestIdx;
 };
 
 const addBaseline = (curve: number[], baseline: number[]): number[] =>
@@ -395,7 +444,10 @@ const LinePlot = ({ x, lines, title, xLabel, yLabel }: { x: number[]; lines: Plo
   const xMax = x[x.length - 1];
   const xRange = xMax - xMin || 1;
 
-  const yValues = lines.flatMap((line) => line.y);
+  const yValues = lines.flatMap((line) => [
+    ...line.y,
+    ...(line.points?.map((point) => point.y) ?? []),
+  ]);
   const yMinRaw = Math.min(...yValues);
   const yMaxRaw = Math.max(...yValues);
   const yPad = (yMaxRaw - yMinRaw || 1) * 0.08;
@@ -412,15 +464,30 @@ const LinePlot = ({ x, lines, title, xLabel, yLabel }: { x: number[]; lines: Plo
       <svg viewBox={`0 0 ${width} ${height}`} className={styles.plotSvg}>
         <rect x={left} y={top} width={innerWidth} height={innerHeight} fill="#fff" stroke="#d8deea" />
         {lines.map((line) => (
-          <polyline
-            key={line.label}
-            fill="none"
-            stroke={line.color}
-            strokeWidth={2}
-            strokeDasharray={line.dash}
-            points={x.map((time, idx) => `${mapX(time).toFixed(2)},${mapY(line.y[idx] ?? line.y[line.y.length - 1]).toFixed(2)}`).join(' ')}
-          />
+          line.y.length > 1 ? (
+            <polyline
+              key={line.label}
+              fill="none"
+              stroke={line.color}
+              strokeWidth={line.strokeWidth ?? 2}
+              strokeDasharray={line.dash}
+              points={x.map((time, idx) => `${mapX(time).toFixed(2)},${mapY(line.y[idx] ?? line.y[line.y.length - 1]).toFixed(2)}`).join(' ')}
+            />
+          ) : null
         ))}
+        {lines.flatMap((line) =>
+          (line.points ?? []).map((point, idx) => (
+            <circle
+              key={`${line.label}-pt-${idx}`}
+              cx={mapX(point.x)}
+              cy={mapY(point.y)}
+              r={3.4}
+              fill={line.color}
+              stroke="#ffffff"
+              strokeWidth={1}
+            />
+          ))
+        )}
         <line x1={left} x2={left} y1={top} y2={top + innerHeight} stroke="#5f6b7a" />
         <line x1={left} x2={left + innerWidth} y1={top + innerHeight} y2={top + innerHeight} stroke="#5f6b7a" />
         <text x={left + innerWidth / 2} y={height - 10} className={styles.axisText}>{xLabel}</text>
@@ -481,7 +548,12 @@ const getPyodideRuntime = async (): Promise<PyodideRuntime> => {
   return pyodideRuntimePromise;
 };
 
-const PeakFindingPlayground = () => {
+interface PeakFindingPlaygroundProps {
+  embedded?: boolean;
+  focusStep?: 1 | 2 | 3 | 'all';
+}
+
+const PeakFindingPlayground = ({ embedded = false, focusStep = 'all' }: PeakFindingPlaygroundProps) => {
   const pyodideRef = useRef<PyodideRuntime | null>(null);
 
   const [runtimeStatus, setRuntimeStatus] = useState<RuntimeStatus>('loading');
@@ -497,7 +569,11 @@ const PeakFindingPlayground = () => {
   const [peakResult, setPeakResult] = useState<PeakResult | null>(null);
   const [fitResult, setFitResult] = useState<FitResult | null>(null);
 
+  const showStep1 = focusStep === 'all' || focusStep === 1;
+  const showStep2 = focusStep === 'all' || focusStep === 2;
+  const showStep3 = focusStep === 'all' || focusStep === 3;
   const isBusy = runningStep !== null;
+  const compactEmbedded = embedded && focusStep !== 'all';
 
   useEffect(() => {
     let cancelled = false;
@@ -561,10 +637,21 @@ json.dumps(result)
     }
   };
 
+  const ensureSyntheticForDownstream = async (): Promise<void> => {
+    if (syntheticResult) {
+      return;
+    }
+    const generated = await runPython<SyntheticResult>('generate_synthetic', syntheticParams as unknown as Record<string, unknown>);
+    setSyntheticResult(generated);
+  };
+
   const runStep2 = async () => {
     setActionError(null);
     setRunningStep('detect');
     try {
+      if (focusStep === 2) {
+        await ensureSyntheticForDownstream();
+      }
       const result = await runPython<PeakResult>('find_peaks_area_gain', peakParams as unknown as Record<string, unknown>);
       setPeakResult(result);
       setFitResult(null);
@@ -579,6 +666,13 @@ json.dumps(result)
     setActionError(null);
     setRunningStep('fit');
     try {
+      if (focusStep === 3) {
+        await ensureSyntheticForDownstream();
+        if (!peakResult || peakResult.peakGuesses.length === 0) {
+          const detected = await runPython<PeakResult>('find_peaks_area_gain', peakParams as unknown as Record<string, unknown>);
+          setPeakResult(detected);
+        }
+      }
       const result = await runPython<FitResult>('fit_multi_gaussian', fitParams as unknown as Record<string, unknown>);
       setFitResult(result);
     } catch (error) {
@@ -609,11 +703,39 @@ json.dumps(result)
   }, [syntheticResult]);
 
   const detectionLines = useMemo<PlotLine[]>(() => {
-    if (!peakResult) {
+    if (!peakResult || !syntheticResult) {
       return [];
     }
-    return [{ label: 'Baseline-corrected signal', color: '#243447', y: peakResult.y0 }];
-  }, [peakResult]);
+
+    const centerPoints = peakResult.peakGuesses.map((guess) => {
+      const idx = nearestIndex(syntheticResult.t, guess.t0_i);
+      return {
+        x: syntheticResult.t[idx],
+        y: peakResult.signal[idx] ?? peakResult.signal[peakResult.signal.length - 1] ?? 0,
+      };
+    });
+
+    const boundPoints = peakResult.kept.flatMap((region) => {
+      const leftIdx = nearestIndex(syntheticResult.t, region.tLeft);
+      const rightIdx = nearestIndex(syntheticResult.t, region.tRight);
+      return [
+        {
+          x: syntheticResult.t[leftIdx],
+          y: peakResult.signal[leftIdx] ?? peakResult.signal[peakResult.signal.length - 1] ?? 0,
+        },
+        {
+          x: syntheticResult.t[rightIdx],
+          y: peakResult.signal[rightIdx] ?? peakResult.signal[peakResult.signal.length - 1] ?? 0,
+        },
+      ];
+    });
+
+    return [
+      { label: 'Signal', color: '#243447', y: peakResult.signal },
+      { label: 't0_i centers', color: '#dc2626', y: [], points: centerPoints },
+      { label: 'Window bounds', color: '#7c3aed', y: [], points: boundPoints },
+    ];
+  }, [peakResult, syntheticResult]);
 
   const fitLines = useMemo<PlotLine[]>(() => {
     if (!fitResult || !syntheticResult) {
@@ -643,21 +765,39 @@ json.dumps(result)
         : 'Runtime failed.';
 
   return (
-    <section className={styles.page}>
-      <SEO
-        title="Peak Finding Playground (Pyodide)"
-        description="Interactive in-browser peak finding and multi-Gaussian fitting."
-        url="https://mila-maya.github.io/playground/peak-finding"
-        type="article"
-      />
+    <section className={`${styles.page} ${embedded ? styles.embedded : ''}`}>
+      {!embedded && (
+        <SEO
+          title="Peak Finding Playground (Pyodide)"
+          description="Interactive in-browser peak finding and multi-Gaussian fitting."
+          url="https://mila-maya.github.io/blog/peak-finding-area-gain-synthetic-chromatogram"
+          type="article"
+        />
+      )}
 
-      <header className={styles.header}>
-        <p className={styles.kicker}>Interactive Playground</p>
-        <h1>Peak Finding by Area Gain (Pyodide)</h1>
-        <p>Run the three notebook-like steps directly in browser and tweak parameters live.</p>
-        <Link to="/projects">Back to My Projects</Link>
-        <Link to="/blog/peak-finding-area-gain-synthetic-chromatogram">Back to blog post</Link>
-      </header>
+      {embedded && !compactEmbedded ? (
+        <header className={styles.header}>
+          <p className={styles.kicker}>Interactive Playground</p>
+          <h2>
+            {focusStep === 1 && 'Embedded Step 1 Playground'}
+            {focusStep === 2 && 'Embedded Step 2 Playground'}
+            {focusStep === 3 && 'Embedded Step 3 Playground'}
+            {focusStep === 'all' && 'Run Peak Finding and Multi-Gaussian Fitting Here'}
+          </h2>
+          <p>
+            {focusStep === 'all'
+              ? 'Use run buttons in order: Step 1, then Step 2, then Step 3.'
+              : 'Adjust parameters, run this step, and inspect the output below.'}
+          </p>
+        </header>
+      ) : !embedded ? (
+        <header className={styles.header}>
+          <p className={styles.kicker}>Interactive Playground</p>
+          <h1>Peak Finding by Area Gain (Pyodide)</h1>
+          <p>Run the three notebook-like steps directly in browser and tweak parameters live.</p>
+          <Link to="/blog/peak-finding-area-gain-synthetic-chromatogram">Back to blog post</Link>
+        </header>
+      ) : null}
 
       <div className={`${styles.status} ${runtimeStatus === 'ready' ? styles.ready : runtimeStatus === 'error' ? styles.error : styles.loading}`}>
         <strong>Runtime:</strong> {statusText} {runtimeError}
@@ -666,8 +806,9 @@ json.dumps(result)
       {actionError && <div className={styles.errorBox}>Error: {actionError}</div>}
 
       <div className={styles.controlGrid}>
+        {showStep1 && (
         <article className={styles.card}>
-          <h2>Step 1: Synthetic chromatogram</h2>
+          <h2>{compactEmbedded ? 'Synthetic chromatogram' : 'Step 1: Synthetic chromatogram'}</h2>
           <div className={styles.fieldGrid}>
             <label>Seed<input type="number" value={syntheticParams.seed} onChange={(event) => setSyntheticParams((prev) => ({ ...prev, seed: toNumber(event.target.value, prev.seed) }))} /></label>
             <label>Points<input type="number" min={200} value={syntheticParams.points} onChange={(event) => setSyntheticParams((prev) => ({ ...prev, points: toNumber(event.target.value, prev.points) }))} /></label>
@@ -693,9 +834,12 @@ json.dumps(result)
             {runningStep === 'generate' ? 'Running step 1...' : 'Run step 1'}
           </button>
         </article>
+        )}
 
+        {showStep2 && (
         <article className={styles.card}>
-          <h2>Step 2: Area-gain peak finding</h2>
+          <h2>{compactEmbedded ? 'Area-gain peak detection' : 'Step 2: Area-gain peak detection'}</h2>
+          {focusStep === 2 && <p className={styles.smallNote}>Uses a generated synthetic chromatogram if step 1 data is missing.</p>}
           <div className={styles.fieldGrid}>
             <label>Prominence<input type="number" step="0.001" value={peakParams.prominence} onChange={(event) => setPeakParams((prev) => ({ ...prev, prominence: toNumber(event.target.value, prev.prominence) }))} /></label>
             <label>Distance<input type="number" value={peakParams.distance} onChange={(event) => setPeakParams((prev) => ({ ...prev, distance: toNumber(event.target.value, prev.distance) }))} /></label>
@@ -703,31 +847,52 @@ json.dumps(result)
             <label>Rel area min<input type="number" step="0.01" value={peakParams.relativeAreaMin} onChange={(event) => setPeakParams((prev) => ({ ...prev, relativeAreaMin: toNumber(event.target.value, prev.relativeAreaMin) }))} /></label>
             <label>Min spacing<input type="number" step="0.1" value={peakParams.minSpacing} onChange={(event) => setPeakParams((prev) => ({ ...prev, minSpacing: toNumber(event.target.value, prev.minSpacing) }))} /></label>
           </div>
-          <button className={styles.primaryButton} onClick={runStep2} disabled={isBusy || runtimeStatus !== 'ready' || !syntheticResult}>
+          <button
+            className={styles.primaryButton}
+            onClick={runStep2}
+            disabled={isBusy || runtimeStatus !== 'ready' || (focusStep === 'all' && !syntheticResult)}
+          >
             {runningStep === 'detect' ? 'Running step 2...' : 'Run step 2'}
           </button>
-          {peakResult && <p className={styles.smallNote}>{peakResult.seedIdx.length} seed peaks, {peakResult.kept.length} kept.</p>}
+          {peakResult && (
+            <p className={styles.smallNote}>
+              {peakResult.seedIdx.length} seed peaks, {peakResult.kept.length} kept. Red points mark <i>t</i><sub>0,i</sub> (and <i>A</i><sub>i</sub>); purple points mark window bounds used for <i>&sigma;</i><sub>i</sub>.
+            </p>
+          )}
         </article>
+        )}
 
+        {showStep3 && (
         <article className={styles.card}>
-          <h2>Step 3: Multi-Gaussian fit</h2>
+          <h2>{compactEmbedded ? 'Multi-Gaussian fit' : 'Step 3: Multi-Gaussian fit'}</h2>
+          {focusStep === 3 && <p className={styles.smallNote}>Auto-runs missing prerequisites (step 1 and step 2) with current parameters.</p>}
           <div className={styles.fieldGrid}>
             <label>Min sigma<input type="number" step="0.1" value={fitParams.minSigma} onChange={(event) => setFitParams((prev) => ({ ...prev, minSigma: toNumber(event.target.value, prev.minSigma) }))} /></label>
             <label>Max sigma<input type="number" step="0.1" value={fitParams.maxSigma} onChange={(event) => setFitParams((prev) => ({ ...prev, maxSigma: toNumber(event.target.value, prev.maxSigma) }))} /></label>
+            <label>Target R2<input type="number" step="0.0001" min={0} max={0.999999} value={fitParams.targetR2} onChange={(event) => setFitParams((prev) => ({ ...prev, targetR2: toNumber(event.target.value, prev.targetR2) }))} /></label>
             <label>Max iterations<input type="number" step="1000" value={fitParams.maxIterations} onChange={(event) => setFitParams((prev) => ({ ...prev, maxIterations: toNumber(event.target.value, prev.maxIterations) }))} /></label>
           </div>
-          <button className={styles.primaryButton} onClick={runStep3} disabled={isBusy || runtimeStatus !== 'ready' || !peakResult || peakResult.peakGuesses.length === 0}>
+          <button
+            className={styles.primaryButton}
+            onClick={runStep3}
+            disabled={isBusy || runtimeStatus !== 'ready' || (focusStep === 'all' && (!peakResult || peakResult.peakGuesses.length === 0))}
+          >
             {runningStep === 'fit' ? 'Running step 3...' : 'Run step 3'}
           </button>
-          {fitResult && <p className={styles.smallNote}>R2 = {fitResult.r2.toFixed(4)}</p>}
+          {fitResult && (
+            <p className={styles.smallNote}>
+              R2 = {fitResult.r2.toFixed(4)} (target {fitResult.targetR2.toFixed(4)}), selected {fitResult.components.length} component(s).
+            </p>
+          )}
         </article>
+        )}
       </div>
 
-      {syntheticResult && <LinePlot title="Step 1 output" x={syntheticResult.t} lines={syntheticLines} xLabel="Time" yLabel="Signal" />}
-      {syntheticResult && peakResult && <LinePlot title="Step 2 output" x={syntheticResult.t} lines={detectionLines} xLabel="Time" yLabel="Signal above baseline" />}
-      {syntheticResult && fitResult && <LinePlot title="Step 3 output" x={syntheticResult.t} lines={fitLines} xLabel="Time" yLabel="Signal" />}
+      {showStep1 && syntheticResult && <LinePlot title="Step 1 output" x={syntheticResult.t} lines={syntheticLines} xLabel="Time" yLabel="Signal" />}
+      {showStep2 && syntheticResult && peakResult && <LinePlot title="Step 2 output" x={syntheticResult.t} lines={detectionLines} xLabel="Time" yLabel="Signal" />}
+      {showStep3 && syntheticResult && fitResult && <LinePlot title="Step 3 output" x={syntheticResult.t} lines={fitLines} xLabel="Time" yLabel="Signal" />}
 
-      {peakResult && (
+      {showStep2 && peakResult && (
         <div className={styles.card}>
           <h3>Detected peak guesses</h3>
           <table className={styles.table}>
@@ -746,7 +911,7 @@ json.dumps(result)
         </div>
       )}
 
-      {fitResult && (
+      {showStep3 && fitResult && (
         <div className={styles.card}>
           <h3>Fitted components</h3>
           <table className={styles.table}>

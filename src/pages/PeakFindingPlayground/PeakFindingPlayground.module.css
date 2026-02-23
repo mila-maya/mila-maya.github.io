@@ -6,6 +6,12 @@
   gap: var(--spacing-md);
 }
 
+.embedded {
+  max-width: 100%;
+  margin: var(--spacing-sm) 0;
+  padding: 0;
+}
+
 .header {
   display: grid;
   gap: 0.55rem;

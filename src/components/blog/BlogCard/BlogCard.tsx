@@ -31,8 +31,8 @@ const BlogCard = ({ post }: BlogCardProps) => {
 
         <div className={styles.meta}>
           <span>{post.author}</span>
-          {formattedDate && <span>• {formattedDate}</span>}
-          {post.category && <span>• {post.category}</span>}
+          {formattedDate && <span>| {formattedDate}</span>}
+          {post.category && <span>| {post.category}</span>}
         </div>
 
         <p className={styles.excerpt}>{post.excerpt}</p>
@@ -47,7 +47,7 @@ const BlogCard = ({ post }: BlogCardProps) => {
           </div>
         )}
 
-        <span className={styles.readMore}>Read more →</span>
+        <span className={styles.readMore}>Read more {'->'}</span>
       </div>
     </Link>
   );

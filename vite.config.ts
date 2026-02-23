@@ -13,6 +13,17 @@ export default defineConfig({
       output: {
         manualChunks: {
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'markdown-vendor': [
+            'react-markdown',
+            'remark-gfm',
+            'rehype-raw',
+            'rehype-slug',
+          ],
+          'syntax-vendor': [
+            'rehype-highlight',
+            'highlight.js',
+            'lowlight',
+          ],
         }
       }
     }

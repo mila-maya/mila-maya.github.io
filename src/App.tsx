@@ -1,12 +1,16 @@
+import { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import MainLayout from '@layouts/MainLayout/MainLayout';
 import Home from '@pages/Home/Home';
-import About from '@pages/About/About';
-import Projects from '@pages/Projects/Projects';
-import Blog from '@pages/Blog/Blog';
-import BlogPost from '@pages/Blog/BlogPost';
-import Contact from '@pages/Contact/Contact';
-import BioinformaticToolbox from '@pages/BioinformaticToolbox/BioinformaticToolbox';
+
+const About = lazy(() => import('@pages/About/About'));
+const Projects = lazy(() => import('@pages/Projects/Projects'));
+const Blog = lazy(() => import('@pages/Blog/Blog'));
+const BlogPost = lazy(() => import('@pages/Blog/BlogPost'));
+const Contact = lazy(() => import('@pages/Contact/Contact'));
+const BioinformaticToolbox = lazy(() => import('@pages/BioinformaticToolbox/BioinformaticToolbox'));
+
+const routeFallback = <div style={{ padding: '2rem' }}>Loading...</div>;
 
 function App() {
   return (
@@ -14,12 +18,12 @@ function App() {
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/projects" element={<Projects />} />
-          <Route path="/projects/bioinformatic-toolbox" element={<BioinformaticToolbox />} />
-          <Route path="/blog" element={<Blog />} />
-          <Route path="/blog/:slug" element={<BlogPost />} />
-          <Route path="/contact" element={<Contact />} />
+          <Route path="/about" element={<Suspense fallback={routeFallback}><About /></Suspense>} />
+          <Route path="/projects" element={<Suspense fallback={routeFallback}><Projects /></Suspense>} />
+          <Route path="/projects/bioinformatic-toolbox" element={<Suspense fallback={routeFallback}><BioinformaticToolbox /></Suspense>} />
+          <Route path="/blog" element={<Suspense fallback={routeFallback}><Blog /></Suspense>} />
+          <Route path="/blog/:slug" element={<Suspense fallback={routeFallback}><BlogPost /></Suspense>} />
+          <Route path="/contact" element={<Suspense fallback={routeFallback}><Contact /></Suspense>} />
         </Route>
       </Routes>
     </BrowserRouter>

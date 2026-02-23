@@ -26,7 +26,6 @@ Radial molecular diffusion continuously moves molecules between streamlines, and
 *Injected band transport and resulting peak broadening.*
 
 At long enough times, the cross-section-averaged band is well approximated by a Gaussian profile [<a href="#ref-3">3</a>,<a href="#ref-5">5</a>].
-Smaller particles diffuse faster and produce narrower peaks; larger particles diffuse more slowly and produce broader peaks.
 
 ## 3) How size is computed from the detector peak
 
@@ -37,32 +36,41 @@ Smaller particles diffuse faster and produce narrower peaks; larger particles di
 
 The detector signal is converted to size in three linked steps.
 
-1. Fit the detector peak with a shared-<i>t</i><sub>0</sub> multi-Gaussian model (single Gaussian is the one-component case) to extract mean elution time <i>t</i><sub>0</sub> and temporal width parameter(s) <i>&sigma;</i><sub>i</sub> [<a href="#ref-3">3</a>,<a href="#ref-5">5</a>].
-2. Use Taylor-Aris to convert <i>t</i><sub>0</sub> and <i>&sigma;</i> (or <i>&sigma;</i><sub>i</sub>) into diffusion coefficient <i>D</i> [<a href="#ref-4">4</a>].
+1. Fit the detector peak with a shared-<i>t</i><sub>0</sub> multi-Gaussian model (single Gaussian is the one-component case, <i>i</i> = 1) to extract mean elution time <i>t</i><sub>0</sub> and component width parameter(s) <i>&sigma;</i><sub>i</sub> [<a href="#ref-3">3</a>,<a href="#ref-5">5</a>].
+2. Use Taylor-Aris to convert <i>t</i><sub>0</sub> and <i>&sigma;</i><sub>i</sub> into diffusion coefficient <i>D</i> [<a href="#ref-4">4</a>].
 3. Use Stokes-Einstein to convert <i>D</i> into hydrodynamic diameter <i>D</i><sub>h</sub> [<a href="#ref-6">6</a>,<a href="#ref-7">7</a>].
 
 In the Taylor-Aris regime, mean elution time <i>t</i><sub>0</sub> is mainly set by flow and capillary geometry between inlet and detector, while particle size is encoded in peak width [<a href="#ref-4">4</a>,<a href="#ref-5">5</a>].
 Smaller particles diffuse faster and therefore generate narrower peaks; larger particles diffuse more slowly and generate broader peaks.
 
-Terms used above:
+<details>
+<summary><strong>Terms used above (click to expand)</strong></summary>
+
+- <i>S</i>(<i>t</i>): detector signal as a function of time
+- <i>A</i><sub>i</sub>: fitted Gaussian area/amplitude of component <i>i</i> in a multi-Gaussian model (single Gaussian: <i>i</i> = 1)
 - <i>t</i><sub>0</sub>: mean elution time
-- <i>&sigma;</i>, <i>&sigma;</i><sub>i</sub>: temporal peak width parameter(s)
+- <i>&sigma;</i><sub>i</sub>: temporal peak-width parameter of component <i>i</i> (single Gaussian: <i>i</i> = 1)
 - <i>D</i>: diffusion coefficient
 - <i>D</i><sub>h</sub>: hydrodynamic diameter
+- <i>R</i><sub>c</sub>: capillary radius
+- <i>k</i><sub>B</sub>: Boltzmann constant
+- <i>T</i>: absolute temperature
+- <i>&eta;</i>: dynamic viscosity (solvent viscosity)
+</details>
 
 ## 4) Validity criteria: when the model is trustworthy
 
 Accurate TDA requires operation inside the Taylor-Aris validity window [<a href="#ref-4">4</a>,<a href="#ref-5">5</a>].
 Use three practical criteria:
 
-- Dimensionless residence time: <i>&tau;</i> = <i>D</i> * <i>t</i><sub>0</sub> / <i>R</i><sub>c</sub><sup>2</sup> with threshold <i>&tau;</i> &ge; 1.25 [<a href="#ref-4">4</a>]
-- Peclet number: <i>Pe</i> = <i>L</i><sub>eff</sub> * <i>R</i><sub>c</sub> / (<i>D</i> * <i>t</i><sub>0</sub>) with threshold <i>Pe</i> &ge; 40 [<a href="#ref-4">4</a>]
-- Particle-to-capillary ratio: <i>R</i><sub>h</sub> / <i>R</i><sub>c</sub> &le; 0.0051 [<a href="#ref-5">5</a>]
+- Dimensionless residence time: <i>&tau;</i> = <i>D</i> * <i>t</i><sub>0</sub> / <i>R</i><sub>c</sub><sup>2</sup> with threshold <i>&tau;</i> &ge; 1.25
+- Peclet number: <i>Pe</i> = <i>L</i><sub>eff</sub> * <i>R</i><sub>c</sub> / (<i>D</i> * <i>t</i><sub>0</sub>) with threshold <i>Pe</i> &ge; 40
+- Particle-to-capillary ratio: <i>R</i><sub>h</sub> / <i>R</i><sub>c</sub> &le; 0.0051
 
 These criteria define an operating pressure corridor for a target size range:
 
 ![Pressure-size operating window](/images/blog/tda-theory/pressure-map.png)
-*Pressure-size operating window recreated from published regime bounds (representative geometry: <i>R</i><sub>c</sub> = 25 &micro;m, <i>L</i><sub>total</sub> = 50 cm, <i>L</i><sub>eff</sub> = 41.8 cm), following Chamieh et al. [<a href="#ref-5">5</a>] and operating-constraint equations summarized by Cottet et al. [<a href="#ref-4">4</a>].*
+*Pressure-size operating window recreated from published regime bounds (representative geometry: <i>R</i><sub>c</sub> = 25 &micro;m, <i>L</i><sub>total</sub> = 50 cm, <i>L</i><sub>eff</sub> = 41.8 cm).*
 
 ## 5) Practical non-ideal effects
 

@@ -6,7 +6,6 @@ Generate a side-by-side figure with:
 Outputs:
 - content/diagrams/02-gaussian-fitting-taylor.pdf
 - public/images/blog/tda-theory/gaussian-fitting.svg
-- public/images/blog/tda-theory/gaussian-fitting.png
 """
 
 from pathlib import Path
@@ -220,15 +219,11 @@ def main():
     out_dir = repo_root / "public" / "images" / "blog" / "tda-theory"
     out_dir.mkdir(parents=True, exist_ok=True)
     svg_path = out_dir / "gaussian-fitting.svg"
-    png_path = out_dir / "gaussian-fitting.png"
-
     plt.savefig(svg_path, bbox_inches="tight")
-    plt.savefig(png_path, dpi=220, bbox_inches="tight")
     plt.close(fig)
 
     print(f"Saved: {pdf_path}")
     print(f"Saved: {svg_path}")
-    print(f"Saved: {png_path}")
 
 
 if __name__ == "__main__":

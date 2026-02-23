@@ -1,0 +1,172 @@
+.page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: var(--spacing-lg);
+  display: grid;
+  gap: var(--spacing-md);
+}
+
+.header {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.kicker {
+  font-size: var(--font-size-sm);
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--primary-color);
+}
+
+.status {
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  padding: 0.65rem 0.85rem;
+  font-size: 0.95rem;
+}
+
+.loading {
+  background: #f3f8ff;
+}
+
+.ready {
+  background: #effcf2;
+}
+
+.error {
+  background: #fff2f2;
+  color: #8b1f1f;
+}
+
+.errorBox {
+  border: 1px solid #eab5b5;
+  background: #fff4f4;
+  color: #7f1d1d;
+  border-radius: var(--border-radius-sm);
+  padding: 0.65rem 0.85rem;
+}
+
+.controlGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--spacing-sm);
+}
+
+.card {
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-sm);
+  display: grid;
+  gap: 0.65rem;
+}
+
+.fieldGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem 0.7rem;
+}
+
+.fieldGrid label {
+  display: grid;
+  gap: 0.25rem;
+  font-size: var(--font-size-sm);
+  color: var(--text-light);
+}
+
+.fieldGrid input {
+  width: 100%;
+  border: 1px solid #ced8e5;
+  border-radius: 0.45rem;
+  padding: 0.38rem 0.52rem;
+  font-size: 0.95rem;
+}
+
+.primaryButton {
+  border: none;
+  border-radius: 0.45rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--primary-color);
+  color: #fff;
+  font-weight: 600;
+}
+
+.primaryButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.smallNote {
+  font-size: var(--font-size-sm);
+  color: var(--text-light);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.table th,
+.table td {
+  border: 1px solid #d9e1ec;
+  padding: 0.42rem 0.5rem;
+  text-align: left;
+}
+
+.table input {
+  width: 100%;
+  border: 1px solid #ced8e5;
+  border-radius: 0.35rem;
+  padding: 0.3rem 0.4rem;
+}
+
+.plotCard {
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  background: #fff;
+  padding: var(--spacing-sm);
+  display: grid;
+  gap: 0.55rem;
+}
+
+.plotSvg {
+  width: 100%;
+  height: auto;
+}
+
+.axisText {
+  font-size: 0.86rem;
+  fill: #374151;
+}
+
+.legendRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+
+.legendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.86rem;
+}
+
+.legendSwatch {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+@media (max-width: 760px) {
+  .page {
+    padding: var(--spacing-sm);
+  }
+
+  .fieldGrid {
+    grid-template-columns: 1fr;
+  }
+}

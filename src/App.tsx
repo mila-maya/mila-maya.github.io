@@ -9,6 +9,7 @@ const Blog = lazy(() => import('@pages/Blog/Blog'));
 const BlogPost = lazy(() => import('@pages/Blog/BlogPost'));
 const Contact = lazy(() => import('@pages/Contact/Contact'));
 const BioinformaticToolbox = lazy(() => import('@pages/BioinformaticToolbox/BioinformaticToolbox'));
+const PeakFindingPlayground = lazy(() => import('@pages/PeakFindingPlayground/PeakFindingPlayground'));
 
 const routeFallback = <div style={{ padding: '2rem' }}>Loading...</div>;
 
@@ -23,6 +24,7 @@ function App() {
           <Route path="/projects/bioinformatic-toolbox" element={<Suspense fallback={routeFallback}><BioinformaticToolbox /></Suspense>} />
           <Route path="/blog" element={<Suspense fallback={routeFallback}><Blog /></Suspense>} />
           <Route path="/blog/:slug" element={<Suspense fallback={routeFallback}><BlogPost /></Suspense>} />
+          <Route path="/playground/peak-finding" element={<Suspense fallback={routeFallback}><PeakFindingPlayground /></Suspense>} />
           <Route path="/contact" element={<Suspense fallback={routeFallback}><Contact /></Suspense>} />
         </Route>
       </Routes>

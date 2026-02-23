@@ -11,10 +11,10 @@ export const blogPosts: BlogPost[] = [
 ## 1) What TDA measures
 
 Taylor Dispersion Analysis (TDA) estimates the diffusion coefficient D of a solute and converts it into hydrodynamic size.
-For nanoparticles, this gives the hydrodynamic diameter Dₕ, which reflects how the particle moves in a fluid.
+For nanoparticles, this gives the hydrodynamic diameter D<sub>h</sub>, which reflects how the particle moves in a fluid.
 
-![Hydrodynamic diameter schematic](/images/blog/tda-theory/hydrodynamic-diameter.png)
-*Hydrodynamic diameter concept.*
+<p align="center"><img src="/images/blog/tda-theory/hydrodynamic-diameter.png" alt="Hydrodynamic diameter schematic" width="420" /></p>
+<p align="center"><em>Hydrodynamic diameter concept.</em></p>
 
 ## 2) Core principle of Taylor-Aris dispersion
 
@@ -26,28 +26,32 @@ Radial molecular diffusion continuously moves molecules between streamlines, and
 *Injected band transport and resulting peak broadening.*
 
 At long enough times, the cross-section-averaged band is well approximated by a Gaussian profile.
+Smaller particles diffuse faster and produce narrower peaks; larger particles diffuse more slowly and produce broader peaks.
 
 ## 3) How size is computed from the detector peak
+
+![Gaussian fitting in TDA](/images/blog/tda-theory/gaussian-fitting.svg)
+*Single and shared-t<sub>0</sub> multi-Gaussian fitting examples (left: single peak, right: Gaussian sum for overlapping components).*
 
 ![Compiled TikZ diagram: from taylorgram to hydrodynamic diameter](/images/blog/tda-theory/taylorgram-to-dh.svg)
 
 The detector signal is converted to size in three linked steps.
 
-1. Fit the detector peak with a Gaussian to extract mean elution time t₀ and temporal peak width σ.
-2. Use Taylor-Aris to convert mean elution time t₀ and temporal peak width σ into diffusion coefficient D.
-3. Use Stokes-Einstein to convert D into hydrodynamic diameter Dₕ.
+1. Fit the detector peak with a shared-t<sub>0</sub> multi-Gaussian model (single Gaussian is the one-component case) to extract mean elution time t<sub>0</sub> and temporal width parameter(s) sigma<sub>i</sub>.
+2. Use Taylor-Aris to convert t<sub>0</sub> and sigma (or sigma<sub>i</sub>) into diffusion coefficient D.
+3. Use Stokes-Einstein to convert D into hydrodynamic diameter D<sub>h</sub>.
 
-In the Taylor-Aris regime, mean elution time t₀ is mainly set by flow and capillary geometry between inlet and detector, while particle size is encoded in peak width.
+In the Taylor-Aris regime, mean elution time t<sub>0</sub> is mainly set by flow and capillary geometry between inlet and detector, while particle size is encoded in peak width.
 Smaller particles diffuse faster and therefore generate narrower peaks; larger particles diffuse more slowly and generate broader peaks.
 
 ## 4) Validity criteria: when the model is trustworthy
 
 Accurate TDA requires operation inside the Taylor-Aris validity window.
-The thesis uses three practical criteria:
+Use three practical criteria:
 
-- Dimensionless residence time: tau = D * t₀ / Rc^2 with threshold tau >= 1.25
-- Peclet number: Pe = u * Rc / D with threshold Pe >= 40
-- Particle-to-capillary ratio: Rₕ / Rc <= 0.0051
+- Dimensionless residence time: tau = D * t<sub>0</sub> / R<sub>c</sub><sup>2</sup> with threshold tau ≥ 1.25
+- Peclet number: Pe = L<sub>eff</sub> * R<sub>c</sub> / (D * t<sub>0</sub>) with threshold Pe ≥ 40
+- Particle-to-capillary ratio: R<sub>h</sub> / R<sub>c</sub> ≤ 0.0051
 
 These criteria define an operating pressure corridor for a target size range:
 
@@ -60,18 +64,10 @@ Even inside a valid Taylor-Aris pressure window, non-ideal effects can still bia
 
 - **Capillary wall interactions (tailing):** transient adsorption at the wall creates asymmetric Taylorgrams and extra broadening. This inflates apparent peak width and can overestimate hydrodynamic size.
 - **Hydrodynamic chromatography bias (finite-size exclusion):** if the particle-to-capillary ratio is too high, particles are partially excluded from the slow near-wall region. That shifts elution earlier and perturbs width, biasing diffusion and size.
-- **Oversized injection plugs:** if injected volume is too large, the initial plug width adds variance that is not molecular diffusion. A common practical limit is Vi / Vc <= 1% (often lower in practice).
+- **Oversized injection plugs:** if injected volume is too large, the initial plug width adds variance that is not molecular diffusion. A common practical limit is V<sub>i</sub> / V<sub>c</sub> ≤ 1% (often lower in practice).
 
 ![Capillary interaction schematic](/images/blog/tda-theory/capillary-interaction.png)
-*Wall interaction mechanism and resulting peak tailing.*
-
-## 6) Gaussian modeling in automated analysis
-
-For monodisperse signals, a single Gaussian is typically sufficient.
-For mixtures, a shared-t₀ multi-Gaussian model is often used in TDA workflows.
-
-![Gaussian fitting in TDA](/images/blog/tda-theory/gaussian-fitting.png)
-*Single- and multi-Gaussian models for TDA peak fitting.*
+*Analyte-wall interactions in a bare fused-silica capillary: deprotonated silanol groups (SiO-) can transiently bind cationic or amphiphilic analytes, causing tailing and additional dispersion.*
 
 ## Bibliography
 

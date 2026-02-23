@@ -41,9 +41,10 @@
 
   % Right equations
   \node[eq, right=4.4cm of mid1] (eqg) {
-    {\Large\bfseries Single Gaussian}\\[0.2em]
-    $\displaystyle S(t)=\frac{A}{\sigma\sqrt{2\pi}}
-      \exp\!\left(-\frac{(t-t_0)^2}{2\sigma^2}\right)$
+    {\Large\bfseries Gaussian Model}\\[0.2em]
+    $\displaystyle S(t)=\sum_i\frac{A_i}{\sigma_i\sqrt{2\pi}}
+      \exp\!\left(-\frac{(t-t_0)^2}{2\sigma_i^2}\right)$\\[0.15em]
+    {\small single Gaussian: one term \,$(i=1)$}
   };
 
   \node[eq, right=4.4cm of mid2] (eqt) {

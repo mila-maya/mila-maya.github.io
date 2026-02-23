@@ -14,7 +14,7 @@ export const blogPosts: BlogPost[] = [
 
 Run the three code windows in order in the same Python session.
 
-Prefer a notebook-like UI in the browser? Open the interactive playground: [Peak Finding Playground](/playground/peak-finding).
+Prefer a notebook-like UI in the browser? Open the interactive playground in My Projects: [Peak Finding Playground](/projects/peak-finding).
 
 ## 1) Create a synthetic chromatogram (overlapping peaks)
 

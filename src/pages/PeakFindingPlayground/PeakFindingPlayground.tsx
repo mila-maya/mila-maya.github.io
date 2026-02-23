@@ -655,6 +655,7 @@ json.dumps(result)
         <p className={styles.kicker}>Interactive Playground</p>
         <h1>Peak Finding by Area Gain (Pyodide)</h1>
         <p>Run the three notebook-like steps directly in browser and tweak parameters live.</p>
+        <Link to="/projects">Back to My Projects</Link>
         <Link to="/blog/peak-finding-area-gain-synthetic-chromatogram">Back to blog post</Link>
       </header>
 

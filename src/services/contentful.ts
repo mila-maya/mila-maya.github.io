@@ -4,6 +4,16 @@ import { projects as localProjects } from '@/data/projects';
 
 // Using local data files instead of Contentful CMS
 // To add/edit content, simply update the files in src/data/blogPosts.ts and src/data/projects.ts
+const legacyBlogSlugAliases: Record<string, string> = {
+  'peak-finding-area-gain-synthetic-chromatogram':
+    'peak-detection-deconvolution-overlapping-chromatograms'
+};
+
+const normalizeSlug = (value: string): string =>
+  decodeURIComponent(value)
+    .trim()
+    .replace(/^\/+|\/+$/g, '')
+    .toLowerCase();
 
 // Fetch all blog posts
 export const getBlogPosts = async (limit = 100): Promise<BlogPost[]> => {
@@ -22,7 +32,9 @@ export const getBlogPosts = async (limit = 100): Promise<BlogPost[]> => {
 export const getBlogPostBySlug = async (slug: string): Promise<BlogPost | null> => {
   return new Promise((resolve) => {
     setTimeout(() => {
-      const post = localBlogPosts.find(p => p.slug === slug) || null;
+      const normalizedSlug = normalizeSlug(slug);
+      const resolvedSlug = legacyBlogSlugAliases[normalizedSlug] ?? normalizedSlug;
+      const post = localBlogPosts.find((entry) => normalizeSlug(entry.slug) === resolvedSlug) || null;
       resolve(post);
     }, 100);
   });

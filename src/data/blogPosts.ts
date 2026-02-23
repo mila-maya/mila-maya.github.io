@@ -32,6 +32,35 @@ Model the signal as baseline plus Gaussian components:
 - Add random noise to emulate measured data.
 </details>
 
+<details>
+<summary><strong>Code (toggle)</strong></summary>
+
+~~~python
+import numpy as np
+import matplotlib.pyplot as plt
+
+rng = np.random.default_rng(5)
+t = np.linspace(0.0, 120.0, 1500)
+
+def gauss(x, A, t0, sigma):
+    return A * np.exp(-0.5 * ((x - t0) / sigma) ** 2)
+
+baseline = 0.025 + 0.00025 * t + 0.008 * np.sin(t / 11.0)
+components = [(0.42, 38.0, 5.2), (0.55, 49.5, 4.0), (0.35, 58.0, 6.6)]
+
+clean = baseline.copy()
+for A, t0, sigma in components:
+    clean += gauss(t, A, t0, sigma)
+y = clean + rng.normal(0.0, 0.012, size=t.size)
+
+plt.plot(t, y, lw=1.2, label="Synthetic chromatogram")
+plt.plot(t, clean, "--", lw=1.0, label="Clean signal")
+plt.legend()
+plt.show()
+~~~
+
+</details>
+
 <peak-finding-playground-step-1></peak-finding-playground-step-1>
 
 ## Step 2 - Detect peaks by area gain
@@ -66,6 +95,58 @@ Parameter initialization from accepted windows:
 - Build initial guesses (<i>A</i><sub>i</sub>, <i>t</i><sub>0,i</sub>, <i>&sigma;</i><sub>i</sub>) from detected center and window bounds.
 </details>
 
+<details>
+<summary><strong>Code (toggle)</strong></summary>
+
+~~~python
+from scipy.signal import find_peaks
+import numpy as np
+
+def grow_region_by_area_gain(x, signal, center_idx, gain_threshold=0.02, min_half=8, max_half=260):
+    prev_area = None
+    best_left = max(0, center_idx - min_half)
+    best_right = min(len(signal) - 1, center_idx + min_half)
+    for half in range(min_half, max_half + 1):
+        left = max(0, center_idx - half)
+        right = min(len(signal) - 1, center_idx + half)
+        area = np.trapz(signal[left:right + 1], x[left:right + 1])
+        if prev_area is not None and prev_area > 0:
+            gain = (area - prev_area) / prev_area
+            if gain < gain_threshold:
+                break
+        best_left, best_right, prev_area = left, right, area
+    best_area = np.trapz(signal[best_left:best_right + 1], x[best_left:best_right + 1])
+    return best_left, best_right, best_area
+
+seed_idx, _ = find_peaks(y, prominence=0.03, distance=85)
+regions = []
+for idx in seed_idx:
+    left, right, area = grow_region_by_area_gain(t, y, int(idx), gain_threshold=0.02)
+    regions.append({"idx": int(idx), "t0": float(t[idx]), "tLeft": float(t[left]), "tRight": float(t[right]), "area": float(area)})
+
+total_area = sum(r["area"] for r in regions) or 1.0
+for r in regions:
+    r["relativeArea"] = r["area"] / total_area
+
+kept = []
+for r in sorted(regions, key=lambda r: r["area"], reverse=True):
+    if r["relativeArea"] < 0.08:
+        continue
+    if all(abs(r["t0"] - k["t0"]) >= 6.0 for k in kept):
+        kept.append(r)
+kept = sorted(kept, key=lambda r: r["t0"])
+
+peak_guesses = []
+for r in kept:
+    li = np.searchsorted(t, r["tLeft"], side="left")
+    ri = np.searchsorted(t, r["tRight"], side="right") - 1
+    ci = np.searchsorted(t, r["t0"], side="left")
+    sigma_i = max((float(t[ri]) - float(t[li])) / 6.0, 0.2)
+    peak_guesses.append({"A_i": float(y[ci]), "t0_i": float(r["t0"]), "sigma_i": float(sigma_i)})
+~~~
+
+</details>
+
 <peak-finding-playground-step-2></peak-finding-playground-step-2>
 
 ## Step 3 - Fit multi-Gaussian model from detected guesses
@@ -91,6 +172,51 @@ For overlapping signals, the fit is refined as a multi-component deconvolution p
 - Add baseline parameters.
 - Run nonlinear least-squares (curve_fit).
 - Report component parameters and <i>R</i><sup>2</sup>.
+</details>
+
+<details>
+<summary><strong>Code (toggle)</strong></summary>
+
+~~~python
+from scipy.optimize import curve_fit
+import numpy as np
+
+def multi_gauss_with_linear_baseline(x, *params):
+    n_comp = (len(params) - 2) // 3
+    c0, c1 = params[-2], params[-1]
+    y_fit = c0 + c1 * (x - np.mean(x))
+    for i in range(n_comp):
+        A_i, t0_i, sigma_i = params[3 * i: 3 * i + 3]
+        y_fit += gauss(x, A_i, t0_i, sigma_i)
+    return y_fit
+
+def fit_with_guesses(t, y, guesses, min_sigma=0.4, max_sigma=25.0, maxfev=120000):
+    p0, lb, ub = [], [], []
+    span = max(float(np.max(y) - np.min(y)), 0.1)
+    for g in guesses:
+        p0.extend([max(float(g["A_i"]), 1e-5), float(g["t0_i"]), min(max(float(g["sigma_i"]), min_sigma), max_sigma)])
+        lb.extend([0.0, float(np.min(t)), min_sigma])
+        ub.extend([span * 5.0, float(np.max(t)), max_sigma])
+    p0.extend([float(np.median(y)), 0.0])
+    lb.extend([float(np.min(y)) - 0.5, -0.05])
+    ub.extend([float(np.max(y)) + 0.5, 0.05])
+    popt, _ = curve_fit(multi_gauss_with_linear_baseline, t, y, p0=p0, bounds=(lb, ub), maxfev=maxfev)
+    y_fit = multi_gauss_with_linear_baseline(t, *popt)
+    ss_res = np.sum((y - y_fit) ** 2)
+    ss_tot = np.sum((y - np.mean(y)) ** 2)
+    r2 = 1.0 - ss_res / ss_tot if ss_tot > 0 else float("nan")
+    return popt, y_fit, r2
+
+target_r2 = 0.996
+best = None
+for n in range(1, len(peak_guesses) + 1):
+    trial = sorted(sorted(peak_guesses, key=lambda g: g["A_i"], reverse=True)[:n], key=lambda g: g["t0_i"])
+    popt, y_fit, r2 = fit_with_guesses(t, y, trial)
+    best = (popt, y_fit, r2)
+    if r2 >= target_r2:
+        break
+~~~
+
 </details>
 
 <peak-finding-playground-step-3></peak-finding-playground-step-3>

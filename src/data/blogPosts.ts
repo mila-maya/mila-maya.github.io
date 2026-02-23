@@ -3,7 +3,7 @@ import type { BlogPost } from '@/types/contentful.types';
 // Add your blog posts here - just edit this file to add/update posts!
 export const blogPosts: BlogPost[] = [
   {
-    title: "Automatic Peak Detection and Deconvolution for Overlapping Peaks in Chromatograms",
+    title: "Automatic Detection and Deconvolution of Overlapping Chromatographic Peaks",
     slug: "peak-detection-deconvolution-overlapping-chromatograms",
     excerpt: "A runnable 3-step workflow for automatic peak detection and deconvolution of overlapping chromatographic peaks.",
     content: `This post presents a three-step runnable workflow for overlapping chromatograms, following maxima-first peak processing and adaptive deconvolution used in MOCCA-style analysis [<a href="#pf-ref-1">1</a>,<a href="#pf-ref-2">2</a>,<a href="#pf-ref-3">3</a>,<a href="#pf-ref-5">5</a>].

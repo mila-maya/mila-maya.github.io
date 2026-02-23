@@ -3,6 +3,116 @@ import type { BlogPost } from '@/types/contentful.types';
 // Add your blog posts here - just edit this file to add/update posts!
 export const blogPosts: BlogPost[] = [
   {
+    title: "Taylor Dispersion Analysis: General Theory and Practical Limits",
+    slug: "taylor-dispersion-analysis-general-theory",
+    excerpt: "A compact theory guide to Taylor Dispersion Analysis (TDA), from Taylor-Aris physics to validity criteria, with figures from my master thesis.",
+    content: `This post summarizes the core theory section of my master thesis and the physical assumptions used by the Taylor Board Dash app.
+
+## 1) What TDA measures
+
+Taylor Dispersion Analysis (TDA) estimates the diffusion coefficient \`D\` of a solute and converts it into hydrodynamic size.
+For nanoparticles, this gives the hydrodynamic diameter \`D_h\`, which reflects how the particle moves in a fluid.
+
+![Hydrodynamic diameter schematic](/images/blog/tda-theory/hydrodynamic-diameter.png)
+*Figure from thesis: hydrodynamic diameter concept.*
+
+## 2) Core principle of Taylor-Aris dispersion
+
+A small sample plug is injected into a capillary under pressure-driven laminar flow (Poiseuille flow).
+Velocity is highest in the center and lowest near the wall.
+Radial molecular diffusion continuously moves molecules between streamlines, and this coupling produces net longitudinal spreading.
+
+![TDA principle and peak broadening](/images/blog/tda-theory/tda-combined-presentation.png)
+*Figure from presentation: injected band transport and resulting peak broadening.*
+
+At long enough times, the cross-section-averaged band is well approximated by a Gaussian profile.
+
+## 3) How size is computed from the detector peak
+
+![Compiled TikZ diagram: from taylorgram to hydrodynamic diameter](/images/blog/tda-theory/taylorgram-to-dh.svg)
+
+The detector signal is converted to size in three linked steps.
+
+1. Fit the detector peak with a Gaussian to extract mean elution time t₀ and temporal peak width σ.
+2. Use Taylor-Aris to convert mean elution time t₀ and temporal peak width σ into diffusion coefficient D.
+3. Use Stokes-Einstein to convert D into hydrodynamic diameter Dₕ.
+
+In the Taylor-Aris regime, mean elution time t₀ is mainly set by flow and capillary geometry between inlet and detector, while particle size is encoded in peak width.
+Smaller particles diffuse faster and therefore generate narrower peaks; larger particles diffuse more slowly and generate broader peaks.
+
+## 4) Validity criteria: when the model is trustworthy
+
+Accurate TDA requires operation inside the Taylor-Aris validity window.
+The thesis uses three practical criteria:
+
+- Dimensionless residence time: \`tau = D * t0 / R_c^2\` with threshold \`tau >= 1.25\`
+- Peclet number: \`Pe = u * R_c / D\` with threshold \`Pe >= 40\`
+- Particle-to-capillary ratio: \`R_h / R_c <= 0.0051\`
+
+These criteria define an operating pressure corridor for a target size range:
+
+![Pressure-size operating window](/images/blog/tda-theory/pressure-map.png)
+*Figure from thesis: pressure map for valid Taylor-Aris operation.*
+
+## 5) Practical non-ideal effects
+
+Even in a valid pressure window, capillary wall interactions can distort the peak shape and bias size estimates.
+This often appears as tailing.
+
+![Capillary interaction schematic](/images/blog/tda-theory/capillary-interaction.png)
+*Figure from thesis: wall interaction mechanism and tailing risk.*
+
+Instrument pressure ramps can also shift observed \`t0\`, so a ramp correction is commonly applied in method validation:
+
+\`\`\`text
+t0 = t0_observed - t_ramp / 2
+\`\`\`
+
+![Pressure ramp timing effect](/images/blog/tda-theory/pressure-ramp.png)
+*Figure from thesis: analyte-independent delay from pressure ramping.*
+
+## 6) Gaussian modeling in automated analysis
+
+For monodisperse signals, a single Gaussian is typically sufficient.
+For mixtures, a shared-\`t0\` multi-Gaussian model is often used in TDA workflows.
+
+![Gaussian fitting in TDA](/images/blog/tda-theory/gaussian-fitting.png)
+*Figure from thesis: single and mixture Gaussian fitting models.*
+
+## 7) Connection to the Dash app
+
+The Taylor Board app implements this theory in a full pipeline:
+
+1. Import raw CE/DAD files
+2. Detect candidate peaks
+3. Select analysis windows
+4. Fit Gaussian components
+5. Compute \`D\`, \`R_h\`, and \`D_h\`
+6. Validate run conditions with Taylor-Aris criteria
+
+That is the bridge from first-principles transport theory to reproducible, automated size estimation in daily lab work.
+
+## Bibliography
+
+1. Taylor, G. I. (1953). *Dispersion of soluble matter in solvent flowing slowly through a tube*. Proceedings of the Royal Society A, 219(1137), 186-203.
+2. Taylor, G. I. (1954). *Conditions under which dispersion of a solute in a stream of solvent can be used to measure molecular diffusion*. Proceedings of the Royal Society A, 225(1163), 473-477. https://doi.org/10.1098/rspa.1954.0216
+3. Aris, R. (1956). *On the dispersion of a solute in a solvent flowing through a tube*. Proceedings of the Royal Society A, 235(1200), 67-77.
+4. Cottet, H., Biron, J.-P., & Martin, M. (2014). *On the optimization of operating conditions for Taylor dispersion analysis of mixtures*. The Analyst, 139(14), 3552-3562. https://doi.org/10.1039/c4an00192c
+5. Chamieh, J., Leclercq, L., Martin, M., Slaoui, S., Jensen, H., Ostergaard, J., & Cottet, H. (2017). *Limits in Size of Taylor Dispersion Analysis*. Analytical Chemistry, 89(24), 13487-13493. https://doi.org/10.1021/acs.analchem.7b03806
+6. Einstein, A. (1905). *On the motion of small particles suspended in liquids at rest required by the molecular-kinetic theory of heat*. Annalen der Physik, 17, 549-560.
+7. Sutherland, W. (1905). *A dynamical theory of diffusion for non-electrolytes and the molecular mass of albumin*. Philosophical Magazine, 9, 781-785.
+`,
+    featuredImage: {
+      url: "/images/blog/tda-theory/tda-combined-presentation.png",
+      title: "Taylor Dispersion Analysis principle",
+      description: "Injected band transport and Taylor dispersion broadening from the presentation"
+    },
+    author: "Mila",
+    publishedDate: "2026-02-22T10:00:00.000Z",
+    tags: ["Taylor Dispersion Analysis", "Nanoparticle Sizing", "CE", "Theory", "Master Thesis"],
+    category: "Science"
+  },
+  {
     title: "The Thesis Setup I Wish I Had on Day One",
     slug: "getting-started-masters-thesis-workflow",
     excerpt: "A practical setup for a code-heavy thesis: LaTeX, VS Code, and AI tools that actually help.",

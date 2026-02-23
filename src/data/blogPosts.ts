@@ -3,37 +3,34 @@ import type { BlogPost } from '@/types/contentful.types';
 // Add your blog posts here - just edit this file to add/update posts!
 export const blogPosts: BlogPost[] = [
   {
-    title: "Automatic Peak Detection and Fitting for Overlapping Peaks in Chromatograms",
+    title: "Automatic Peak Detection and Deconvolution for Overlapping Peaks in Chromatograms",
     slug: "peak-finding-area-gain-synthetic-chromatogram",
     excerpt: "A runnable 3-step workflow for automatic peak detection and multi-Gaussian fitting of overlapping chromatographic peaks.",
-    content: `This post is structured as three linked steps.  
-For each step you get: theory with formulas -> short algorithm -> embedded runnable playground.
-The workflow follows chromatography automation ideas used in MOCCA (original + later expanded version) and iterative multivariate deconvolution for overlapping peaks [<a href="#pf-ref-1">1</a>,<a href="#pf-ref-2">2</a>,<a href="#pf-ref-3">3</a>,<a href="#pf-ref-5">5</a>].
+    content: `This post presents a three-step runnable workflow for overlapping chromatograms, following maxima-first peak processing and adaptive deconvolution used in MOCCA-style analysis [<a href="#pf-ref-1">1</a>,<a href="#pf-ref-2">2</a>,<a href="#pf-ref-3">3</a>,<a href="#pf-ref-5">5</a>].
 
 ## Step 1 - Build a synthetic chromatogram (overlapping peaks)
 
-**Theory**
+<details>
+<summary><strong>Theory and algorithm</strong></summary>
 
 Model the signal as baseline plus Gaussian components:
 
-<i>S</i>(<i>t</i>) = <i>B</i>(<i>t</i>) + &Sigma;<sub>i</sub> <i>A</i><sub>i</sub> exp(-(<i>t</i> - <i>t</i><sub>0,i</sub>)<sup>2</sup> / (2 <i>&sigma;</i><sub>i</sub><sup>2</sup>))
+<p align="center"><i>S</i>(<i>t</i>) = <i>B</i>(<i>t</i>) + &Sigma;<sub>i</sub> <i>A</i><sub>i</sub> exp&#8201;[ -(<i>t</i> - <i>t</i><sub>0,i</sub>)<sup>2</sup> / (2<i>&sigma;</i><sub>i</sub><sup>2</sup>) ]</p>
 
 - <i>B</i>(<i>t</i>): baseline drift
-- <i>A</i><sub>i</sub>: amplitude of component <i>i</i>
-- <i>t</i><sub>0,i</sub>: center time of component <i>i</i>
-- <i>&sigma;</i><sub>i</sub>: width of component <i>i</i>
+- <i>A</i><sub>i</sub>: component amplitude
+- <i>t</i><sub>0,i</sub>: component center time
+- <i>&sigma;</i><sub>i</sub>: component width
 
-<details>
-<summary><strong>Algorithm (toggle)</strong></summary>
-
-- Create time axis <i>t</i>.
-- Define baseline <i>B</i>(<i>t</i>).
-- Add multiple overlapping Gaussian components.
-- Add random noise to emulate measured data.
+Algorithm:
+1. Create the time axis <i>t</i>.
+2. Define baseline <i>B</i>(<i>t</i>).
+3. Add overlapping Gaussian components.
+4. Add random noise to emulate measurement.
 </details>
 
 <details>
-<summary><strong>Code (toggle)</strong></summary>
+<summary><strong>Python snippet</strong></summary>
 
 ~~~python
 import numpy as np
@@ -65,44 +62,29 @@ plt.show()
 
 ## Step 2 - MOCCA-style peak picking and significance filtering
 
-**Theory**
-
-Peak picking is maxima-first on the measured signal <i>S</i>(<i>t</i>) and then filtered by significance criteria [<a href="#pf-ref-2">2</a>].
-For each candidate peak <i>i</i>, define area over its local prominence-base interval:
-
-<i>Q</i><sub>i</sub> = &int; <i>S</i>(<i>t</i>) d<i>t</i>
-
-Relative prominence and relative area:
-
-<i>p</i><sub>i,rel</sub> = <i>p</i><sub>i</sub> / max<sub>j</sub><i>p</i><sub>j</sub>, &nbsp;&nbsp;
-<i>Q</i><sub>i,rel</sub> = <i>Q</i><sub>i</sub> / &Sigma;<sub>j</sub><i>Q</i><sub>j</sub>
-
-Keep peaks that satisfy all three thresholds:
-
-- minimum height/prominence
-- minimum relative prominence
-- minimum relative area [<a href="#pf-ref-2">2</a>]
-
-Relative-area filtering is also consistent with integration-focused chromatography practice [<a href="#pf-ref-4">4</a>].
-
-Initial guesses from accepted peaks:
-
-- <i>t</i><sub>0,i</sub>: center time of detected peak <i>i</i>
-- <i>A</i><sub>i</sub>: signal at <i>t</i><sub>0,i</sub>
-- <i>&sigma;</i><sub>i</sub>: initialized to 1.0 during fitting (not guessed in peak detection)
-
 <details>
-<summary><strong>Algorithm (toggle)</strong></summary>
+<summary><strong>Theory and algorithm</strong></summary>
 
-- Find seed maxima on the measured signal with minimum prominence.
-- Calculate relative prominence and relative area for all candidates.
-- Keep only candidates above threshold values.
-- Apply a simple minimum spacing rule between kept centers.
-- Build initial guesses (<i>A</i><sub>i</sub>, <i>t</i><sub>0,i</sub>) from accepted centers only.
+Peak picking is maxima-first on the measured signal <i>S</i>(<i>t</i>), followed by significance filtering [<a href="#pf-ref-2">2</a>].  
+For each candidate peak <i>i</i>, compute area over its local prominence-base interval:
+
+<p align="center"><i>Q</i><sub>i</sub> = &int;<sub><i>t</i><sub>L,i</sub></sub><sup><i>t</i><sub>R,i</sub></sup> <i>S</i>(<i>t</i>) d<i>t</i></p>
+
+<p align="center"><i>p</i><sub>i,rel</sub> = <i>p</i><sub>i</sub> / max<sub>j</sub><i>p</i><sub>j</sub>, &nbsp; <i>Q</i><sub>i,rel</sub> = <i>Q</i><sub>i</sub> / &Sigma;<sub>j</sub><i>Q</i><sub>j</sub></p>
+
+Keep candidates by three thresholds:
+1. Minimum prominence (absolute height criterion).
+2. Minimum relative prominence.
+3. Minimum relative area [<a href="#pf-ref-2">2</a>,<a href="#pf-ref-4">4</a>].
+
+Then apply minimum spacing and keep accepted centers as initialization points:
+- <i>A</i><sub>i</sub>: signal at center.
+- <i>t</i><sub>0,i</sub>: detected center time.
+- <i>&sigma;</i><sub>i</sub> is not guessed here.
 </details>
 
 <details>
-<summary><strong>Code (toggle)</strong></summary>
+<summary><strong>Python snippet</strong></summary>
 
 ~~~python
 from scipy.signal import find_peaks
@@ -115,6 +97,7 @@ min_spacing = 4.0
 
 seed_idx, info = find_peaks(
     y,
+    height=-np.inf,
     prominence=min_height,
 )
 
@@ -159,7 +142,8 @@ kept = sorted(selected, key=lambda r: r["t0"])
 
 peak_guesses = []
 for r in kept:
-    ci = np.searchsorted(t, r["t0"], side="left")
+    ci = int(r["idx"])
+    ci = max(0, min(ci, len(t) - 1))
     peak_guesses.append({"A_i": float(y[ci]), "t0_i": float(r["t0"])})
 ~~~
 
@@ -169,34 +153,26 @@ for r in kept:
 
 ## Step 3 - Fit multi-Gaussian model from detected guesses
 
-**Theory**
-
-Fit the measured signal with Gaussian sum plus linear baseline:
-
-<i>S</i>(<i>t</i>) = &Sigma;<sub>i</sub> <i>A</i><sub>i</sub> exp(-(<i>t</i> - <i>t</i><sub>0,i</sub>)<sup>2</sup> / (2 <i>&sigma;</i><sub>i</sub><sup>2</sup>)) + <i>c</i><sub>0</sub> + <i>c</i><sub>1</sub>(<i>t</i> - mean(<i>t</i>))
-
-Use step-2 guesses (<i>A</i><sub>i</sub>, <i>t</i><sub>0,i</sub>) as initial values and start each <i>&sigma;</i><sub>i</sub> at 1.0 before optimization.  
-Evaluate fit quality with:
-
-<i>R</i><sup>2</sup> = 1 - SS<sub>res</sub> / SS<sub>tot</sub>
-
-For overlapping signals, refine as a multi-component deconvolution problem and increase component count until fit quality is acceptable (MSE/R<sup>2</sup>-driven adaptive strategy as used in MOCCA workflows) [<a href="#pf-ref-2">2</a>,<a href="#pf-ref-3">3</a>,<a href="#pf-ref-5">5</a>].  
-To avoid overfitting, require a minimum <i>&Delta;R</i><sup>2</sup> improvement before accepting an additional component.
-
 <details>
-<summary><strong>Algorithm (toggle)</strong></summary>
+<summary><strong>Theory and algorithm</strong></summary>
 
-- Build initial parameter vector from peak guesses.
-- Initialize all <i>&sigma;</i><sub>i</sub> at 1.0 (bounded by min/max limits).
-- Set lower and upper bounds.
-- Add baseline parameters.
-- Run nonlinear least-squares (curve_fit).
-- If a higher-component model reaches target <i>R</i><sup>2</sup> with only marginal gain, keep the simpler previous model.
-- Report component parameters and <i>R</i><sup>2</sup>.
+Fit the measured signal with a Gaussian sum plus linear baseline:
+
+<p align="center"><i>S</i>(<i>t</i>) = &Sigma;<sub>i</sub> <i>A</i><sub>i</sub> exp&#8201;[ -(<i>t</i> - <i>t</i><sub>0,i</sub>)<sup>2</sup> / (2<i>&sigma;</i><sub>i</sub><sup>2</sup>) ] + <i>c</i><sub>0</sub> + <i>c</i><sub>1</sub>(<i>t</i> - mean(<i>t</i>))</p>
+
+Use Step 2 guesses (<i>A</i><sub>i</sub>, <i>t</i><sub>0,i</sub>), initialize each <i>&sigma;</i><sub>i</sub> at 1.0, and optimize with bounded nonlinear least squares.
+
+<p align="center"><i>R</i><sup>2</sup> = 1 - SS<sub>res</sub> / SS<sub>tot</sub>, &nbsp; &Delta;<i>R</i><sup>2</sup><sub>n</sub> = <i>R</i><sup>2</sup><sub>n</sub> - <i>R</i><sup>2</sup><sub>n-1</sub></p>
+
+Adaptive component selection [<a href="#pf-ref-2">2</a>,<a href="#pf-ref-3">3</a>,<a href="#pf-ref-5">5</a>]:
+1. Increase component count in amplitude-ranked order.
+2. Track the best model by <i>R</i><sup>2</sup>.
+3. When target <i>R</i><sup>2</sup> is reached, require <i>&Delta;R</i><sup>2</sup> to exceed the minimum gain; if not, keep the lower-component model.
+4. If target is never reached, return the best model.
 </details>
 
 <details>
-<summary><strong>Code (toggle)</strong></summary>
+<summary><strong>Python snippet</strong></summary>
 
 ~~~python
 from scipy.optimize import curve_fit
@@ -263,8 +239,8 @@ if selected is None:
 5. <span id="pf-ref-5"></span>MOCCA2 package and documentation. https://pypi.org/project/mocca2/ ; https://bayer-group.github.io/MOCCA/ ; source: https://github.com/Bayer-Group/MOCCA
 `,
     featuredImage: {
-      url: "/images/blog/tda-theory/gaussian-fitting.svg",
-      title: "Automatic peak detection and fitting",
+      url: "/images/blog/peak-deconvolution/gaussian-fitting.svg",
+      title: "Automatic peak detection and deconvolution",
       description: "Synthetic overlapping peaks, MOCCA-style detection, and multi-Gaussian fitting"
     },
     author: "Mila",

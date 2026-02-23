@@ -21,6 +21,12 @@
   object-fit: cover;
 }
 
+.imageContain {
+  object-fit: contain;
+  background: #ffffff;
+  padding: 0.25rem;
+}
+
 .imagePlaceholder {
   width: 100%;
   height: 200px;

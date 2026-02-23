@@ -11,6 +11,8 @@ const BlogCard = ({ post }: BlogCardProps) => {
   const formattedDate = post.publishedDate
     ? format(new Date(post.publishedDate), 'MMM dd, yyyy')
     : '';
+  const imageUrl = post.featuredImage?.url ?? '';
+  const isSvg = /\.svg(\?|$)/i.test(imageUrl);
 
   return (
     <Link to={`/blog/${post.slug}`} className={styles.card}>
@@ -18,7 +20,7 @@ const BlogCard = ({ post }: BlogCardProps) => {
         <img
           src={post.featuredImage.url}
           alt={post.featuredImage.title || post.title}
-          className={styles.image}
+          className={`${styles.image} ${isSvg ? styles.imageContain : ''}`}
         />
       ) : (
         <div className={styles.imagePlaceholder}>

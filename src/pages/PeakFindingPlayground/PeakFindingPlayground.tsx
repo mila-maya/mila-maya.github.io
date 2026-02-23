@@ -104,6 +104,8 @@ interface PlotLine {
   label: string;
   color: string;
   y: number[];
+  fillTo?: number[];
+  fillOpacity?: number;
   dash?: string;
   points?: Array<{ x: number; y: number }>;
   strokeWidth?: number;
@@ -467,6 +469,7 @@ const LinePlot = ({ x, lines, title, xLabel, yLabel }: { x: number[]; lines: Plo
 
   const yValues = lines.flatMap((line) => [
     ...line.y,
+    ...(line.fillTo ?? []),
     ...(line.points?.map((point) => point.y) ?? []),
   ]);
   const yMinRaw = Math.min(...yValues);
@@ -484,6 +487,29 @@ const LinePlot = ({ x, lines, title, xLabel, yLabel }: { x: number[]; lines: Plo
       <h3>{title}</h3>
       <svg viewBox={`0 0 ${width} ${height}`} className={styles.plotSvg}>
         <rect x={left} y={top} width={innerWidth} height={innerHeight} fill="#fff" stroke="#d8deea" />
+        {lines.map((line) => {
+          if (!line.fillTo || line.y.length < 2 || line.fillTo.length === 0) {
+            return null;
+          }
+          const upper = x.map((time, idx) => {
+            const yValue = line.y[idx] ?? line.y[line.y.length - 1] ?? 0;
+            return `${mapX(time).toFixed(2)},${mapY(yValue).toFixed(2)}`;
+          });
+          const lower = x.map((time, idx) => {
+            const reverseIdx = x.length - 1 - idx;
+            const yValue = line.fillTo?.[reverseIdx] ?? line.fillTo?.[line.fillTo.length - 1] ?? 0;
+            return `${mapX(time).toFixed(2)},${mapY(yValue).toFixed(2)}`;
+          });
+          return (
+            <polygon
+              key={`${line.label}-fill`}
+              fill={line.color}
+              fillOpacity={line.fillOpacity ?? 0.14}
+              stroke="none"
+              points={`${upper.join(' ')} ${lower.join(' ')}`}
+            />
+          );
+        })}
         {lines.map((line) => (
           line.y.length > 1 ? (
             <polyline
@@ -756,18 +782,13 @@ json.dumps(result)
         label: `Fit component ${index + 1}`,
         color: COLORS[(index + 2) % COLORS.length],
         y: addBaseline(component.y, fitResult.baselineFit),
+        fillTo: fitResult.baselineFit,
+        fillOpacity: 0.14,
         dash: '3 3',
       });
     });
     return lines;
   }, [fitResult, syntheticResult]);
-
-  const statusText =
-    runtimeStatus === 'loading'
-      ? 'Loading Pyodide runtime (numpy + scipy)...'
-      : runtimeStatus === 'ready'
-        ? 'Runtime ready.'
-        : 'Runtime failed.';
 
   return (
     <section className={`${styles.page} ${embedded ? styles.embedded : ''}`}>
@@ -804,9 +825,7 @@ json.dumps(result)
         </header>
       ) : null}
 
-      <div className={`${styles.status} ${runtimeStatus === 'ready' ? styles.ready : runtimeStatus === 'error' ? styles.error : styles.loading}`}>
-        <strong>Runtime:</strong> {statusText} {runtimeError}
-      </div>
+      {runtimeStatus === 'error' && runtimeError && <div className={styles.errorBox}>Runtime error: {runtimeError}</div>}
 
       {actionError && <div className={styles.errorBox}>Error: {actionError}</div>}
 

@@ -22,10 +22,11 @@ function App() {
           <Route path="/projects" element={<Suspense fallback={routeFallback}><Projects /></Suspense>} />
           <Route path="/work" element={<Navigate to="/projects" replace />} />
           <Route path="/projects/bioinformatic-toolbox" element={<Suspense fallback={routeFallback}><BioinformaticToolbox /></Suspense>} />
-          <Route path="/projects/peak-finding" element={<Navigate to="/blog/peak-finding-area-gain-synthetic-chromatogram" replace />} />
+          <Route path="/projects/peak-finding" element={<Navigate to="/blog/peak-detection-deconvolution-overlapping-chromatograms" replace />} />
           <Route path="/blog" element={<Suspense fallback={routeFallback}><Blog /></Suspense>} />
+          <Route path="/blog/peak-finding-area-gain-synthetic-chromatogram" element={<Navigate to="/blog/peak-detection-deconvolution-overlapping-chromatograms" replace />} />
           <Route path="/blog/:slug" element={<Suspense fallback={routeFallback}><BlogPost /></Suspense>} />
-          <Route path="/playground/peak-finding" element={<Navigate to="/blog/peak-finding-area-gain-synthetic-chromatogram" replace />} />
+          <Route path="/playground/peak-finding" element={<Navigate to="/blog/peak-detection-deconvolution-overlapping-chromatograms" replace />} />
           <Route path="/contact" element={<Suspense fallback={routeFallback}><Contact /></Suspense>} />
         </Route>
       </Routes>

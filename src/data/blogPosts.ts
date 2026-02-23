@@ -5,16 +5,16 @@ export const blogPosts: BlogPost[] = [
   {
     title: "Taylor Dispersion Analysis: General Theory and Practical Limits",
     slug: "taylor-dispersion-analysis-general-theory",
-    excerpt: "A compact theory guide to Taylor Dispersion Analysis (TDA), from Taylor-Aris physics to validity criteria, with figures from my master thesis.",
-    content: `This post summarizes the core theory section of my master thesis and the physical assumptions used by the Taylor Board Dash app.
+    excerpt: "A compact theory guide to Taylor Dispersion Analysis (TDA), from Taylor-Aris physics to validity criteria.",
+    content: `This post summarizes the core theory of Taylor Dispersion Analysis and the physical assumptions used by the Taylor Board Dash app.
 
 ## 1) What TDA measures
 
-Taylor Dispersion Analysis (TDA) estimates the diffusion coefficient \`D\` of a solute and converts it into hydrodynamic size.
-For nanoparticles, this gives the hydrodynamic diameter \`D_h\`, which reflects how the particle moves in a fluid.
+Taylor Dispersion Analysis (TDA) estimates the diffusion coefficient D of a solute and converts it into hydrodynamic size.
+For nanoparticles, this gives the hydrodynamic diameter Dₕ, which reflects how the particle moves in a fluid.
 
 ![Hydrodynamic diameter schematic](/images/blog/tda-theory/hydrodynamic-diameter.png)
-*Figure from thesis: hydrodynamic diameter concept.*
+*Hydrodynamic diameter concept.*
 
 ## 2) Core principle of Taylor-Aris dispersion
 
@@ -23,7 +23,7 @@ Velocity is highest in the center and lowest near the wall.
 Radial molecular diffusion continuously moves molecules between streamlines, and this coupling produces net longitudinal spreading.
 
 ![TDA principle and peak broadening](/images/blog/tda-theory/tda-combined-presentation.png)
-*Figure from presentation: injected band transport and resulting peak broadening.*
+*Injected band transport and resulting peak broadening.*
 
 At long enough times, the cross-section-averaged band is well approximated by a Gaussian profile.
 
@@ -45,52 +45,33 @@ Smaller particles diffuse faster and therefore generate narrower peaks; larger p
 Accurate TDA requires operation inside the Taylor-Aris validity window.
 The thesis uses three practical criteria:
 
-- Dimensionless residence time: \`tau = D * t0 / R_c^2\` with threshold \`tau >= 1.25\`
-- Peclet number: \`Pe = u * R_c / D\` with threshold \`Pe >= 40\`
-- Particle-to-capillary ratio: \`R_h / R_c <= 0.0051\`
+- Dimensionless residence time: tau = D * t₀ / Rc^2 with threshold tau >= 1.25
+- Peclet number: Pe = u * Rc / D with threshold Pe >= 40
+- Particle-to-capillary ratio: Rₕ / Rc <= 0.0051
 
 These criteria define an operating pressure corridor for a target size range:
 
 ![Pressure-size operating window](/images/blog/tda-theory/pressure-map.png)
-*Figure from thesis: pressure map for valid Taylor-Aris operation.*
+*Operating window for valid Taylor-Aris conditions.*
 
 ## 5) Practical non-ideal effects
 
-Even in a valid pressure window, capillary wall interactions can distort the peak shape and bias size estimates.
-This often appears as tailing.
+Even inside a valid Taylor-Aris pressure window, non-ideal effects can still bias size estimates.
+
+- **Capillary wall interactions (tailing):** transient adsorption at the wall creates asymmetric Taylorgrams and extra broadening. This inflates apparent peak width and can overestimate hydrodynamic size.
+- **Hydrodynamic chromatography bias (finite-size exclusion):** if the particle-to-capillary ratio is too high, particles are partially excluded from the slow near-wall region. That shifts elution earlier and perturbs width, biasing diffusion and size.
+- **Oversized injection plugs:** if injected volume is too large, the initial plug width adds variance that is not molecular diffusion. A common practical limit is Vi / Vc <= 1% (often lower in practice).
 
 ![Capillary interaction schematic](/images/blog/tda-theory/capillary-interaction.png)
-*Figure from thesis: wall interaction mechanism and tailing risk.*
-
-Instrument pressure ramps can also shift observed \`t0\`, so a ramp correction is commonly applied in method validation:
-
-\`\`\`text
-t0 = t0_observed - t_ramp / 2
-\`\`\`
-
-![Pressure ramp timing effect](/images/blog/tda-theory/pressure-ramp.png)
-*Figure from thesis: analyte-independent delay from pressure ramping.*
+*Wall interaction mechanism and resulting peak tailing.*
 
 ## 6) Gaussian modeling in automated analysis
 
 For monodisperse signals, a single Gaussian is typically sufficient.
-For mixtures, a shared-\`t0\` multi-Gaussian model is often used in TDA workflows.
+For mixtures, a shared-t₀ multi-Gaussian model is often used in TDA workflows.
 
 ![Gaussian fitting in TDA](/images/blog/tda-theory/gaussian-fitting.png)
-*Figure from thesis: single and mixture Gaussian fitting models.*
-
-## 7) Connection to the Dash app
-
-The Taylor Board app implements this theory in a full pipeline:
-
-1. Import raw CE/DAD files
-2. Detect candidate peaks
-3. Select analysis windows
-4. Fit Gaussian components
-5. Compute \`D\`, \`R_h\`, and \`D_h\`
-6. Validate run conditions with Taylor-Aris criteria
-
-That is the bridge from first-principles transport theory to reproducible, automated size estimation in daily lab work.
+*Single- and multi-Gaussian models for TDA peak fitting.*
 
 ## Bibliography
 
@@ -105,7 +86,7 @@ That is the bridge from first-principles transport theory to reproducible, autom
     featuredImage: {
       url: "/images/blog/tda-theory/tda-combined-presentation.png",
       title: "Taylor Dispersion Analysis principle",
-      description: "Injected band transport and Taylor dispersion broadening from the presentation"
+      description: "Injected band transport and Taylor dispersion broadening"
     },
     author: "Mila",
     publishedDate: "2026-02-22T10:00:00.000Z",
@@ -171,13 +152,13 @@ Clean up build artifacts: \`latexmk -c\`
 ## 4) Using AI
 
 - **ChatGPT Projects** — uploaded literature papers to summarize key points, find gaps, and consult with the literature while writing
-- **Codex in VS Code** — fixing LaTeX errors, organizing files, and building the presentation from thesis figures, tables, and content
+- **Codex in VS Code** — fixing LaTeX errors, organizing files, and building the presentation from figures, tables, and key content
 - **Claude in VS Code** — rewriting and summarizing text in a fluent, friendly tone
 - **Claude in Windsurf** — improving structure, removing repetition, and making content leaner
 
 The editor-based tools — Codex and Claude — see your entire project, not just a single file or snippet. For rewriting, I preferred Claude over ChatGPT. ChatGPT tends to produce stiff, bullet-heavy text, while Claude reads more naturally.
 
-For the presentation, I let Codex generate slides directly from thesis content — figures, tables, and key points. No need to start from scratch.
+For the presentation, I let Codex generate slides directly from my project content — figures, tables, and key points. No need to start from scratch.
 
 One thing to watch out for: AI will confidently make up references and citations. Always verify.
 

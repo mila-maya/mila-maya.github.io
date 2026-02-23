@@ -34,3 +34,12 @@ build/
 
 # Local project workspace
 project/
+
+# Temporary MOCCA analysis artifacts
+/mocca_src/
+/mocca2_src/
+/mocca-*.whl
+/mocca2-*.whl
+/.tmp_mocca/
+/.tmp_mocca_old/
+/.tmp_pkg/

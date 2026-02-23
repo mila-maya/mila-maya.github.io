@@ -8,7 +8,7 @@ export const blogPosts: BlogPost[] = [
     excerpt: "A runnable 3-step workflow for automatic peak detection and multi-Gaussian fitting of overlapping chromatographic peaks.",
     content: `This post is structured as three linked steps.  
 For each step you get: theory with formulas -> short algorithm -> embedded runnable playground.
-The workflow follows chromatography automation ideas used in MOCCA (original + later expanded version) and iterative multivariate deconvolution for overlapping peaks [<a href="#pf-ref-1">1</a>,<a href="#pf-ref-2">2</a>,<a href="#pf-ref-3">3</a>].
+The workflow follows chromatography automation ideas used in MOCCA (original + later expanded version) and iterative multivariate deconvolution for overlapping peaks [<a href="#pf-ref-1">1</a>,<a href="#pf-ref-2">2</a>,<a href="#pf-ref-3">3</a>,<a href="#pf-ref-5">5</a>].
 
 ## Step 1 - Build a synthetic chromatogram (overlapping peaks)
 
@@ -46,7 +46,7 @@ def gauss(x, A, t0, sigma):
     return A * np.exp(-0.5 * ((x - t0) / sigma) ** 2)
 
 baseline = 0.025 + 0.00025 * t + 0.008 * np.sin(t / 11.0)
-components = [(0.42, 38.0, 5.2), (0.55, 49.5, 4.0), (0.35, 58.0, 6.6)]
+components = [(0.50, 34.0, 4.4), (0.62, 51.0, 4.2), (0.38, 62.0, 5.4)]
 
 clean = baseline.copy()
 for A, t0, sigma in components:
@@ -63,36 +63,42 @@ plt.show()
 
 <peak-finding-playground-step-1></peak-finding-playground-step-1>
 
-## Step 2 - Detect peaks by area gain
+## Step 2 - MOCCA-style peak picking and significance filtering
 
 **Theory**
 
-For each seed peak, expand a symmetric window step-by-step directly on the measured signal <i>S</i>(<i>t</i>).
-Let <i>Q</i><sub>k</sub> be area at expansion step <i>k</i>:
+Peak picking is maxima-first on the measured signal <i>S</i>(<i>t</i>) and then filtered by significance criteria [<a href="#pf-ref-2">2</a>].
+For each candidate peak <i>i</i>, define area over its local prominence-base interval:
 
-<i>Q</i><sub>k</sub> = &int; <i>S</i>(<i>t</i>) d<i>t</i>
+<i>Q</i><sub>i</sub> = &int; <i>S</i>(<i>t</i>) d<i>t</i>
 
-Relative area gain:
+Relative prominence and relative area:
 
-<i>g</i><sub>k</sub> = (<i>Q</i><sub>k</sub> - <i>Q</i><sub>k-1</sub>) / <i>Q</i><sub>k-1</sub>
+<i>p</i><sub>i,rel</sub> = <i>p</i><sub>i</sub> / max<sub>j</sub><i>p</i><sub>j</sub>, &nbsp;&nbsp;
+<i>Q</i><sub>i,rel</sub> = <i>Q</i><sub>i</sub> / &Sigma;<sub>j</sub><i>Q</i><sub>j</sub>
 
-Stop when <i>g</i><sub>k</sub> drops below threshold.  
-Then keep only peaks with meaningful relative area and spacing, consistent with practical chromatographic integration logic [<a href="#pf-ref-4">4</a>].
+Keep peaks that satisfy all three thresholds:
 
-Parameter initialization from accepted windows:
+- minimum height/prominence
+- minimum relative prominence
+- minimum relative area [<a href="#pf-ref-2">2</a>]
+
+Relative-area filtering is also consistent with integration-focused chromatography practice [<a href="#pf-ref-4">4</a>].
+
+Initial guesses from accepted peaks:
 
 - <i>t</i><sub>0,i</sub>: center time of detected peak <i>i</i>
 - <i>A</i><sub>i</sub>: signal at <i>t</i><sub>0,i</sub>
-- <i>&sigma;</i><sub>i</sub> &asymp; (<i>t</i><sub>right,i</sub> - <i>t</i><sub>left,i</sub>) / 6
+- <i>&sigma;</i><sub>i</sub>: initialized to 1.0 during fitting (not guessed in peak detection)
 
 <details>
 <summary><strong>Algorithm (toggle)</strong></summary>
 
-- Find seed maxima (prominence, distance) on the measured signal.
-- Grow each seed window symmetrically and monitor area gain.
-- Stop growth when gain threshold is crossed.
-- Filter candidates by relative area and spacing.
-- Build initial guesses (<i>A</i><sub>i</sub>, <i>t</i><sub>0,i</sub>, <i>&sigma;</i><sub>i</sub>) from detected center and window bounds.
+- Find seed maxima on the measured signal with minimum prominence.
+- Calculate relative prominence and relative area for all candidates.
+- Keep only candidates above threshold values.
+- Apply a simple minimum spacing rule between kept centers.
+- Build initial guesses (<i>A</i><sub>i</sub>, <i>t</i><sub>0,i</sub>) from accepted centers only.
 </details>
 
 <details>
@@ -102,47 +108,59 @@ Parameter initialization from accepted windows:
 from scipy.signal import find_peaks
 import numpy as np
 
-def grow_region_by_area_gain(x, signal, center_idx, gain_threshold=0.02, min_half=8, max_half=260):
-    prev_area = None
-    best_left = max(0, center_idx - min_half)
-    best_right = min(len(signal) - 1, center_idx + min_half)
-    for half in range(min_half, max_half + 1):
-        left = max(0, center_idx - half)
-        right = min(len(signal) - 1, center_idx + half)
-        area = np.trapz(signal[left:right + 1], x[left:right + 1])
-        if prev_area is not None and prev_area > 0:
-            gain = (area - prev_area) / prev_area
-            if gain < gain_threshold:
-                break
-        best_left, best_right, prev_area = left, right, area
-    best_area = np.trapz(signal[best_left:best_right + 1], x[best_left:best_right + 1])
-    return best_left, best_right, best_area
+min_height = 0.03
+min_rel_height = 0.01
+min_rel_area = 0.02
+min_spacing = 4.0
 
-seed_idx, _ = find_peaks(y, prominence=0.03, distance=85)
-regions = []
-for idx in seed_idx:
-    left, right, area = grow_region_by_area_gain(t, y, int(idx), gain_threshold=0.02)
-    regions.append({"idx": int(idx), "t0": float(t[idx]), "tLeft": float(t[left]), "tRight": float(t[right]), "area": float(area)})
+seed_idx, info = find_peaks(
+    y,
+    prominence=min_height,
+)
 
-total_area = sum(r["area"] for r in regions) or 1.0
-for r in regions:
+max_prom = np.max(info["prominences"]) if len(seed_idx) else 0.0
+if max_prom > 0:
+    keep = (info["prominences"] / max_prom) > min_rel_height
+else:
+    keep = np.ones(len(seed_idx), dtype=bool)
+
+maxima = seed_idx[keep]
+left_bases = info["left_bases"][keep]
+right_bases = info["right_bases"][keep]
+prominences = info["prominences"][keep]
+candidates = []
+area_fn = np.trapezoid if hasattr(np, "trapezoid") else np.trapz
+for i in range(len(maxima)):
+    li = int(left_bases[i])
+    ri = int(right_bases[i])
+    li = max(0, min(li, len(y) - 1))
+    ri = max(0, min(ri, len(y) - 1))
+    if ri <= li:
+        ri = min(li + 1, len(y) - 1)
+    area = area_fn(y[li:ri + 1], t[li:ri + 1])
+    candidates.append({
+        "idx": int(maxima[i]),
+        "t0": float(t[maxima[i]]),
+        "prominence": float(prominences[i]),
+        "area": float(max(area, 0.0))
+    })
+
+total_area = sum(r["area"] for r in candidates) or 1.0
+for r in candidates:
     r["relativeArea"] = r["area"] / total_area
 
-kept = []
-for r in sorted(regions, key=lambda r: r["area"], reverse=True):
-    if r["relativeArea"] < 0.08:
-        continue
-    if all(abs(r["t0"] - k["t0"]) >= 6.0 for k in kept):
-        kept.append(r)
-kept = sorted(kept, key=lambda r: r["t0"])
+kept = [r for r in candidates if r["relativeArea"] >= min_rel_area]
+kept = sorted(kept, key=lambda r: r["prominence"], reverse=True)
+selected = []
+for r in kept:
+    if all(abs(r["t0"] - s["t0"]) >= min_spacing for s in selected):
+        selected.append(r)
+kept = sorted(selected, key=lambda r: r["t0"])
 
 peak_guesses = []
 for r in kept:
-    li = np.searchsorted(t, r["tLeft"], side="left")
-    ri = np.searchsorted(t, r["tRight"], side="right") - 1
     ci = np.searchsorted(t, r["t0"], side="left")
-    sigma_i = max((float(t[ri]) - float(t[li])) / 6.0, 0.2)
-    peak_guesses.append({"A_i": float(y[ci]), "t0_i": float(r["t0"]), "sigma_i": float(sigma_i)})
+    peak_guesses.append({"A_i": float(y[ci]), "t0_i": float(r["t0"])})
 ~~~
 
 </details>
@@ -157,20 +175,23 @@ Fit the measured signal with Gaussian sum plus linear baseline:
 
 <i>S</i>(<i>t</i>) = &Sigma;<sub>i</sub> <i>A</i><sub>i</sub> exp(-(<i>t</i> - <i>t</i><sub>0,i</sub>)<sup>2</sup> / (2 <i>&sigma;</i><sub>i</sub><sup>2</sup>)) + <i>c</i><sub>0</sub> + <i>c</i><sub>1</sub>(<i>t</i> - mean(<i>t</i>))
 
-Use step-2 guesses as initial values.  
+Use step-2 guesses (<i>A</i><sub>i</sub>, <i>t</i><sub>0,i</sub>) as initial values and start each <i>&sigma;</i><sub>i</sub> at 1.0 before optimization.  
 Evaluate fit quality with:
 
 <i>R</i><sup>2</sup> = 1 - SS<sub>res</sub> / SS<sub>tot</sub>
 
-For overlapping signals, the fit is refined as a multi-component deconvolution problem [<a href="#pf-ref-3">3</a>].
+For overlapping signals, refine as a multi-component deconvolution problem and increase component count until fit quality is acceptable (MSE/R<sup>2</sup>-driven adaptive strategy as used in MOCCA workflows) [<a href="#pf-ref-2">2</a>,<a href="#pf-ref-3">3</a>,<a href="#pf-ref-5">5</a>].  
+To avoid overfitting, require a minimum <i>&Delta;R</i><sup>2</sup> improvement before accepting an additional component.
 
 <details>
 <summary><strong>Algorithm (toggle)</strong></summary>
 
 - Build initial parameter vector from peak guesses.
+- Initialize all <i>&sigma;</i><sub>i</sub> at 1.0 (bounded by min/max limits).
 - Set lower and upper bounds.
 - Add baseline parameters.
 - Run nonlinear least-squares (curve_fit).
+- If a higher-component model reaches target <i>R</i><sup>2</sup> with only marginal gain, keep the simpler previous model.
 - Report component parameters and <i>R</i><sup>2</sup>.
 </details>
 
@@ -194,7 +215,8 @@ def fit_with_guesses(t, y, guesses, min_sigma=0.4, max_sigma=25.0, maxfev=120000
     p0, lb, ub = [], [], []
     span = max(float(np.max(y) - np.min(y)), 0.1)
     for g in guesses:
-        p0.extend([max(float(g["A_i"]), 1e-5), float(g["t0_i"]), min(max(float(g["sigma_i"]), min_sigma), max_sigma)])
+        sigma0 = min(max(1.0, min_sigma), max_sigma)
+        p0.extend([max(float(g["A_i"]), 1e-5), float(g["t0_i"]), sigma0])
         lb.extend([0.0, float(np.min(t)), min_sigma])
         ub.extend([span * 5.0, float(np.max(t)), max_sigma])
     p0.extend([float(np.median(y)), 0.0])
@@ -208,13 +230,24 @@ def fit_with_guesses(t, y, guesses, min_sigma=0.4, max_sigma=25.0, maxfev=120000
     return popt, y_fit, r2
 
 target_r2 = 0.996
-best = None
+min_r2_gain = 0.01
+selected = None
+prev_model = None
+best_model = None
 for n in range(1, len(peak_guesses) + 1):
     trial = sorted(sorted(peak_guesses, key=lambda g: g["A_i"], reverse=True)[:n], key=lambda g: g["t0_i"])
     popt, y_fit, r2 = fit_with_guesses(t, y, trial)
-    best = (popt, y_fit, r2)
+    if best_model is None or r2 > best_model[2]:
+        best_model = (popt, y_fit, r2)
     if r2 >= target_r2:
+        if prev_model is not None and (r2 - prev_model[2]) < min_r2_gain:
+            selected = prev_model
+            break
+        selected = (popt, y_fit, r2)
         break
+    prev_model = (popt, y_fit, r2)
+if selected is None:
+    selected = best_model
 ~~~
 
 </details>
@@ -227,11 +260,12 @@ for n in range(1, len(peak_guesses) + 1):
 2. <span id="pf-ref-2"></span>Oboril, J., Haas, C. P., Luebbesmeyer, M., Nicholls, R., Gressling, T., Jensen, K. F., Volpin, G., & Hillenbrand, J. (2024). *Automated processing of chromatograms: a comprehensive Python package with a GUI for intelligent peak identification and deconvolution in chemical reaction analysis*. Digital Discovery, 3(10), 2041-2051. https://doi.org/10.1039/D4DD00214H
 3. <span id="pf-ref-3"></span>Erny, G. L., Moeenfard, M., & Alves, A. (2021). *Iterative multivariate peaks fitting-A robust approach for the analysis of non-baseline resolved chromatographic peaks*. Separations, 8(10), 178. https://doi.org/10.3390/separations8100178
 4. <span id="pf-ref-4"></span>Snow, N. H. (2019). *From detector to decision, part IV: demystifying peak integration*. LCGC North America. https://www.chromatographyonline.com/view/detector-decision-part-iv-demystifying-peak-integration
+5. <span id="pf-ref-5"></span>MOCCA2 package and documentation. https://pypi.org/project/mocca2/ ; https://bayer-group.github.io/MOCCA/ ; source: https://github.com/Bayer-Group/MOCCA
 `,
     featuredImage: {
       url: "/images/blog/tda-theory/gaussian-fitting.svg",
       title: "Automatic peak detection and fitting",
-      description: "Synthetic overlapping peaks, area-gain detection, and multi-Gaussian fitting"
+      description: "Synthetic overlapping peaks, MOCCA-style detection, and multi-Gaussian fitting"
     },
     author: "Mila",
     publishedDate: "2026-02-23T18:00:00.000Z",

@@ -26,10 +26,9 @@ interface SyntheticParams {
 }
 
 interface PeakParams {
-  prominence: number;
-  distance: number;
-  gainThreshold: number;
-  relativeAreaMin: number;
+  minHeight: number;
+  minRelHeight: number;
+  minRelArea: number;
   minSpacing: number;
 }
 
@@ -38,6 +37,7 @@ interface FitParams {
   maxSigma: number;
   maxIterations: number;
   targetR2: number;
+  minR2Gain: number;
 }
 
 interface SyntheticResult {
@@ -51,14 +51,12 @@ interface SyntheticResult {
 interface PeakGuess {
   A_i: number;
   t0_i: number;
-  sigma_i: number;
 }
 
 interface KeptPeak {
   idx: number;
   t0: number;
-  tLeft: number;
-  tRight: number;
+  prominence: number;
   relativeArea: number;
 }
 
@@ -82,6 +80,7 @@ interface FitResult {
   components: FitComponent[];
   r2: number;
   targetR2: number;
+  minR2Gain: number;
 }
 
 interface PyodideGlobals {
@@ -121,18 +120,17 @@ const DEFAULT_SYNTHETIC: SyntheticParams = {
   baselineWaveAmp: 0.008,
   baselineWavePeriod: 11,
   components: [
-    { A: 0.42, t0: 38, sigma: 5.2 },
-    { A: 0.55, t0: 49.5, sigma: 4.0 },
-    { A: 0.35, t0: 58, sigma: 6.6 },
+    { A: 0.5, t0: 34, sigma: 4.4 },
+    { A: 0.62, t0: 51, sigma: 4.2 },
+    { A: 0.38, t0: 62, sigma: 5.4 },
   ],
 };
 
 const DEFAULT_PEAK: PeakParams = {
-  prominence: 0.03,
-  distance: 85,
-  gainThreshold: 0.02,
-  relativeAreaMin: 0.08,
-  minSpacing: 6,
+  minHeight: 0.03,
+  minRelHeight: 0.01,
+  minRelArea: 0.02,
+  minSpacing: 4.0,
 };
 
 const DEFAULT_FIT: FitParams = {
@@ -140,6 +138,7 @@ const DEFAULT_FIT: FitParams = {
   maxSigma: 25,
   maxIterations: 120000,
   targetR2: 0.996,
+  minR2Gain: 0.01,
 };
 
 const COLORS = ['#1f4fba', '#2ca02c', '#ff7f0e', '#9467bd', '#17a2b8', '#d62728'];
@@ -157,6 +156,11 @@ _state = {}
 def _gauss(x, A, t0, sigma):
     sigma_safe = max(float(sigma), 1e-6)
     return float(A) * np.exp(-0.5 * ((x - float(t0)) / sigma_safe) ** 2)
+
+def _integrate_area(y_segment, t_segment):
+    if hasattr(np, "trapezoid"):
+        return float(np.trapezoid(y_segment, t_segment))
+    return float(np.trapz(y_segment, t_segment))
 
 def generate_synthetic(payload):
     seed = int(payload.get("seed", 5))
@@ -202,29 +206,7 @@ def generate_synthetic(payload):
         "components": [curve.tolist() for curve in component_curves],
     }
 
-def _grow_region_by_gain(x, signal, center_idx, gain_threshold=0.02, min_half=8, max_half=260):
-    center = int(center_idx)
-    n = len(signal)
-    previous_area = None
-    best_left = max(0, center - min_half)
-    best_right = min(n - 1, center + min_half)
-
-    for half in range(min_half, max_half + 1):
-        left = max(0, center - half)
-        right = min(n - 1, center + half)
-        area = float(np.trapz(signal[left:right + 1], x[left:right + 1]))
-        if previous_area is not None and previous_area > 0:
-            gain = (area - previous_area) / previous_area
-            if gain < gain_threshold:
-                break
-        best_left = left
-        best_right = right
-        previous_area = area
-
-    best_area = float(np.trapz(signal[best_left:best_right + 1], x[best_left:best_right + 1]))
-    return best_left, best_right, best_area
-
-def find_peaks_area_gain(payload):
+def find_peaks_mocca_style(payload):
     if "t" not in _state or "y" not in _state:
         raise RuntimeError("Run step 1 first.")
 
@@ -232,52 +214,78 @@ def find_peaks_area_gain(payload):
     y = _state["y"]
     signal = np.asarray(y, dtype=float)
 
-    prominence = max(float(payload.get("prominence", 0.03)), 1e-6)
-    distance = max(int(payload.get("distance", 85)), 1)
-    gain_threshold = float(payload.get("gainThreshold", 0.02))
-    relative_area_min = max(float(payload.get("relativeAreaMin", 0.08)), 0.0)
-    min_spacing = max(float(payload.get("minSpacing", 6.0)), 0.0)
+    min_height = max(float(payload.get("minHeight", 0.03)), 1e-8)
+    min_rel_height = max(float(payload.get("minRelHeight", 0.01)), 0.0)
+    min_rel_area = max(float(payload.get("minRelArea", 0.02)), 0.0)
+    min_spacing = max(float(payload.get("minSpacing", 4.0)), 0.0)
 
-    seed_idx, _ = find_peaks(signal, prominence=prominence, distance=distance)
-    regions = []
-    for idx in seed_idx.tolist():
-        left, right, area = _grow_region_by_gain(t, signal, idx, gain_threshold=gain_threshold)
-        regions.append({
-            "idx": int(idx),
-            "t0": float(t[idx]),
-            "tLeft": float(t[left]),
-            "tRight": float(t[right]),
-            "area": float(area),
+    seed_idx, info = find_peaks(
+        signal,
+        height=-np.inf,
+        prominence=min_height,
+    )
+
+    if len(seed_idx) == 0:
+        _state["peak_guesses"] = []
+        return {
+            "signal": signal.tolist(),
+            "seedIdx": [],
+            "kept": [],
+            "peakGuesses": [],
+        }
+
+    max_prominence = float(np.max(info["prominences"])) if len(info["prominences"]) > 0 else 0.0
+    if max_prominence > 0.0:
+        keep_mask = (info["prominences"] / max_prominence) > min_rel_height
+    else:
+        keep_mask = np.ones(len(seed_idx), dtype=bool)
+
+    maxima = seed_idx[keep_mask]
+    left_bases = info["left_bases"][keep_mask]
+    right_bases = info["right_bases"][keep_mask]
+    prominences = info["prominences"][keep_mask]
+
+    candidates = []
+    for idx in range(len(maxima)):
+        left = max(0, min(int(left_bases[idx]), len(signal) - 1))
+        right = max(0, min(int(right_bases[idx]), len(signal) - 1))
+        maximum = max(0, min(int(maxima[idx]), len(signal) - 1))
+        if right <= left:
+            right = min(left + 1, len(signal) - 1)
+        area = _integrate_area(signal[left:right + 1], t[left:right + 1])
+        candidates.append({
+            "idx": maximum,
+            "t0": float(t[maximum]),
+            "prominence": float(prominences[idx]),
+            "area": max(area, 0.0),
         })
 
-    total_area = sum(region["area"] for region in regions)
-    if total_area <= 0:
+    total_area = sum(region["area"] for region in candidates)
+    if total_area <= 0.0:
         total_area = 1.0
-    for region in regions:
+
+    for region in candidates:
         region["relativeArea"] = float(region["area"] / total_area)
 
-    regions = sorted(regions, key=lambda region: region["area"], reverse=True)
-    kept = []
-    for region in regions:
-        if region["relativeArea"] < relative_area_min:
-            continue
-        if all(abs(region["t0"] - kept_region["t0"]) >= min_spacing for kept_region in kept):
-            kept.append(region)
+    kept = [region for region in candidates if region["relativeArea"] >= min_rel_area]
+
+    if min_spacing > 0.0 and len(kept) > 1:
+        kept_desc = sorted(kept, key=lambda region: region["prominence"], reverse=True)
+        spaced = []
+        for region in kept_desc:
+            if all(abs(region["t0"] - selected["t0"]) >= min_spacing for selected in spaced):
+                spaced.append(region)
+        kept = spaced
 
     kept = sorted(kept, key=lambda region: region["t0"])
+
     peak_guesses = []
     for region in kept:
-        left_idx = int(np.searchsorted(t, region["tLeft"], side="left"))
-        right_idx = int(np.searchsorted(t, region["tRight"], side="right") - 1)
-        center_idx = int(np.searchsorted(t, region["t0"], side="left"))
-        left_idx = max(0, min(left_idx, len(t) - 1))
-        right_idx = max(0, min(right_idx, len(t) - 1))
+        center_idx = int(region["idx"])
         center_idx = max(0, min(center_idx, len(t) - 1))
-        sigma = max((float(t[right_idx]) - float(t[left_idx])) / 6.0, 0.2)
         peak_guesses.append({
             "A_i": float(signal[center_idx]),
             "t0_i": float(region["t0"]),
-            "sigma_i": float(sigma),
         })
 
     _state["peak_guesses"] = peak_guesses
@@ -303,13 +311,16 @@ def _fit_with_guesses(t, y, guesses, min_sigma, max_sigma, max_iterations):
     lower = []
     upper = []
     data_span = max(float(np.max(y) - np.min(y)), 0.1)
+    t_min = float(np.min(t))
+    t_max = float(np.max(t))
+
     for guess in guesses:
         A_i = max(float(guess["A_i"]), 1e-5)
         t0_i = float(guess["t0_i"])
-        sigma_i = min(max(float(guess["sigma_i"]), min_sigma), max_sigma)
+        sigma_i = min(max(1.0, min_sigma), max_sigma)
         p0.extend([A_i, t0_i, sigma_i])
-        lower.extend([0.0, float(np.min(t)), min_sigma])
-        upper.extend([data_span * 5.0, float(np.max(t)), max_sigma])
+        lower.extend([0.0, t_min, min_sigma])
+        upper.extend([data_span * 5.0, t_max, max_sigma])
 
     p0.extend([float(np.median(y)), 0.0])
     lower.extend([float(np.min(y)) - 0.5, -0.05])
@@ -344,9 +355,11 @@ def fit_multi_gaussian(payload):
     max_iterations = max(int(payload.get("maxIterations", 120000)), 10000)
     target_r2 = float(payload.get("targetR2", 0.996))
     target_r2 = min(max(target_r2, 0.0), 0.999999)
+    min_r2_gain = max(float(payload.get("minR2Gain", 0.01)), 0.0)
 
     sorted_by_amplitude = sorted(guesses, key=lambda value: float(value["A_i"]), reverse=True)
     best_model = None
+    previous_model = None
     selected_model = None
 
     for n_components in range(1, len(sorted_by_amplitude) + 1):
@@ -366,9 +379,16 @@ def fit_multi_gaussian(payload):
         trial = {"popt": popt, "yFit": y_fit, "r2": float(r2)}
         if best_model is None or trial["r2"] > best_model["r2"]:
             best_model = trial
+
         if trial["r2"] >= target_r2:
+            if previous_model is not None:
+                gain = float(trial["r2"] - previous_model["r2"])
+                if gain < min_r2_gain:
+                    selected_model = previous_model
+                    break
             selected_model = trial
             break
+        previous_model = trial
 
     if selected_model is None:
         selected_model = best_model
@@ -399,6 +419,7 @@ def fit_multi_gaussian(payload):
         "components": components,
         "r2": float(r2),
         "targetR2": float(target_r2),
+        "minR2Gain": float(min_r2_gain),
     }
 `;
 
@@ -652,7 +673,7 @@ json.dumps(result)
       if (focusStep === 2) {
         await ensureSyntheticForDownstream();
       }
-      const result = await runPython<PeakResult>('find_peaks_area_gain', peakParams as unknown as Record<string, unknown>);
+      const result = await runPython<PeakResult>('find_peaks_mocca_style', peakParams as unknown as Record<string, unknown>);
       setPeakResult(result);
       setFitResult(null);
     } catch (error) {
@@ -669,7 +690,7 @@ json.dumps(result)
       if (focusStep === 3) {
         await ensureSyntheticForDownstream();
         if (!peakResult || peakResult.peakGuesses.length === 0) {
-          const detected = await runPython<PeakResult>('find_peaks_area_gain', peakParams as unknown as Record<string, unknown>);
+          const detected = await runPython<PeakResult>('find_peaks_mocca_style', peakParams as unknown as Record<string, unknown>);
           setPeakResult(detected);
         }
       }
@@ -715,25 +736,9 @@ json.dumps(result)
       };
     });
 
-    const boundPoints = peakResult.kept.flatMap((region) => {
-      const leftIdx = nearestIndex(syntheticResult.t, region.tLeft);
-      const rightIdx = nearestIndex(syntheticResult.t, region.tRight);
-      return [
-        {
-          x: syntheticResult.t[leftIdx],
-          y: peakResult.signal[leftIdx] ?? peakResult.signal[peakResult.signal.length - 1] ?? 0,
-        },
-        {
-          x: syntheticResult.t[rightIdx],
-          y: peakResult.signal[rightIdx] ?? peakResult.signal[peakResult.signal.length - 1] ?? 0,
-        },
-      ];
-    });
-
     return [
       { label: 'Signal', color: '#243447', y: peakResult.signal },
       { label: 't0_i centers', color: '#dc2626', y: [], points: centerPoints },
-      { label: 'Window bounds', color: '#7c3aed', y: [], points: boundPoints },
     ];
   }, [peakResult, syntheticResult]);
 
@@ -782,7 +787,7 @@ json.dumps(result)
             {focusStep === 1 && 'Embedded Step 1 Playground'}
             {focusStep === 2 && 'Embedded Step 2 Playground'}
             {focusStep === 3 && 'Embedded Step 3 Playground'}
-            {focusStep === 'all' && 'Run Peak Finding and Multi-Gaussian Fitting Here'}
+            {focusStep === 'all' && 'Run Peak Detection and Multi-Gaussian Fitting Here'}
           </h2>
           <p>
             {focusStep === 'all'
@@ -793,7 +798,7 @@ json.dumps(result)
       ) : !embedded ? (
         <header className={styles.header}>
           <p className={styles.kicker}>Interactive Playground</p>
-          <h1>Peak Finding by Area Gain (Pyodide)</h1>
+          <h1>Automatic Peak Detection and Gaussian Fitting (Pyodide)</h1>
           <p>Run the three notebook-like steps directly in browser and tweak parameters live.</p>
           <Link to="/blog/peak-finding-area-gain-synthetic-chromatogram">Back to blog post</Link>
         </header>
@@ -813,6 +818,7 @@ json.dumps(result)
             <label>Seed<input type="number" value={syntheticParams.seed} onChange={(event) => setSyntheticParams((prev) => ({ ...prev, seed: toNumber(event.target.value, prev.seed) }))} /></label>
             <label>Points<input type="number" min={200} value={syntheticParams.points} onChange={(event) => setSyntheticParams((prev) => ({ ...prev, points: toNumber(event.target.value, prev.points) }))} /></label>
             <label>Noise std<input type="number" step="0.001" value={syntheticParams.noiseStd} onChange={(event) => setSyntheticParams((prev) => ({ ...prev, noiseStd: toNumber(event.target.value, prev.noiseStd) }))} /></label>
+            <label>Time min<input type="number" value={syntheticParams.tMin} onChange={(event) => setSyntheticParams((prev) => ({ ...prev, tMin: toNumber(event.target.value, prev.tMin) }))} /></label>
             <label>Time max<input type="number" value={syntheticParams.tMax} onChange={(event) => setSyntheticParams((prev) => ({ ...prev, tMax: toNumber(event.target.value, prev.tMax) }))} /></label>
           </div>
 
@@ -838,14 +844,13 @@ json.dumps(result)
 
         {showStep2 && (
         <article className={styles.card}>
-          <h2>{compactEmbedded ? 'Area-gain peak detection' : 'Step 2: Area-gain peak detection'}</h2>
+          <h2>{compactEmbedded ? 'MOCCA-style peak detection' : 'Step 2: MOCCA-style peak detection'}</h2>
           {focusStep === 2 && <p className={styles.smallNote}>Uses a generated synthetic chromatogram if step 1 data is missing.</p>}
           <div className={styles.fieldGrid}>
-            <label>Prominence<input type="number" step="0.001" value={peakParams.prominence} onChange={(event) => setPeakParams((prev) => ({ ...prev, prominence: toNumber(event.target.value, prev.prominence) }))} /></label>
-            <label>Distance<input type="number" value={peakParams.distance} onChange={(event) => setPeakParams((prev) => ({ ...prev, distance: toNumber(event.target.value, prev.distance) }))} /></label>
-            <label>Gain threshold<input type="number" step="0.001" value={peakParams.gainThreshold} onChange={(event) => setPeakParams((prev) => ({ ...prev, gainThreshold: toNumber(event.target.value, prev.gainThreshold) }))} /></label>
-            <label>Rel area min<input type="number" step="0.01" value={peakParams.relativeAreaMin} onChange={(event) => setPeakParams((prev) => ({ ...prev, relativeAreaMin: toNumber(event.target.value, prev.relativeAreaMin) }))} /></label>
-            <label>Min spacing<input type="number" step="0.1" value={peakParams.minSpacing} onChange={(event) => setPeakParams((prev) => ({ ...prev, minSpacing: toNumber(event.target.value, prev.minSpacing) }))} /></label>
+            <label>Min height<input type="number" step="0.001" value={peakParams.minHeight} onChange={(event) => setPeakParams((prev) => ({ ...prev, minHeight: toNumber(event.target.value, prev.minHeight) }))} /></label>
+            <label>Min rel height<input type="number" step="0.001" value={peakParams.minRelHeight} onChange={(event) => setPeakParams((prev) => ({ ...prev, minRelHeight: toNumber(event.target.value, prev.minRelHeight) }))} /></label>
+            <label>Min rel area<input type="number" step="0.001" value={peakParams.minRelArea} onChange={(event) => setPeakParams((prev) => ({ ...prev, minRelArea: toNumber(event.target.value, prev.minRelArea) }))} /></label>
+            <label>Min spacing<input type="number" step="0.1" min={0} value={peakParams.minSpacing} onChange={(event) => setPeakParams((prev) => ({ ...prev, minSpacing: toNumber(event.target.value, prev.minSpacing) }))} /></label>
           </div>
           <button
             className={styles.primaryButton}
@@ -856,7 +861,7 @@ json.dumps(result)
           </button>
           {peakResult && (
             <p className={styles.smallNote}>
-              {peakResult.seedIdx.length} seed peaks, {peakResult.kept.length} kept. Red points mark <i>t</i><sub>0,i</sub> (and <i>A</i><sub>i</sub>); purple points mark window bounds used for <i>&sigma;</i><sub>i</sub>.
+              {peakResult.seedIdx.length} seed peaks, {peakResult.kept.length} kept. Red points mark <i>t</i><sub>0,i</sub> centers used as fit seeds.
             </p>
           )}
         </article>
@@ -870,8 +875,12 @@ json.dumps(result)
             <label>Min sigma<input type="number" step="0.1" value={fitParams.minSigma} onChange={(event) => setFitParams((prev) => ({ ...prev, minSigma: toNumber(event.target.value, prev.minSigma) }))} /></label>
             <label>Max sigma<input type="number" step="0.1" value={fitParams.maxSigma} onChange={(event) => setFitParams((prev) => ({ ...prev, maxSigma: toNumber(event.target.value, prev.maxSigma) }))} /></label>
             <label>Target R2<input type="number" step="0.0001" min={0} max={0.999999} value={fitParams.targetR2} onChange={(event) => setFitParams((prev) => ({ ...prev, targetR2: toNumber(event.target.value, prev.targetR2) }))} /></label>
+            <label>Min R2 gain<input type="number" step="0.0001" min={0} max={0.1} value={fitParams.minR2Gain} onChange={(event) => setFitParams((prev) => ({ ...prev, minR2Gain: toNumber(event.target.value, prev.minR2Gain) }))} /></label>
             <label>Max iterations<input type="number" step="1000" value={fitParams.maxIterations} onChange={(event) => setFitParams((prev) => ({ ...prev, maxIterations: toNumber(event.target.value, prev.maxIterations) }))} /></label>
           </div>
+          <p className={styles.smallNote}>
+            Initialization uses fixed <i>&sigma;</i><sub>0</sub> = 1.0 for each component (clipped to the min/max sigma bounds).
+          </p>
           <button
             className={styles.primaryButton}
             onClick={runStep3}
@@ -881,7 +890,7 @@ json.dumps(result)
           </button>
           {fitResult && (
             <p className={styles.smallNote}>
-              R2 = {fitResult.r2.toFixed(4)} (target {fitResult.targetR2.toFixed(4)}), selected {fitResult.components.length} component(s).
+              R2 = {fitResult.r2.toFixed(4)} (target {fitResult.targetR2.toFixed(4)}), min gain {fitResult.minR2Gain.toFixed(4)}, selected {fitResult.components.length} component(s).
             </p>
           )}
         </article>
@@ -896,14 +905,13 @@ json.dumps(result)
         <div className={styles.card}>
           <h3>Detected peak guesses</h3>
           <table className={styles.table}>
-            <thead><tr><th>#</th><th>A_i</th><th>t0_i</th><th>sigma_i</th></tr></thead>
+            <thead><tr><th>#</th><th>A_i</th><th>t0_i</th></tr></thead>
             <tbody>
               {peakResult.peakGuesses.map((guess, index) => (
                 <tr key={`guess-${index}`}>
                   <td>{index + 1}</td>
                   <td>{guess.A_i.toFixed(4)}</td>
                   <td>{guess.t0_i.toFixed(3)}</td>
-                  <td>{guess.sigma_i.toFixed(3)}</td>
                 </tr>
               ))}
             </tbody>

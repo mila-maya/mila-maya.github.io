@@ -35,7 +35,6 @@ interface PeakParams {
 interface FitParams {
   minSigma: number;
   maxSigma: number;
-  maxIterations: number;
   targetR2: number;
   minR2Gain: number;
 }
@@ -75,6 +74,7 @@ interface FitComponent {
 }
 
 interface FitResult {
+  signal: number[];
   yFit: number[];
   baselineFit: number[];
   components: FitComponent[];
@@ -138,12 +138,73 @@ const DEFAULT_PEAK: PeakParams = {
 const DEFAULT_FIT: FitParams = {
   minSigma: 0.4,
   maxSigma: 25,
-  maxIterations: 120000,
   targetR2: 0.996,
   minR2Gain: 0.01,
 };
 
+const FIT_MAX_ITERATIONS = 200000;
+
 const COLORS = ['#1f4fba', '#2ca02c', '#ff7f0e', '#9467bd', '#17a2b8', '#d62728'];
+
+const cloneSyntheticParams = (params: SyntheticParams): SyntheticParams => ({
+  ...params,
+  components: params.components.map((component) => ({ ...component })),
+});
+
+const SHARED_SYNTHETIC_PARAMS_KEY = 'peak-finding-playground:synthetic-params:v1';
+
+let sharedSyntheticParams: SyntheticParams = cloneSyntheticParams(DEFAULT_SYNTHETIC);
+
+const parseSyntheticParams = (raw: string | null): SyntheticParams | null => {
+  if (!raw) {
+    return null;
+  }
+  try {
+    const parsed = JSON.parse(raw) as Partial<SyntheticParams>;
+    if (!parsed || !Array.isArray(parsed.components)) {
+      return null;
+    }
+    return cloneSyntheticParams({
+      seed: Number(parsed.seed ?? DEFAULT_SYNTHETIC.seed),
+      points: Number(parsed.points ?? DEFAULT_SYNTHETIC.points),
+      tMin: Number(parsed.tMin ?? DEFAULT_SYNTHETIC.tMin),
+      tMax: Number(parsed.tMax ?? DEFAULT_SYNTHETIC.tMax),
+      noiseStd: Number(parsed.noiseStd ?? DEFAULT_SYNTHETIC.noiseStd),
+      baselineOffset: Number(parsed.baselineOffset ?? DEFAULT_SYNTHETIC.baselineOffset),
+      baselineSlope: Number(parsed.baselineSlope ?? DEFAULT_SYNTHETIC.baselineSlope),
+      baselineWaveAmp: Number(parsed.baselineWaveAmp ?? DEFAULT_SYNTHETIC.baselineWaveAmp),
+      baselineWavePeriod: Number(parsed.baselineWavePeriod ?? DEFAULT_SYNTHETIC.baselineWavePeriod),
+      components: parsed.components.map((component, idx) => ({
+        A: Number((component as Partial<SyntheticComponent>)?.A ?? DEFAULT_SYNTHETIC.components[idx]?.A ?? 0.3),
+        t0: Number((component as Partial<SyntheticComponent>)?.t0 ?? DEFAULT_SYNTHETIC.components[idx]?.t0 ?? 50),
+        sigma: Number((component as Partial<SyntheticComponent>)?.sigma ?? DEFAULT_SYNTHETIC.components[idx]?.sigma ?? 5),
+      })),
+    });
+  } catch {
+    return null;
+  }
+};
+
+const publishSharedSyntheticParams = (params: SyntheticParams): void => {
+  sharedSyntheticParams = cloneSyntheticParams(params);
+  if (typeof window !== 'undefined') {
+    try {
+      window.localStorage.setItem(SHARED_SYNTHETIC_PARAMS_KEY, JSON.stringify(sharedSyntheticParams));
+    } catch {
+      // Ignore storage failures (private mode / quota).
+    }
+  }
+};
+
+const consumeSharedSyntheticParams = (): SyntheticParams => {
+  if (typeof window !== 'undefined') {
+    const fromStorage = parseSyntheticParams(window.localStorage.getItem(SHARED_SYNTHETIC_PARAMS_KEY));
+    if (fromStorage) {
+      sharedSyntheticParams = fromStorage;
+    }
+  }
+  return cloneSyntheticParams(sharedSyntheticParams);
+};
 
 const PYODIDE_VERSION = '0.26.4';
 const PYODIDE_INDEX_URL = `https://cdn.jsdelivr.net/pyodide/v${PYODIDE_VERSION}/full/`;
@@ -354,7 +415,7 @@ def fit_multi_gaussian(payload):
 
     min_sigma = max(float(payload.get("minSigma", 0.4)), 0.05)
     max_sigma = max(float(payload.get("maxSigma", 25.0)), min_sigma + 0.05)
-    max_iterations = max(int(payload.get("maxIterations", 120000)), 10000)
+    max_iterations = max(int(payload.get("maxIterations", 200000)), 10000)
     target_r2 = float(payload.get("targetR2", 0.996))
     target_r2 = min(max(target_r2, 0.0), 0.999999)
     min_r2_gain = max(float(payload.get("minR2Gain", 0.01)), 0.0)
@@ -416,6 +477,7 @@ def fit_multi_gaussian(payload):
         })
 
     return {
+        "signal": y.tolist(),
         "yFit": y_fit.tolist(),
         "baselineFit": baseline_fit.tolist(),
         "components": components,
@@ -608,7 +670,12 @@ const PeakFindingPlayground = ({ embedded = false, focusStep = 'all' }: PeakFind
   const [actionError, setActionError] = useState<string | null>(null);
   const [runningStep, setRunningStep] = useState<RunningStep>(null);
 
-  const [syntheticParams, setSyntheticParams] = useState<SyntheticParams>(DEFAULT_SYNTHETIC);
+  const [syntheticParams, setSyntheticParams] = useState<SyntheticParams>(() => {
+    if (focusStep === 2 || focusStep === 3) {
+      return consumeSharedSyntheticParams();
+    }
+    return cloneSyntheticParams(DEFAULT_SYNTHETIC);
+  });
   const [peakParams, setPeakParams] = useState<PeakParams>(DEFAULT_PEAK);
   const [fitParams, setFitParams] = useState<FitParams>(DEFAULT_FIT);
 
@@ -650,6 +717,12 @@ const PeakFindingPlayground = ({ embedded = false, focusStep = 'all' }: PeakFind
     };
   }, []);
 
+  useEffect(() => {
+    if (showStep1) {
+      publishSharedSyntheticParams(syntheticParams);
+    }
+  }, [showStep1, syntheticParams]);
+
   const runPython = async <T,>(functionName: string, payload: Record<string, unknown>): Promise<T> => {
     const runtime = pyodideRef.current;
     if (!runtime) {
@@ -669,14 +742,30 @@ json.dumps(result)
     }
   };
 
+  const generateSyntheticFromParams = async (params: SyntheticParams): Promise<SyntheticResult> => {
+    const result = await runPython<SyntheticResult>('generate_synthetic', params as unknown as Record<string, unknown>);
+    setSyntheticResult(result);
+    setPeakResult(null);
+    setFitResult(null);
+    return result;
+  };
+
+  const getSyntheticParamsForRun = (): SyntheticParams => {
+    if (showStep1) {
+      return cloneSyntheticParams(syntheticParams);
+    }
+    const shared = consumeSharedSyntheticParams();
+    setSyntheticParams(shared);
+    return shared;
+  };
+
   const runStep1 = async () => {
     setActionError(null);
     setRunningStep('generate');
     try {
-      const result = await runPython<SyntheticResult>('generate_synthetic', syntheticParams as unknown as Record<string, unknown>);
-      setSyntheticResult(result);
-      setPeakResult(null);
-      setFitResult(null);
+      const params = getSyntheticParamsForRun();
+      publishSharedSyntheticParams(params);
+      await generateSyntheticFromParams(params);
     } catch (error) {
       setActionError(error instanceof Error ? error.message : String(error));
     } finally {
@@ -685,20 +774,15 @@ json.dumps(result)
   };
 
   const ensureSyntheticForDownstream = async (): Promise<void> => {
-    if (syntheticResult) {
-      return;
-    }
-    const generated = await runPython<SyntheticResult>('generate_synthetic', syntheticParams as unknown as Record<string, unknown>);
-    setSyntheticResult(generated);
+    const params = getSyntheticParamsForRun();
+    await generateSyntheticFromParams(params);
   };
 
   const runStep2 = async () => {
     setActionError(null);
     setRunningStep('detect');
     try {
-      if (focusStep === 2) {
-        await ensureSyntheticForDownstream();
-      }
+      await ensureSyntheticForDownstream();
       const result = await runPython<PeakResult>('find_peaks_mocca_style', peakParams as unknown as Record<string, unknown>);
       setPeakResult(result);
       setFitResult(null);
@@ -713,14 +797,13 @@ json.dumps(result)
     setActionError(null);
     setRunningStep('fit');
     try {
-      if (focusStep === 3) {
-        await ensureSyntheticForDownstream();
-        if (!peakResult || peakResult.peakGuesses.length === 0) {
-          const detected = await runPython<PeakResult>('find_peaks_mocca_style', peakParams as unknown as Record<string, unknown>);
-          setPeakResult(detected);
-        }
-      }
-      const result = await runPython<FitResult>('fit_multi_gaussian', fitParams as unknown as Record<string, unknown>);
+      await ensureSyntheticForDownstream();
+      const detected = await runPython<PeakResult>('find_peaks_mocca_style', peakParams as unknown as Record<string, unknown>);
+      setPeakResult(detected);
+      const result = await runPython<FitResult>('fit_multi_gaussian', {
+        ...fitParams,
+        maxIterations: FIT_MAX_ITERATIONS,
+      } as unknown as Record<string, unknown>);
       setFitResult(result);
     } catch (error) {
       setActionError(error instanceof Error ? error.message : String(error));
@@ -773,7 +856,7 @@ json.dumps(result)
       return [];
     }
     const lines: PlotLine[] = [
-      { label: 'Data', color: COLORS[0], y: syntheticResult.y },
+      { label: 'Data', color: COLORS[0], y: fitResult.signal },
       { label: 'Gaussian sum fit', color: COLORS[1], y: fitResult.yFit },
       { label: 'Baseline fit', color: '#6b7280', y: fitResult.baselineFit, dash: '4 4' },
     ];
@@ -796,7 +879,7 @@ json.dumps(result)
         <SEO
           title="Peak Finding Playground (Pyodide)"
           description="Interactive in-browser peak finding and multi-Gaussian fitting."
-          url="https://mila-maya.github.io/blog/peak-finding-area-gain-synthetic-chromatogram"
+          url="https://mila-maya.github.io/blog/peak-detection-deconvolution-overlapping-chromatograms"
           type="article"
         />
       )}
@@ -821,7 +904,7 @@ json.dumps(result)
           <p className={styles.kicker}>Interactive Playground</p>
           <h1>Automatic Peak Detection and Gaussian Fitting (Pyodide)</h1>
           <p>Run the three notebook-like steps directly in browser and tweak parameters live.</p>
-          <Link to="/blog/peak-finding-area-gain-synthetic-chromatogram">Back to blog post</Link>
+          <Link to="/blog/peak-detection-deconvolution-overlapping-chromatograms">Back to blog post</Link>
         </header>
       ) : null}
 
@@ -834,27 +917,81 @@ json.dumps(result)
         <article className={styles.card}>
           <h2>{compactEmbedded ? 'Synthetic chromatogram' : 'Step 1: Synthetic chromatogram'}</h2>
           <div className={styles.fieldGrid}>
-            <label>Seed<input type="number" value={syntheticParams.seed} onChange={(event) => setSyntheticParams((prev) => ({ ...prev, seed: toNumber(event.target.value, prev.seed) }))} /></label>
-            <label>Points<input type="number" min={200} value={syntheticParams.points} onChange={(event) => setSyntheticParams((prev) => ({ ...prev, points: toNumber(event.target.value, prev.points) }))} /></label>
-            <label>Noise std<input type="number" step="0.001" value={syntheticParams.noiseStd} onChange={(event) => setSyntheticParams((prev) => ({ ...prev, noiseStd: toNumber(event.target.value, prev.noiseStd) }))} /></label>
-            <label>Time min<input type="number" value={syntheticParams.tMin} onChange={(event) => setSyntheticParams((prev) => ({ ...prev, tMin: toNumber(event.target.value, prev.tMin) }))} /></label>
-            <label>Time max<input type="number" value={syntheticParams.tMax} onChange={(event) => setSyntheticParams((prev) => ({ ...prev, tMax: toNumber(event.target.value, prev.tMax) }))} /></label>
+            <label>
+              Noise std
+              <div className={styles.sliderControl}>
+                <input
+                  type="range"
+                  min={0}
+                  max={0.05}
+                  step={0.001}
+                  value={syntheticParams.noiseStd}
+                  onChange={(event) => setSyntheticParams((prev) => ({ ...prev, noiseStd: toNumber(event.target.value, prev.noiseStd) }))}
+                />
+                <span className={styles.sliderValue}>{syntheticParams.noiseStd.toFixed(3)}</span>
+              </div>
+            </label>
           </div>
 
           <h3>Components</h3>
-          <table className={styles.table}>
-            <thead><tr><th>#</th><th>A</th><th>t0</th><th>sigma</th></tr></thead>
-            <tbody>
-              {syntheticParams.components.map((component, index) => (
-                <tr key={`cmp-${index}`}>
-                  <td>{index + 1}</td>
-                  <td><input type="number" step="0.01" value={component.A} onChange={(event) => setSyntheticParams((prev) => ({ ...prev, components: prev.components.map((item, itemIndex) => (itemIndex === index ? { ...item, A: toNumber(event.target.value, item.A) } : item)) }))} /></td>
-                  <td><input type="number" step="0.1" value={component.t0} onChange={(event) => setSyntheticParams((prev) => ({ ...prev, components: prev.components.map((item, itemIndex) => (itemIndex === index ? { ...item, t0: toNumber(event.target.value, item.t0) } : item)) }))} /></td>
-                  <td><input type="number" step="0.1" value={component.sigma} onChange={(event) => setSyntheticParams((prev) => ({ ...prev, components: prev.components.map((item, itemIndex) => (itemIndex === index ? { ...item, sigma: toNumber(event.target.value, item.sigma) } : item)) }))} /></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className={styles.componentGrid}>
+            {syntheticParams.components.map((component, index) => (
+              <div key={`cmp-${index}`} className={styles.componentCard}>
+                <h4 className={styles.componentTitle}>Component {index + 1}</h4>
+                <label>
+                  Area A
+                  <div className={styles.sliderControl}>
+                    <input
+                      type="range"
+                      min={0.05}
+                      max={1.2}
+                      step={0.01}
+                      value={component.A}
+                      onChange={(event) => setSyntheticParams((prev) => ({
+                        ...prev,
+                        components: prev.components.map((item, itemIndex) => (itemIndex === index ? { ...item, A: toNumber(event.target.value, item.A) } : item)),
+                      }))}
+                    />
+                    <span className={styles.sliderValue}>{component.A.toFixed(2)}</span>
+                  </div>
+                </label>
+                <label>
+                  Center t0
+                  <div className={styles.sliderControl}>
+                    <input
+                      type="range"
+                      min={syntheticParams.tMin}
+                      max={syntheticParams.tMax}
+                      step={0.1}
+                      value={component.t0}
+                      onChange={(event) => setSyntheticParams((prev) => ({
+                        ...prev,
+                        components: prev.components.map((item, itemIndex) => (itemIndex === index ? { ...item, t0: toNumber(event.target.value, item.t0) } : item)),
+                      }))}
+                    />
+                    <span className={styles.sliderValue}>{component.t0.toFixed(1)}</span>
+                  </div>
+                </label>
+                <label>
+                  Width sigma
+                  <div className={styles.sliderControl}>
+                    <input
+                      type="range"
+                      min={0.5}
+                      max={15}
+                      step={0.1}
+                      value={component.sigma}
+                      onChange={(event) => setSyntheticParams((prev) => ({
+                        ...prev,
+                        components: prev.components.map((item, itemIndex) => (itemIndex === index ? { ...item, sigma: toNumber(event.target.value, item.sigma) } : item)),
+                      }))}
+                    />
+                    <span className={styles.sliderValue}>{component.sigma.toFixed(1)}</span>
+                  </div>
+                </label>
+              </div>
+            ))}
+          </div>
           <button className={styles.primaryButton} onClick={runStep1} disabled={isBusy || runtimeStatus !== 'ready'}>
             {runningStep === 'generate' ? 'Running step 1...' : 'Run step 1'}
           </button>
@@ -864,7 +1001,7 @@ json.dumps(result)
         {showStep2 && (
         <article className={styles.card}>
           <h2>{compactEmbedded ? 'MOCCA-style peak detection' : 'Step 2: MOCCA-style peak detection'}</h2>
-          {focusStep === 2 && <p className={styles.smallNote}>Uses a generated synthetic chromatogram if step 1 data is missing.</p>}
+          {focusStep === 2 && <p className={styles.smallNote}>Uses shared synthetic settings from Step 1 (or defaults if none were set).</p>}
           <div className={styles.fieldGrid}>
             <label>Min height<input type="number" step="0.001" value={peakParams.minHeight} onChange={(event) => setPeakParams((prev) => ({ ...prev, minHeight: toNumber(event.target.value, prev.minHeight) }))} /></label>
             <label>Min rel height<input type="number" step="0.001" value={peakParams.minRelHeight} onChange={(event) => setPeakParams((prev) => ({ ...prev, minRelHeight: toNumber(event.target.value, prev.minRelHeight) }))} /></label>
@@ -889,17 +1026,13 @@ json.dumps(result)
         {showStep3 && (
         <article className={styles.card}>
           <h2>{compactEmbedded ? 'Multi-Gaussian fit' : 'Step 3: Multi-Gaussian fit'}</h2>
-          {focusStep === 3 && <p className={styles.smallNote}>Auto-runs missing prerequisites (step 1 and step 2) with current parameters.</p>}
+          {focusStep === 3 && <p className={styles.smallNote}>Uses shared synthetic settings from Step 1, then runs detection and fitting.</p>}
           <div className={styles.fieldGrid}>
             <label>Min sigma<input type="number" step="0.1" value={fitParams.minSigma} onChange={(event) => setFitParams((prev) => ({ ...prev, minSigma: toNumber(event.target.value, prev.minSigma) }))} /></label>
             <label>Max sigma<input type="number" step="0.1" value={fitParams.maxSigma} onChange={(event) => setFitParams((prev) => ({ ...prev, maxSigma: toNumber(event.target.value, prev.maxSigma) }))} /></label>
-            <label>Target R2<input type="number" step="0.0001" min={0} max={0.999999} value={fitParams.targetR2} onChange={(event) => setFitParams((prev) => ({ ...prev, targetR2: toNumber(event.target.value, prev.targetR2) }))} /></label>
-            <label>Min R2 gain<input type="number" step="0.0001" min={0} max={0.1} value={fitParams.minR2Gain} onChange={(event) => setFitParams((prev) => ({ ...prev, minR2Gain: toNumber(event.target.value, prev.minR2Gain) }))} /></label>
-            <label>Max iterations<input type="number" step="1000" value={fitParams.maxIterations} onChange={(event) => setFitParams((prev) => ({ ...prev, maxIterations: toNumber(event.target.value, prev.maxIterations) }))} /></label>
+            <label>Target R&sup2;<input type="number" step="0.0001" min={0} max={0.999999} value={fitParams.targetR2} onChange={(event) => setFitParams((prev) => ({ ...prev, targetR2: toNumber(event.target.value, prev.targetR2) }))} /></label>
+            <label>Min &Delta;R&sup2; gain<input type="number" step="0.0001" min={0} max={0.1} value={fitParams.minR2Gain} onChange={(event) => setFitParams((prev) => ({ ...prev, minR2Gain: toNumber(event.target.value, prev.minR2Gain) }))} /></label>
           </div>
-          <p className={styles.smallNote}>
-            Initialization uses fixed <i>&sigma;</i><sub>0</sub> = 1.0 for each component (clipped to the min/max sigma bounds).
-          </p>
           <button
             className={styles.primaryButton}
             onClick={runStep3}
@@ -909,7 +1042,7 @@ json.dumps(result)
           </button>
           {fitResult && (
             <p className={styles.smallNote}>
-              R2 = {fitResult.r2.toFixed(4)} (target {fitResult.targetR2.toFixed(4)}), min gain {fitResult.minR2Gain.toFixed(4)}, selected {fitResult.components.length} component(s).
+              R&sup2; = {fitResult.r2.toFixed(4)} (target R&sup2; {fitResult.targetR2.toFixed(4)}), min &Delta;R&sup2; gain {fitResult.minR2Gain.toFixed(4)}, selected {fitResult.components.length} component(s).
             </p>
           )}
         </article>

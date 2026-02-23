@@ -4,8 +4,8 @@ import type { BlogPost } from '@/types/contentful.types';
 export const blogPosts: BlogPost[] = [
   {
     title: "Automatic Peak Detection and Deconvolution for Overlapping Peaks in Chromatograms",
-    slug: "peak-finding-area-gain-synthetic-chromatogram",
-    excerpt: "A runnable 3-step workflow for automatic peak detection and multi-Gaussian fitting of overlapping chromatographic peaks.",
+    slug: "peak-detection-deconvolution-overlapping-chromatograms",
+    excerpt: "A runnable 3-step workflow for automatic peak detection and deconvolution of overlapping chromatographic peaks.",
     content: `This post presents a three-step runnable workflow for overlapping chromatograms, following maxima-first peak processing and adaptive deconvolution used in MOCCA-style analysis [<a href="#pf-ref-1">1</a>,<a href="#pf-ref-2">2</a>,<a href="#pf-ref-3">3</a>,<a href="#pf-ref-5">5</a>].
 
 ## Step 1 - Build a synthetic chromatogram (overlapping peaks)
@@ -23,10 +23,10 @@ Model the signal as baseline plus Gaussian components:
 - <i>&sigma;</i><sub>i</sub>: component width
 
 Algorithm:
-1. Create the time axis <i>t</i>.
-2. Define baseline <i>B</i>(<i>t</i>).
-3. Add overlapping Gaussian components.
-4. Add random noise to emulate measurement.
+- Create the time axis <i>t</i>.
+- Define baseline <i>B</i>(<i>t</i>).
+- Add overlapping Gaussian components.
+- Add random noise to emulate measurement.
 </details>
 
 <details>
@@ -72,15 +72,13 @@ For each candidate peak <i>i</i>, compute area over its local prominence-base in
 
 <p align="center"><i>p</i><sub>i,rel</sub> = <i>p</i><sub>i</sub> / max<sub>j</sub><i>p</i><sub>j</sub>, &nbsp; <i>Q</i><sub>i,rel</sub> = <i>Q</i><sub>i</sub> / &Sigma;<sub>j</sub><i>Q</i><sub>j</sub></p>
 
-Keep candidates by three thresholds:
-1. Minimum prominence (absolute height criterion).
-2. Minimum relative prominence.
-3. Minimum relative area [<a href="#pf-ref-2">2</a>,<a href="#pf-ref-4">4</a>].
+Retain peaks that satisfy:
+<p align="center"><i>p</i><sub>i</sub> &ge; <i>p</i><sub>min</sub>, &nbsp; <i>p</i><sub>i,rel</sub> &gt; <i>r</i><sub>min</sub>, &nbsp; <i>Q</i><sub>i,rel</sub> &ge; <i>a</i><sub>min</sub></p>
 
-Then apply minimum spacing and keep accepted centers as initialization points:
-- <i>A</i><sub>i</sub>: signal at center.
-- <i>t</i><sub>0,i</sub>: detected center time.
-- <i>&sigma;</i><sub>i</sub> is not guessed here.
+Apply a minimum center spacing &Delta;<i>t</i><sub>min</sub> to the retained set, then define initialization points:
+- <i>t</i><sub>0,i</sub>: detected center time
+- <i>A</i><sub>i</sub> = <i>S</i>(<i>t</i><sub>0,i</sub>)
+- <i>&sigma;</i><sub>i</sub> is not estimated in Step 2 [<a href="#pf-ref-2">2</a>,<a href="#pf-ref-4">4</a>]
 </details>
 
 <details>
@@ -160,15 +158,15 @@ Fit the measured signal with a Gaussian sum plus linear baseline:
 
 <p align="center"><i>S</i>(<i>t</i>) = &Sigma;<sub>i</sub> <i>A</i><sub>i</sub> exp&#8201;[ -(<i>t</i> - <i>t</i><sub>0,i</sub>)<sup>2</sup> / (2<i>&sigma;</i><sub>i</sub><sup>2</sup>) ] + <i>c</i><sub>0</sub> + <i>c</i><sub>1</sub>(<i>t</i> - mean(<i>t</i>))</p>
 
-Use Step 2 guesses (<i>A</i><sub>i</sub>, <i>t</i><sub>0,i</sub>), initialize each <i>&sigma;</i><sub>i</sub> at 1.0, and optimize with bounded nonlinear least squares.
+Use Step 2 guesses (<i>A</i><sub>i</sub>, <i>t</i><sub>0,i</sub>), initialize each <i>&sigma;</i><sub>i</sub> at 1.0, and optimize with bounded nonlinear least squares (<i>maxfev</i> fixed to 200000 in this playground).
 
 <p align="center"><i>R</i><sup>2</sup> = 1 - SS<sub>res</sub> / SS<sub>tot</sub>, &nbsp; &Delta;<i>R</i><sup>2</sup><sub>n</sub> = <i>R</i><sup>2</sup><sub>n</sub> - <i>R</i><sup>2</sup><sub>n-1</sub></p>
 
 Adaptive component selection [<a href="#pf-ref-2">2</a>,<a href="#pf-ref-3">3</a>,<a href="#pf-ref-5">5</a>]:
-1. Increase component count in amplitude-ranked order.
-2. Track the best model by <i>R</i><sup>2</sup>.
-3. When target <i>R</i><sup>2</sup> is reached, require <i>&Delta;R</i><sup>2</sup> to exceed the minimum gain; if not, keep the lower-component model.
-4. If target is never reached, return the best model.
+- Increase component count in amplitude-ranked order.
+- Track the best model by <i>R</i><sup>2</sup>.
+- When target <i>R</i><sup>2</sup> is reached, require <i>&Delta;R</i><sup>2</sup> to exceed the minimum gain; if not, keep the lower-component model.
+- If target is never reached, return the best model.
 </details>
 
 <details>
@@ -177,6 +175,8 @@ Adaptive component selection [<a href="#pf-ref-2">2</a>,<a href="#pf-ref-3">3</a
 ~~~python
 from scipy.optimize import curve_fit
 import numpy as np
+
+MAX_ITER = 200000
 
 def multi_gauss_with_linear_baseline(x, *params):
     n_comp = (len(params) - 2) // 3
@@ -187,14 +187,16 @@ def multi_gauss_with_linear_baseline(x, *params):
         y_fit += gauss(x, A_i, t0_i, sigma_i)
     return y_fit
 
-def fit_with_guesses(t, y, guesses, min_sigma=0.4, max_sigma=25.0, maxfev=120000):
+def fit_with_guesses(t, y, guesses, min_sigma=0.4, max_sigma=25.0, maxfev=MAX_ITER):
     p0, lb, ub = [], [], []
     span = max(float(np.max(y) - np.min(y)), 0.1)
+    t_min = float(np.min(t))
+    t_max = float(np.max(t))
     for g in guesses:
         sigma0 = min(max(1.0, min_sigma), max_sigma)
         p0.extend([max(float(g["A_i"]), 1e-5), float(g["t0_i"]), sigma0])
-        lb.extend([0.0, float(np.min(t)), min_sigma])
-        ub.extend([span * 5.0, float(np.max(t)), max_sigma])
+        lb.extend([0.0, t_min, min_sigma])
+        ub.extend([span * 5.0, t_max, max_sigma])
     p0.extend([float(np.median(y)), 0.0])
     lb.extend([float(np.min(y)) - 0.5, -0.05])
     ub.extend([float(np.max(y)) + 0.5, 0.05])
@@ -203,27 +205,35 @@ def fit_with_guesses(t, y, guesses, min_sigma=0.4, max_sigma=25.0, maxfev=120000
     ss_res = np.sum((y - y_fit) ** 2)
     ss_tot = np.sum((y - np.mean(y)) ** 2)
     r2 = 1.0 - ss_res / ss_tot if ss_tot > 0 else float("nan")
-    return popt, y_fit, r2
+    return {"popt": popt, "yFit": y_fit, "r2": float(r2)}
 
-target_r2 = 0.996
-min_r2_gain = 0.01
-selected = None
+target_r2 = min(max(0.996, 0.0), 0.999999)
+min_r2_gain = max(0.01, 0.0)
+sorted_by_amplitude = sorted(peak_guesses, key=lambda g: float(g["A_i"]), reverse=True)
+selected_model = None
 prev_model = None
 best_model = None
-for n in range(1, len(peak_guesses) + 1):
-    trial = sorted(sorted(peak_guesses, key=lambda g: g["A_i"], reverse=True)[:n], key=lambda g: g["t0_i"])
-    popt, y_fit, r2 = fit_with_guesses(t, y, trial)
-    if best_model is None or r2 > best_model[2]:
-        best_model = (popt, y_fit, r2)
-    if r2 >= target_r2:
-        if prev_model is not None and (r2 - prev_model[2]) < min_r2_gain:
-            selected = prev_model
+
+for n in range(1, len(sorted_by_amplitude) + 1):
+    trial_guesses = sorted(sorted_by_amplitude[:n], key=lambda g: g["t0_i"])
+    try:
+        trial = fit_with_guesses(t, y, trial_guesses)
+    except Exception:
+        continue
+    if best_model is None or trial["r2"] > best_model["r2"]:
+        best_model = trial
+    if trial["r2"] >= target_r2:
+        if prev_model is not None and (trial["r2"] - prev_model["r2"]) < min_r2_gain:
+            selected_model = prev_model
             break
-        selected = (popt, y_fit, r2)
+        selected_model = trial
         break
-    prev_model = (popt, y_fit, r2)
-if selected is None:
-    selected = best_model
+    prev_model = trial
+
+if selected_model is None:
+    selected_model = best_model
+if selected_model is None:
+    raise RuntimeError("curve_fit failed for all tested component counts.")
 ~~~
 
 </details>
@@ -239,13 +249,13 @@ if selected is None:
 5. <span id="pf-ref-5"></span>MOCCA2 package and documentation. https://pypi.org/project/mocca2/ ; https://bayer-group.github.io/MOCCA/ ; source: https://github.com/Bayer-Group/MOCCA
 `,
     featuredImage: {
-      url: "/images/blog/peak-deconvolution/gaussian-fitting.svg",
+      url: "/images/blog/peak-deconvolution/deconvolution-step3.svg",
       title: "Automatic peak detection and deconvolution",
       description: "Synthetic overlapping peaks, MOCCA-style detection, and multi-Gaussian fitting"
     },
     author: "Mila",
     publishedDate: "2026-02-23T18:00:00.000Z",
-    tags: ["Peak Detection", "Gaussian Fitting", "Chromatography", "Python"],
+    tags: ["Peak Detection", "Gaussian Fitting", "Chromatography", "Python", "MOCCA", "Master Thesis"],
     category: "Science"
   },
   {

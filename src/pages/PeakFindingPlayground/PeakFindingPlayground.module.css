@@ -89,6 +89,64 @@
   font-size: 0.95rem;
 }
 
+.fieldGrid input[type='range'] {
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  accent-color: var(--primary-color);
+  height: 1.2rem;
+}
+
+.sliderControl {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.sliderValue {
+  min-width: 3.3rem;
+  text-align: right;
+  color: var(--text-color);
+  font-variant-numeric: tabular-nums;
+}
+
+.componentGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.componentCard {
+  border: 1px solid #d9e1ec;
+  border-radius: 0.45rem;
+  background: #fbfcfe;
+  padding: 0.55rem;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.componentCard label {
+  display: grid;
+  gap: 0.22rem;
+  font-size: var(--font-size-sm);
+  color: var(--text-light);
+}
+
+.componentCard input[type='range'] {
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  accent-color: var(--primary-color);
+  height: 1.2rem;
+}
+
+.componentTitle {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--text-color);
+}
+
 .primaryButton {
   border: none;
   border-radius: 0.45rem;

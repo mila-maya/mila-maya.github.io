@@ -6,10 +6,6 @@ const Header = () => {
     <header className={styles.header}>
       <div className={styles.container}>
         <div className={styles.headerContent}>
-          <h1 className={styles.title}>Mila</h1>
-          <p className={styles.subtitle}>
-            Scientific Software Engineer | Bioinformatics | ML and AI Development
-          </p>
           <nav className={styles.nav}>
             <NavLink
               to="/"
@@ -25,7 +21,7 @@ const Header = () => {
                 `${styles.navLink} ${isActive ? styles.active : ''}`
               }
             >
-              Projects and Posts
+              Projects & Posts
             </NavLink>
           </nav>
         </div>

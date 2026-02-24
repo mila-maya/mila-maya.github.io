@@ -58,11 +58,11 @@ const ProjectsAndPosts = () => {
 
   return (
     <>
-      <SEO title="Projects and Posts" description={PROJECTS_AND_POSTS_DESCRIPTION} />
+      <SEO title="Projects & Posts" description={PROJECTS_AND_POSTS_DESCRIPTION} />
 
       <div className={styles.container}>
         <header className={styles.header}>
-          <h1 className={styles.title}>Projects and Posts</h1>
+          <h1 className={styles.title}>Projects & Posts</h1>
           <p className={styles.description}>{PROJECTS_AND_POSTS_DESCRIPTION}</p>
         </header>
 

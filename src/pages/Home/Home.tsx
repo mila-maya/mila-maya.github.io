@@ -1,10 +1,6 @@
 import { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import SEO from '@components/common/SEO/SEO';
-import ProjectCard from '@components/projects/ProjectCard/ProjectCard';
-import BlogCard from '@components/blog/BlogCard/BlogCard';
-import { useProjects } from '@hooks/useProjects';
-import { useBlogPosts } from '@hooks/useBlogPosts';
 import styles from './Home.module.css';
 
 const Home = () => {
@@ -60,12 +56,7 @@ const Home = () => {
     'Scientific software architecture and API integration'
   ];
 
-  const { projects, loading: projectsLoading } = useProjects();
-  const { posts, loading: postsLoading } = useBlogPosts(3);
   const location = useLocation();
-
-  const featuredProjects = projects.slice(0, 3);
-  const recentPosts = posts.slice(0, 3);
 
   useEffect(() => {
     if (location.hash !== '#about') {
@@ -85,19 +76,16 @@ const Home = () => {
       <section className={styles.heroWrap}>
         <div className={styles.hero}>
           <div className={styles.heroMain}>
-            <span className={styles.kicker}>Scientific Software x Bioinformatics x ML</span>
-            <h1 className={styles.heroTitle}>Hi, I am Mila Lettmayer.</h1>
+            <span className={styles.kicker}>Scientific Software Engineer | Bioinformatics | ML and AI Development</span>
+            <h1 className={styles.heroTitle}>Hi, I&apos;m Mila Lettmayer.</h1>
             <p className={styles.heroSubtitle}>
               I build reliable analysis software for biotech and research teams. My
               work spans automated scientific pipelines, dashboard products, and now
               focused ML and AI skill development for data-driven applications.
             </p>
             <div className={styles.actions}>
-              <Link to="/projects-and-posts#projects" className={`${styles.action} ${styles.primaryAction}`}>
-                Explore Projects and Posts
-              </Link>
-              <Link to="/#about" className={`${styles.action} ${styles.secondaryAction}`}>
-                About My Work
+              <Link to="/projects-and-posts" className={`${styles.action} ${styles.primaryAction}`}>
+                Explore Projects & Posts
               </Link>
             </div>
           </div>
@@ -165,48 +153,6 @@ const Home = () => {
             </div>
           </div>
         </div>
-      </section>
-
-      <section className={styles.section}>
-        <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>Featured Projects</h2>
-          <Link to="/projects-and-posts#projects" className={styles.viewAllLink}>
-            View All {'->'}
-          </Link>
-        </div>
-
-        {projectsLoading ? (
-          <div className={styles.loading}>Loading projects...</div>
-        ) : featuredProjects.length > 0 ? (
-          <div className={styles.grid}>
-            {featuredProjects.map((project) => (
-              <ProjectCard key={project.slug} project={project} />
-            ))}
-          </div>
-        ) : (
-          <div className={styles.empty}>No projects yet. Check back soon!</div>
-        )}
-      </section>
-
-      <section className={styles.section}>
-        <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>Recent Posts</h2>
-          <Link to="/projects-and-posts#posts" className={styles.viewAllLink}>
-            View All {'->'}
-          </Link>
-        </div>
-
-        {postsLoading ? (
-          <div className={styles.loading}>Loading posts...</div>
-        ) : recentPosts.length > 0 ? (
-          <div className={styles.grid}>
-            {recentPosts.map((post) => (
-              <BlogCard key={post.slug} post={post} />
-            ))}
-          </div>
-        ) : (
-          <div className={styles.empty}>No blog posts yet. Check back soon!</div>
-        )}
       </section>
     </>
   );

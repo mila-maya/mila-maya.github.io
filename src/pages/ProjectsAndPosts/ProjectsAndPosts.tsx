@@ -5,24 +5,24 @@ import ProjectCard from '@components/projects/ProjectCard/ProjectCard';
 import BlogCard from '@components/blog/BlogCard/BlogCard';
 import { useProjects } from '@hooks/useProjects';
 import { useBlogPosts } from '@hooks/useBlogPosts';
-import styles from './Work.module.css';
+import styles from './ProjectsAndPosts.module.css';
 
-const WORK_DESCRIPTION =
+const PROJECTS_AND_POSTS_DESCRIPTION =
   "Projects, tutorials, and thoughts on software development - and everything I'm learning along the way.";
 
-type WorkFilter = 'all' | 'projects' | 'posts';
+type ContentFilter = 'all' | 'projects' | 'posts';
 
-const hashToFilter = (hash: string): WorkFilter => {
+const hashToFilter = (hash: string): ContentFilter => {
   if (hash === '#projects') return 'projects';
   if (hash === '#posts') return 'posts';
   return 'all';
 };
 
-const Work = () => {
+const ProjectsAndPosts = () => {
   const { projects, loading: projectsLoading, error: projectsError } = useProjects();
   const { posts, loading: postsLoading, error: postsError } = useBlogPosts();
   const location = useLocation();
-  const [filter, setFilter] = useState<WorkFilter>(hashToFilter(location.hash));
+  const [filter, setFilter] = useState<ContentFilter>(hashToFilter(location.hash));
 
   useEffect(() => {
     setFilter(hashToFilter(location.hash));
@@ -58,15 +58,15 @@ const Work = () => {
 
   return (
     <>
-      <SEO title="Work" description={WORK_DESCRIPTION} />
+      <SEO title="Projects and Posts" description={PROJECTS_AND_POSTS_DESCRIPTION} />
 
       <div className={styles.container}>
         <header className={styles.header}>
-          <h1 className={styles.title}>Work</h1>
-          <p className={styles.description}>{WORK_DESCRIPTION}</p>
+          <h1 className={styles.title}>Projects and Posts</h1>
+          <p className={styles.description}>{PROJECTS_AND_POSTS_DESCRIPTION}</p>
         </header>
 
-        <div className={styles.filters} role="tablist" aria-label="Filter work items">
+        <div className={styles.filters} role="tablist" aria-label="Filter content">
           <button
             type="button"
             role="tab"
@@ -97,7 +97,7 @@ const Work = () => {
         </div>
 
         {loading ? (
-          <div className={styles.loading}>Loading work...</div>
+          <div className={styles.loading}>Loading content...</div>
         ) : anyError && !hasContent ? (
           <div className={styles.error}>Error loading content. Please try again later.</div>
         ) : items.length > 0 ? (
@@ -129,4 +129,4 @@ const Work = () => {
   );
 };
 
-export default Work;
+export default ProjectsAndPosts;

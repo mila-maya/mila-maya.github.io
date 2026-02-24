@@ -97,8 +97,8 @@ const BlogPost = () => {
       />
 
       <article className={styles.container}>
-        <Link to="/blog" className={styles.backLink}>
-          {'<-'} Back to Blog
+        <Link to="/work#posts" className={styles.backLink}>
+          {'<-'} Back to Work
         </Link>
 
         <header className={styles.header}>

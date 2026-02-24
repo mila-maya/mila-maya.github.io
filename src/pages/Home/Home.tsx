@@ -93,8 +93,8 @@ const Home = () => {
               focused ML and AI skill development for data-driven applications.
             </p>
             <div className={styles.actions}>
-              <Link to="/projects" className={`${styles.action} ${styles.primaryAction}`}>
-                Explore Projects
+              <Link to="/work#projects" className={`${styles.action} ${styles.primaryAction}`}>
+                Explore Work
               </Link>
               <Link to="/#about" className={`${styles.action} ${styles.secondaryAction}`}>
                 About My Work
@@ -178,7 +178,7 @@ const Home = () => {
       <section className={styles.section}>
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>Featured Projects</h2>
-          <Link to="/projects" className={styles.viewAllLink}>
+          <Link to="/work#projects" className={styles.viewAllLink}>
             View All {'->'}
           </Link>
         </div>
@@ -199,7 +199,7 @@ const Home = () => {
       <section className={styles.section}>
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>Recent Posts</h2>
-          <Link to="/blog" className={styles.viewAllLink}>
+          <Link to="/work#posts" className={styles.viewAllLink}>
             View All {'->'}
           </Link>
         </div>

@@ -3,8 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import MainLayout from '@layouts/MainLayout/MainLayout';
 import Home from '@pages/Home/Home';
 
-const Projects = lazy(() => import('@pages/Projects/Projects'));
-const Blog = lazy(() => import('@pages/Blog/Blog'));
+const Work = lazy(() => import('@pages/Work/Work'));
 const BlogPost = lazy(() => import('@pages/Blog/BlogPost'));
 const Contact = lazy(() => import('@pages/Contact/Contact'));
 const BioinformaticToolbox = lazy(() => import('@pages/BioinformaticToolbox/BioinformaticToolbox'));
@@ -17,9 +16,8 @@ function App() {
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
-          <Route path="/projects" element={<Suspense fallback={routeFallback}><Projects /></Suspense>} />
+          <Route path="/work" element={<Suspense fallback={routeFallback}><Work /></Suspense>} />
           <Route path="/projects/bioinformatic-toolbox" element={<Suspense fallback={routeFallback}><BioinformaticToolbox /></Suspense>} />
-          <Route path="/blog" element={<Suspense fallback={routeFallback}><Blog /></Suspense>} />
           <Route path="/blog/:slug" element={<Suspense fallback={routeFallback}><BlogPost /></Suspense>} />
           <Route path="/contact" element={<Suspense fallback={routeFallback}><Contact /></Suspense>} />
         </Route>

@@ -417,7 +417,15 @@ cd presentation && latexmk -pdf -interaction=nonstopmode presentation.tex && cd 
 
 Clean up build artifacts: \`latexmk -c\`
 
-## 4) Using AI
+## 4) Figures that stay sharp and searchable
+
+What worked best for me was exporting plots and diagrams as **vector PDF** and including them directly in LaTeX, because the figures stay sharp at any zoom and the text remains selectable and searchable in the final thesis PDF.
+
+~~~tex
+\includegraphics[width=\linewidth]{figures/my-figure.pdf}
+~~~
+
+## 5) Using AI
 
 - **ChatGPT Projects** — uploaded literature papers to summarize key points, find gaps, and consult with the literature while writing
 - **Codex in VS Code** — fixing LaTeX errors, organizing files, and building the presentation from figures, tables, and key content

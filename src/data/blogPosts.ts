@@ -390,16 +390,22 @@ latexmk -v
 bibtex --version
 ~~~
 
-## 2) Folder structure
+## 2) Project Structure and Searchable Figures
 
 - [thesis.tex](/template-files/thesis.tex)
 - frontmatter/ — [cover.tex](/template-files/frontmatter/cover.tex), [abstracts.tex](/template-files/frontmatter/abstracts.tex)
 - chapters/ — [01-intro.tex](/template-files/chapters/01-intro.tex), [02-methods.tex](/template-files/chapters/02-methods.tex), [03-results.tex](/template-files/chapters/03-results.tex)
 - [bib/references.bib](/template-files/bib/references.bib)
-- figures/
 - appendix/
 - presentation/ — [presentation.tex](/template-files/presentation/presentation.tex)
 - [Makefile](/template-files/Makefile)
+- figures/
+
+What worked best for me: saving plots and diagrams as **vector PDF** and including them directly in LaTeX. That way, figures stay sharp at any zoom and text remains searchable in the final thesis PDF.
+
+~~~tex
+\includegraphics[width=\linewidth]{figures/my-figure.pdf}
+~~~
 
 ## 3) Build
 
@@ -417,15 +423,7 @@ cd presentation && latexmk -pdf -interaction=nonstopmode presentation.tex && cd 
 
 Clean up build artifacts: \`latexmk -c\`
 
-## 4) Figures that stay sharp and searchable
-
-What worked best for me was exporting plots and diagrams as **vector PDF** and including them directly in LaTeX, because the figures stay sharp at any zoom and the text remains selectable and searchable in the final thesis PDF.
-
-~~~tex
-\includegraphics[width=\linewidth]{figures/my-figure.pdf}
-~~~
-
-## 5) Using AI
+## 4) Using AI
 
 - **ChatGPT Projects** — uploaded literature papers to summarize key points, find gaps, and consult with the literature while writing
 - **Codex in VS Code** — fixing LaTeX errors, organizing files, and building the presentation from figures, tables, and key content

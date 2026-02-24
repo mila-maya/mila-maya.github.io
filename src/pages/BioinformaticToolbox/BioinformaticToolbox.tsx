@@ -38,8 +38,8 @@ const BioinformaticToolbox = () => {
           <p className={styles.subtitle}>
             Three independent workflows for protein analysis — from sequence retrieval to structure prediction.
           </p>
-          <Link to="/work#projects" className={styles.backLink}>
-            &larr; Back to Work
+          <Link to="/projects-and-posts#projects" className={styles.backLink}>
+            &larr; Back to Projects and Posts
           </Link>
         </header>
 

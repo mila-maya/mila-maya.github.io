@@ -1,4 +1,4 @@
-import styles from './Footer.module.css';
+﻿import styles from './Footer.module.css';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -6,16 +6,8 @@ const Footer = () => {
   return (
     <footer className={styles.footer}>
       <div className={styles.container}>
-        <p className={styles.copyright}>(c) {currentYear} Mila. All rights reserved.</p>
         <div className={styles.links}>
-          <a
-            href="https://github.com/mila-maya"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.link}
-          >
-            GitHub
-          </a>
+          <span className={styles.connectLabel}>Connect With Me:</span>
           <a
             href="https://www.linkedin.com/in/mila-lettmayer/"
             target="_blank"
@@ -25,9 +17,12 @@ const Footer = () => {
             LinkedIn
           </a>
         </div>
+        <p className={styles.copyright}>(c) {currentYear} Mila. All rights reserved.</p>
       </div>
     </footer>
   );
 };
 
 export default Footer;
+
+

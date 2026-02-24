@@ -93,20 +93,12 @@ const Home = () => {
               focused ML and AI skill development for data-driven applications.
             </p>
             <div className={styles.actions}>
-              <Link to="/work#projects" className={`${styles.action} ${styles.primaryAction}`}>
-                Explore Work
+              <Link to="/projects-and-posts#projects" className={`${styles.action} ${styles.primaryAction}`}>
+                Explore Projects and Posts
               </Link>
               <Link to="/#about" className={`${styles.action} ${styles.secondaryAction}`}>
                 About My Work
               </Link>
-              <a
-                href="https://www.linkedin.com/in/mila-lettmayer/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`${styles.action} ${styles.ghostAction}`}
-              >
-                LinkedIn
-              </a>
             </div>
           </div>
 
@@ -178,7 +170,7 @@ const Home = () => {
       <section className={styles.section}>
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>Featured Projects</h2>
-          <Link to="/work#projects" className={styles.viewAllLink}>
+          <Link to="/projects-and-posts#projects" className={styles.viewAllLink}>
             View All {'->'}
           </Link>
         </div>
@@ -199,7 +191,7 @@ const Home = () => {
       <section className={styles.section}>
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>Recent Posts</h2>
-          <Link to="/work#posts" className={styles.viewAllLink}>
+          <Link to="/projects-and-posts#posts" className={styles.viewAllLink}>
             View All {'->'}
           </Link>
         </div>
@@ -221,3 +213,4 @@ const Home = () => {
 };
 
 export default Home;
+

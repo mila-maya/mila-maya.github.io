@@ -13,23 +13,39 @@
 }
 
 .copyright {
-  color: var(--text-light);
-  margin-bottom: var(--spacing-sm);
+  color: #8a8f98;
+  font-size: 0.85rem;
+  margin-top: 0.45rem;
+}
+
+.connectLabel {
+  color: var(--text-color);
+  font-weight: 700;
 }
 
 .links {
   display: flex;
-  gap: var(--spacing-md);
+  gap: 0.75rem;
   justify-content: center;
+  align-items: baseline;
   flex-wrap: wrap;
 }
 
 .link {
-  color: var(--primary-color);
-  text-decoration: none;
-  transition: color var(--transition-fast);
+  color: #0a66c2;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+  text-decoration-thickness: 1.5px;
+  transition: color var(--transition-fast), text-decoration-thickness var(--transition-fast);
 }
 
 .link:hover {
-  color: var(--primary-hover);
+  color: #084f96;
+  text-decoration-thickness: 2px;
+}
+
+.link:focus-visible {
+  outline: 2px solid #0a66c2;
+  outline-offset: 2px;
 }

@@ -35,6 +35,10 @@ build/
 # Local project workspace
 project/
 
+# Temporary debug files
+tmp-*.cjs
+tmp-*.js
+
 # Temporary MOCCA analysis artifacts
 /mocca_src/
 /mocca2_src/

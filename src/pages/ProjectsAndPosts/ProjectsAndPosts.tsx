@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import SEO from '@components/common/SEO/SEO';
+import PageHeader from '@components/common/PageHeader/PageHeader';
+import FilterBar, { type FilterOption } from '@components/common/FilterBar/FilterBar';
 import ProjectCard from '@components/projects/ProjectCard/ProjectCard';
 import BlogCard from '@components/blog/BlogCard/BlogCard';
 import { useProjects } from '@hooks/useProjects';
@@ -11,6 +13,12 @@ const PROJECTS_AND_POSTS_DESCRIPTION =
   "Projects, tutorials, and thoughts on software development - and everything I'm learning along the way.";
 
 type ContentFilter = 'all' | 'projects' | 'posts';
+
+const FILTER_OPTIONS: FilterOption<ContentFilter>[] = [
+  { id: 'all', label: 'All' },
+  { id: 'projects', label: 'Projects' },
+  { id: 'posts', label: 'Posts' },
+];
 
 const hashToFilter = (hash: string): ContentFilter => {
   if (hash === '#projects') return 'projects';
@@ -61,40 +69,14 @@ const ProjectsAndPosts = () => {
       <SEO title="Projects & Posts" description={PROJECTS_AND_POSTS_DESCRIPTION} />
 
       <div className={styles.container}>
-        <header className={styles.header}>
-          <h1 className={styles.title}>Projects & Posts</h1>
-          <p className={styles.description}>{PROJECTS_AND_POSTS_DESCRIPTION}</p>
-        </header>
+        <PageHeader title="Projects & Posts" description={PROJECTS_AND_POSTS_DESCRIPTION} />
 
-        <div className={styles.filters} role="tablist" aria-label="Filter content">
-          <button
-            type="button"
-            role="tab"
-            aria-selected={filter === 'all'}
-            className={`${styles.filter} ${filter === 'all' ? styles.filterActive : ''}`}
-            onClick={() => setFilter('all')}
-          >
-            All
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={filter === 'projects'}
-            className={`${styles.filter} ${filter === 'projects' ? styles.filterActive : ''}`}
-            onClick={() => setFilter('projects')}
-          >
-            Projects
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={filter === 'posts'}
-            className={`${styles.filter} ${filter === 'posts' ? styles.filterActive : ''}`}
-            onClick={() => setFilter('posts')}
-          >
-            Posts
-          </button>
-        </div>
+        <FilterBar
+          options={FILTER_OPTIONS}
+          activeId={filter}
+          onChange={setFilter}
+          ariaLabel="Filter content"
+        />
 
         {loading ? (
           <div className={styles.loading}>Loading content...</div>

@@ -1,0 +1,329 @@
+[
+  {
+    "id": "11a28025-71c3-80e3-bb75-fb13d6dd58a2",
+    "slug": "atomic-habits",
+    "title": "Atomic Habits",
+    "authors": [
+      "James Clear"
+    ],
+    "categories": [
+      "Productivity"
+    ],
+    "rating": [
+      "5-Star"
+    ],
+    "finished": "2024-06-01",
+    "url": null,
+    "notionUrl": "https://www.notion.so/Atomic-Habits-11a2802571c380e3bb75fb13d6dd58a2",
+    "takeaways": [],
+    "cover": "https://covers.openlibrary.org/b/id/12539702-L.jpg"
+  },
+  {
+    "id": "19028025-71c3-802e-8c2c-f8259be524a6",
+    "slug": "feel-good-productivity",
+    "title": "Feel Good Productivity",
+    "authors": [
+      "Ali Abdaal"
+    ],
+    "categories": [
+      "Life",
+      "Productivity"
+    ],
+    "rating": [
+      "5-Star"
+    ],
+    "finished": "2025-03-13",
+    "url": null,
+    "notionUrl": "https://www.notion.so/Feel-Good-Productivity-1902802571c3802e8c2cf8259be524a6",
+    "takeaways": [],
+    "cover": "https://covers.openlibrary.org/b/id/14635414-L.jpg"
+  },
+  {
+    "id": "11a28025-71c3-8008-9e5b-fbe0c7041fec",
+    "slug": "make-time",
+    "title": "Make Time",
+    "authors": [
+      "Jake Knapp",
+      "John Zeratsky"
+    ],
+    "categories": [
+      "Productivity"
+    ],
+    "rating": [
+      "Lifechanging"
+    ],
+    "finished": "2024-04-01",
+    "url": null,
+    "notionUrl": "https://www.notion.so/Make-Time-11a2802571c380089e5bfbe0c7041fec",
+    "takeaways": [],
+    "cover": "https://covers.openlibrary.org/b/id/14179816-L.jpg"
+  },
+  {
+    "id": "11a28025-71c3-80fd-b065-f41d4aa133ff",
+    "slug": "master-the-money-game",
+    "title": "Master the Money Game",
+    "authors": [
+      "Tony Robins"
+    ],
+    "categories": [
+      "Finance"
+    ],
+    "rating": [
+      "Lifechanging"
+    ],
+    "finished": "2024-10-23",
+    "url": null,
+    "notionUrl": "https://www.notion.so/Master-the-Money-Game-11a2802571c380fdb065f41d4aa133ff",
+    "takeaways": [],
+    "cover": null
+  },
+  {
+    "id": "13428025-71c3-8083-8b1e-d55dd138266a",
+    "slug": "millionaire-fastlane",
+    "title": "Millionaire Fastlane",
+    "authors": [
+      "MJ DeMarco"
+    ],
+    "categories": [
+      "Enterpreneur"
+    ],
+    "rating": [
+      "Lifechanging"
+    ],
+    "finished": "2024-11-17",
+    "url": null,
+    "notionUrl": "https://www.notion.so/Millionaire-Fastlane-1342802571c380838b1ed55dd138266a",
+    "takeaways": [],
+    "cover": "https://covers.openlibrary.org/b/id/12393433-L.jpg"
+  },
+  {
+    "id": "11a28025-71c3-8026-9c99-fe256baefe3d",
+    "slug": "mindset",
+    "title": "Mindset",
+    "authors": [
+      "Carol Dweck"
+    ],
+    "categories": [
+      "Life"
+    ],
+    "rating": [
+      "5-Star"
+    ],
+    "finished": "2024-07-01",
+    "url": null,
+    "notionUrl": "https://www.notion.so/Mindset-11a2802571c380269c99fe256baefe3d",
+    "takeaways": [],
+    "cover": "https://covers.openlibrary.org/b/id/746414-L.jpg"
+  },
+  {
+    "id": "1ac28025-71c3-80d5-acda-ebccbbe1e6f3",
+    "slug": "period-power",
+    "title": "Period Power",
+    "authors": [
+      "Maisie Hill"
+    ],
+    "categories": [
+      "Health"
+    ],
+    "rating": [],
+    "finished": null,
+    "url": "https://www.youtube.com/watch?v=gpyZ_7Wqrrk",
+    "notionUrl": "https://www.notion.so/Period-Power-1ac2802571c380d5acdaebccbbe1e6f3",
+    "takeaways": [],
+    "cover": "https://covers.openlibrary.org/b/id/10168383-L.jpg"
+  },
+  {
+    "id": "1c728025-71c3-807e-9914-eb31ea8a30c5",
+    "slug": "presence-bringing-your-boldest-self-to-your-biggest-challenges",
+    "title": "Presence: Bringing Your Boldest Self to Your Biggest Challenges",
+    "authors": [
+      "Amy Cuddy"
+    ],
+    "categories": [
+      "Life",
+      "Carrier"
+    ],
+    "rating": [
+      "Lifechanging"
+    ],
+    "finished": null,
+    "url": "https://m.youtube.com/watch?v=ATo9sYax-AQ",
+    "notionUrl": "https://www.notion.so/Presence-Bringing-Your-Boldest-Self-to-Your-Biggest-Challenges-1c72802571c3807e9914eb31ea8a30c5",
+    "takeaways": [],
+    "cover": null
+  },
+  {
+    "id": "11a28025-71c3-80f4-87ff-f53ecc84dcb3",
+    "slug": "show-your-work",
+    "title": "Show Your Work",
+    "authors": [
+      "Austin Cleon"
+    ],
+    "categories": [
+      "Carrier"
+    ],
+    "rating": [
+      "5-Star"
+    ],
+    "finished": "2024-09-01",
+    "url": null,
+    "notionUrl": "https://www.notion.so/Show-Your-Work-11a2802571c380f487fff53ecc84dcb3",
+    "takeaways": [],
+    "cover": null
+  },
+  {
+    "id": "11a28025-71c3-8031-a15b-f0487229d096",
+    "slug": "so-good-they-can-t-ignore-you",
+    "title": "So Good They can’t Ignore You",
+    "authors": [
+      "Cal Newport"
+    ],
+    "categories": [
+      "Carrier"
+    ],
+    "rating": [
+      "Lifechanging"
+    ],
+    "finished": "2024-03-01",
+    "url": null,
+    "notionUrl": "https://www.notion.so/So-Good-They-can-t-Ignore-You-11a2802571c38031a15bf0487229d096",
+    "takeaways": [],
+    "cover": "https://covers.openlibrary.org/b/id/9215292-L.jpg"
+  },
+  {
+    "id": "18a28025-71c3-80be-9696-d2ae47f21356",
+    "slug": "taking-charge-of-your-fertility",
+    "title": "Taking Charge of your Fertility",
+    "authors": [
+      "Tony  Welschler"
+    ],
+    "categories": [
+      "Health",
+      "Life"
+    ],
+    "rating": [
+      "Lifechanging"
+    ],
+    "finished": "2025-02-07",
+    "url": null,
+    "notionUrl": "https://www.notion.so/Taking-Charge-of-your-Fertility-18a2802571c380be9696d2ae47f21356",
+    "takeaways": [],
+    "cover": null
+  },
+  {
+    "id": "1c728025-71c3-8046-aeef-c7be5464ec8d",
+    "slug": "the-art-of-happiness",
+    "title": "The art of happiness",
+    "authors": [
+      "14th Dalai Lama",
+      "Howard Cutler"
+    ],
+    "categories": [
+      "Life",
+      "Health"
+    ],
+    "rating": [
+      "Lifechanging"
+    ],
+    "finished": "2024-04-05",
+    "url": null,
+    "notionUrl": "https://www.notion.so/The-art-of-happiness-1c72802571c38046aeefc7be5464ec8d",
+    "takeaways": [],
+    "cover": "https://covers.openlibrary.org/b/id/6671211-L.jpg"
+  },
+  {
+    "id": "11a28025-71c3-80a6-aee7-c8023f5dbfa4",
+    "slug": "the-compound-effect",
+    "title": "The Compound Effect",
+    "authors": [
+      "Darren Hardy"
+    ],
+    "categories": [
+      "Life"
+    ],
+    "rating": [
+      "Lifechanging"
+    ],
+    "finished": "2024-06-01",
+    "url": null,
+    "notionUrl": "https://www.notion.so/The-Compound-Effect-11a2802571c380a6aee7c8023f5dbfa4",
+    "takeaways": [],
+    "cover": "https://covers.openlibrary.org/b/id/7115046-L.jpg"
+  },
+  {
+    "id": "11a28025-71c3-80c2-ace7-edb861a66617",
+    "slug": "the-e-myth-revisited",
+    "title": "The E-myth Revisited",
+    "authors": [
+      "Michael Gerber"
+    ],
+    "categories": [
+      "Enterpreneur"
+    ],
+    "rating": [
+      "5-Star"
+    ],
+    "finished": "2024-12-02",
+    "url": "https://www.youtube.com/watch?v=7YGS3OxJZN4",
+    "notionUrl": "https://www.notion.so/The-E-myth-Revisited-11a2802571c380c2ace7edb861a66617",
+    "takeaways": [],
+    "cover": "https://covers.openlibrary.org/b/id/684209-L.jpg"
+  },
+  {
+    "id": "11a28025-71c3-8081-98a0-fb455d032c72",
+    "slug": "the-magic-of-tidying-up",
+    "title": "The Magic of Tidying Up",
+    "authors": [
+      "Marie Kondo"
+    ],
+    "categories": [
+      "Life"
+    ],
+    "rating": [
+      "Lifechanging"
+    ],
+    "finished": "2023-05-01",
+    "url": null,
+    "notionUrl": "https://www.notion.so/The-Magic-of-Tidying-Up-11a2802571c3808198a0fb455d032c72",
+    "takeaways": [],
+    "cover": "https://covers.openlibrary.org/b/id/7367218-L.jpg"
+  },
+  {
+    "id": "12428025-71c3-8020-9df0-c2d6ffa563d3",
+    "slug": "the-rational-optimist",
+    "title": "The Rational Optimist",
+    "authors": [
+      "Matt Ridley"
+    ],
+    "categories": [
+      "Life"
+    ],
+    "rating": [
+      "Lifechanging"
+    ],
+    "finished": "2024-07-01",
+    "url": null,
+    "notionUrl": "https://www.notion.so/The-Rational-Optimist-1242802571c380209df0c2d6ffa563d3",
+    "takeaways": [],
+    "cover": "https://covers.openlibrary.org/b/id/7024445-L.jpg"
+  },
+  {
+    "id": "11a28025-71c3-8027-ad23-ea9b62ab7279",
+    "slug": "work-and-life-principles",
+    "title": "Work and Life Principles",
+    "authors": [
+      "Ray Dalio"
+    ],
+    "categories": [
+      "Life"
+    ],
+    "rating": [
+      "5-Star"
+    ],
+    "finished": "2024-09-01",
+    "url": "https://principlesyou.com/archetypes",
+    "notionUrl": "https://www.notion.so/Work-and-Life-Principles-11a2802571c38027ad23ea9b62ab7279",
+    "takeaways": [],
+    "cover": null
+  }
+]

@@ -4,12 +4,13 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "npm run sync:thesis && tsc && vite build",
+    "dev": "npm run sync:books && vite",
+    "build": "npm run sync:thesis && npm run sync:books && tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "sync:thesis": "node scripts/sync-thesis-template.mjs --skip-pdfs",
-    "sync:thesis:strict": "node scripts/sync-thesis-template.mjs"
+    "sync:thesis:strict": "node scripts/sync-thesis-template.mjs",
+    "sync:books": "node scripts/sync-books-from-notion.mjs"
   },
   "dependencies": {
     "contentful": "^11.10.3",

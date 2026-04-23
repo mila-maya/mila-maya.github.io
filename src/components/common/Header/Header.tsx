@@ -23,6 +23,14 @@ const Header = () => {
             >
               Projects & Posts
             </NavLink>
+            <NavLink
+              to="/books"
+              className={({ isActive }) =>
+                `${styles.navLink} ${isActive ? styles.active : ''}`
+              }
+            >
+              Books
+            </NavLink>
           </nav>
         </div>
       </div>

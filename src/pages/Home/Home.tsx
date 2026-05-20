@@ -1,6 +1,11 @@
-import { useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import BlogCard from '@components/blog/BlogCard/BlogCard';
+import ProfileBadge from '@components/common/ProfileBadge/ProfileBadge';
 import SEO from '@components/common/SEO/SEO';
+import ProjectCard from '@components/projects/ProjectCard/ProjectCard';
+import { siteConfig } from '@/config/site';
+import { useBlogPosts } from '@hooks/useBlogPosts';
+import { useProjects } from '@hooks/useProjects';
 import styles from './Home.module.css';
 
 const Home = () => {
@@ -8,17 +13,20 @@ const Home = () => {
     {
       period: 'Feb 2026 - Present',
       title: 'Career Development',
-      detail: 'Deepening ML and AI skills through hands-on Python projects in model evaluation, dashboards, and financial analysis.'
+      detail:
+        'Deepening ML and AI skills through hands-on Python projects in model evaluation, dashboards, and financial analysis.'
     },
     {
       period: 'Nov 2024 - Jan 2026',
       title: 'Scientific Software Engineer (Part-time), RNAnalytics',
-      detail: 'Built production workflows for nanoparticle analysis, quality checks, and cloud platform integration.'
+      detail:
+        'Built production workflows for nanoparticle analysis, quality checks, and cloud platform integration.'
     },
     {
       period: 'May 2017 - Jan 2026',
       title: 'Dipl.-Ing. Biotechnology (Bioinformatics), BOKU',
-      detail: 'Master thesis on automated Taylorgram processing for nanoparticle size characterization.'
+      detail:
+        'Master thesis on automated Taylorgram processing for nanoparticle size characterization.'
     },
     {
       period: 'Mar 2012 - Apr 2017',
@@ -56,48 +64,67 @@ const Home = () => {
     'Scientific software architecture and API integration'
   ];
 
-  const location = useLocation();
+  const { projects, loading: projectsLoading } = useProjects();
+  const { posts, loading: postsLoading } = useBlogPosts();
+  const featuredProject = projects[0];
+  const recentPosts = posts.slice(0, 2);
 
-  useEffect(() => {
-    if (location.hash !== '#about') {
-      return;
-    }
-
-    const aboutSection = document.getElementById('about');
-    if (aboutSection) {
-      aboutSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }, [location.hash]);
+  const proofPoints = [
+    { value: 'RNAnalytics', label: 'Production delivery' },
+    { value: `${posts.length || 3}`, label: 'Technical posts' },
+    { value: `${projects.length || 1}`, label: 'Interactive tools' },
+    { value: 'BOKU', label: 'Bioinformatics training' }
+  ];
 
   return (
     <>
-      <SEO />
+      <SEO
+        description="Scientific software engineer with a bioinformatics background, sharing interactive tools, technical writing, and applied ML work."
+      />
 
       <section className={styles.heroWrap}>
         <div className={styles.hero}>
           <div className={styles.heroMain}>
-            <span className={styles.kicker}>Scientific Software Engineer | Bioinformatics | ML and AI Development</span>
+            <span className={styles.kicker}>{siteConfig.headline}</span>
             <h1 className={styles.heroTitle}>Hi, I&apos;m Mila Lettmayer.</h1>
             <p className={styles.heroSubtitle}>
-              I build reliable analysis software for biotech and research teams. My
-              work spans automated scientific pipelines, dashboard products, and now
-              focused ML and AI skill development for data-driven applications.
+              I build reliable analysis software for biotech and research teams. This site is my
+              working shelf for interactive tools, scientific write-ups, and practical notes from
+              bioinformatics and applied ML work.
             </p>
             <div className={styles.actions}>
-              <Link to="/projects-and-posts" className={`${styles.action} ${styles.primaryAction}`}>
+              <Link to={siteConfig.projectsUrl} className={`${styles.action} ${styles.primaryAction}`}>
                 Explore Projects & Posts
               </Link>
+              <Link to={siteConfig.aboutUrl} className={`${styles.action} ${styles.secondaryAction}`}>
+                Read Full Background
+              </Link>
+              <a
+                href={siteConfig.githubUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${styles.action} ${styles.ghostAction}`}
+              >
+                View GitHub
+              </a>
+            </div>
+
+            <div className={styles.proofGrid}>
+              {proofPoints.map((item) => (
+                <article key={item.label} className={styles.proofCard}>
+                  <span className={styles.proofValue}>{item.value}</span>
+                  <span className={styles.proofLabel}>{item.label}</span>
+                </article>
+              ))}
             </div>
           </div>
 
           <aside className={styles.heroAside}>
-            <img
-              src="/avatar.jpg"
-              alt="Mila Lettmayer"
+            <ProfileBadge
+              alt={siteConfig.name}
+              imageSrc={siteConfig.profileImage}
+              initials={siteConfig.initials}
               className={styles.avatar}
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-              }}
             />
             <h2 className={styles.asideTitle}>Current Focus</h2>
             <ul className={styles.focusList}>
@@ -105,6 +132,22 @@ const Home = () => {
                 <li key={area}>{area}</li>
               ))}
             </ul>
+            <div className={styles.asideLinks}>
+              <a
+                href={siteConfig.linkedInUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.asideLink}
+              >
+                LinkedIn
+              </a>
+              <Link to={siteConfig.thesisWorkflowUrl} className={styles.asideLink}>
+                Thesis Workflow
+              </Link>
+              <a href={siteConfig.thesisTemplateUrl} className={styles.asideLink}>
+                Template Download
+              </a>
+            </div>
           </aside>
         </div>
       </section>
@@ -112,9 +155,14 @@ const Home = () => {
       <section id="about" className={`${styles.section} ${styles.aboutSection}`}>
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>About My Work</h2>
+          <Link to={siteConfig.aboutUrl} className={styles.sectionCta}>
+            Full background
+          </Link>
         </div>
         <p className={styles.aboutIntro}>
-          I build software that makes scientific analysis faster, more reliable, and easier to operate. My background combines biotechnology, bioinformatics, and production engineering.
+          I build software that makes scientific analysis faster, more reliable, and easier to
+          operate. My background combines biotechnology, bioinformatics, and production
+          engineering.
         </p>
         <div className={styles.aboutGrid}>
           <div className={styles.aboutColumn}>
@@ -150,6 +198,46 @@ const Home = () => {
                   </div>
                 </article>
               ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className={styles.section}>
+        <div className={styles.sectionHeader}>
+          <div>
+            <h2 className={styles.sectionTitle}>Featured Work</h2>
+            <p className={styles.sectionLead}>
+              A quick way to see what the site is really about before you browse everything.
+            </p>
+          </div>
+          <Link to={siteConfig.projectsUrl} className={styles.sectionCta}>
+            All projects & posts
+          </Link>
+        </div>
+
+        <div className={styles.featuredLayout}>
+          <div className={styles.featuredColumn}>
+            <h3 className={styles.subheading}>Featured Project</h3>
+            {projectsLoading ? (
+              <p className={styles.statusText}>Loading project...</p>
+            ) : featuredProject ? (
+              <ProjectCard project={featuredProject} />
+            ) : (
+              <p className={styles.statusText}>Project details coming soon.</p>
+            )}
+          </div>
+
+          <div className={styles.featuredColumn}>
+            <h3 className={styles.subheading}>Recent Writing</h3>
+            <div className={styles.stack}>
+              {postsLoading ? (
+                <p className={styles.statusText}>Loading posts...</p>
+              ) : recentPosts.length > 0 ? (
+                recentPosts.map((post) => <BlogCard key={post.slug} post={post} />)
+              ) : (
+                <p className={styles.statusText}>Posts coming soon.</p>
+              )}
             </div>
           </div>
         </div>

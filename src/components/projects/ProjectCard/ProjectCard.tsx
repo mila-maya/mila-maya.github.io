@@ -1,4 +1,4 @@
-import type { Project } from '@/types/contentful.types';
+import type { Project } from '@/types/content.types';
 import { Link } from 'react-router-dom';
 import styles from './ProjectCard.module.css';
 
@@ -7,7 +7,6 @@ interface ProjectCardProps {
 }
 
 const ProjectCard = ({ project }: ProjectCardProps) => {
-  const showLinks = !project.hideLinks && !project.cardUrl;
   const cardContent = (
     <>
       {project.featuredImage ? (
@@ -33,8 +32,23 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
         </div>
       )}
 
-      {showLinks && (
+      {(project.cardUrl || project.githubUrl || project.liveUrl) && (
         <div className={styles.links}>
+          {project.cardUrl && project.cardUrl.startsWith('/') && (
+            <Link to={project.cardUrl} className={`${styles.link} ${styles.primaryLink}`}>
+              Open Case Study {'->'}
+            </Link>
+          )}
+          {project.cardUrl && !project.cardUrl.startsWith('/') && (
+            <a
+              href={project.cardUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${styles.link} ${styles.primaryLink}`}
+            >
+              Open Project {'->'}
+            </a>
+          )}
           {project.githubUrl && (
             <a
               href={project.githubUrl}
@@ -42,7 +56,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
               rel="noopener noreferrer"
               className={styles.link}
             >
-              View on GitHub {'->'}
+              Source {'->'}
             </a>
           )}
           {project.liveUrl && (
@@ -60,33 +74,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
     </>
   );
 
-  if (!project.cardUrl) {
-    return <div className={styles.card}>{cardContent}</div>;
-  }
-
-  if (project.cardUrl.startsWith('/')) {
-    return (
-      <Link
-        to={project.cardUrl}
-        className={`${styles.card} ${styles.clickableCard}`}
-        aria-label={`Open project ${project.title}`}
-      >
-        {cardContent}
-      </Link>
-    );
-  }
-
-  return (
-    <a
-      href={project.cardUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={`${styles.card} ${styles.clickableCard}`}
-      aria-label={`Open project ${project.title}`}
-    >
-      {cardContent}
-    </a>
-  );
+  return <article className={styles.card}>{cardContent}</article>;
 };
 
 export default ProjectCard;

@@ -32,7 +32,7 @@ const BookDetail = () => {
   return (
     <>
       <SEO
-        title={`${book.title} - Books - Mila Maya`}
+        title={`${book.title} | Books`}
         description={
           book.takeaways[0] ??
           `Takeaways from ${book.title}${authorLine ? ' by ' + authorLine : ''}.`

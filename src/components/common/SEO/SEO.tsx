@@ -1,4 +1,6 @@
-import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { Helmet } from 'react-helmet-async';
+import { useLocation } from 'react-router-dom';
+import { siteConfig } from '@/config/site';
 
 interface SEOProps {
   title?: string;
@@ -8,36 +10,46 @@ interface SEOProps {
   type?: string;
 }
 
+const toAbsoluteUrl = (value: string): string => {
+  if (/^https?:\/\//i.test(value)) {
+    return value;
+  }
+
+  return `${siteConfig.siteUrl}${value.startsWith('/') ? value : `/${value}`}`;
+};
+
 const SEO = ({
-  title = 'Mila - Personal Portfolio',
-  description = 'Personal portfolio and blog by Mila - showcasing projects, sharing tips, and building cool stuff.',
-  image = '/avatar.jpg',
-  url = 'https://mila-maya.github.io',
+  title,
+  description = siteConfig.description,
+  image = siteConfig.defaultShareImage,
+  url,
   type = 'website'
 }: SEOProps) => {
-  const fullTitle = title === 'Mila - Personal Portfolio' ? title : `${title} | Mila`;
+  const location = useLocation();
+  const fullTitle = title ? `${title} | ${siteConfig.name}` : `${siteConfig.name} | ${siteConfig.role}`;
+  const resolvedUrl = toAbsoluteUrl(url ?? `${location.pathname}${location.search}`);
+  const resolvedImage = image ? toAbsoluteUrl(image) : undefined;
 
   return (
-    <HelmetProvider>
-      <Helmet>
-        <title>{fullTitle}</title>
-        <meta name="description" content={description} />
+    <Helmet>
+      <title>{fullTitle}</title>
+      <meta name="description" content={description} />
+      <meta name="robots" content="index, follow" />
+      <link rel="canonical" href={resolvedUrl} />
 
-        {/* Open Graph / Facebook */}
-        <meta property="og:type" content={type} />
-        <meta property="og:url" content={url} />
-        <meta property="og:title" content={fullTitle} />
-        <meta property="og:description" content={description} />
-        <meta property="og:image" content={image} />
+      <meta property="og:type" content={type} />
+      <meta property="og:site_name" content={siteConfig.name} />
+      <meta property="og:url" content={resolvedUrl} />
+      <meta property="og:title" content={fullTitle} />
+      <meta property="og:description" content={description} />
+      {resolvedImage && <meta property="og:image" content={resolvedImage} />}
 
-        {/* Twitter */}
-        <meta property="twitter:card" content="summary_large_image" />
-        <meta property="twitter:url" content={url} />
-        <meta property="twitter:title" content={fullTitle} />
-        <meta property="twitter:description" content={description} />
-        <meta property="twitter:image" content={image} />
-      </Helmet>
-    </HelmetProvider>
+      <meta name="twitter:card" content={resolvedImage ? 'summary_large_image' : 'summary'} />
+      <meta name="twitter:url" content={resolvedUrl} />
+      <meta name="twitter:title" content={fullTitle} />
+      <meta name="twitter:description" content={description} />
+      {resolvedImage && <meta name="twitter:image" content={resolvedImage} />}
+    </Helmet>
   );
 };
 

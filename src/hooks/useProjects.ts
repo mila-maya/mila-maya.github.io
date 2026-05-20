@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { getProjects } from '@/services/contentful';
-import type { Project } from '@/types/contentful.types';
+import { getProjects } from '@/services/content';
+import type { Project } from '@/types/content.types';
 
 export const useProjects = () => {
   const [projects, setProjects] = useState<Project[]>([]);

@@ -10,7 +10,7 @@ import { useBlogPosts } from '@hooks/useBlogPosts';
 import styles from './ProjectsAndPosts.module.css';
 
 const PROJECTS_AND_POSTS_DESCRIPTION =
-  "Projects, tutorials, and thoughts on software development - and everything I'm learning along the way.";
+  'Selected tools, technical notes, and practical write-ups from my work in scientific software, bioinformatics, and applied ML.';
 
 type ContentFilter = 'all' | 'projects' | 'posts';
 

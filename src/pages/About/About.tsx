@@ -1,4 +1,6 @@
 import SEO from '@components/common/SEO/SEO';
+import ProfileBadge from '@components/common/ProfileBadge/ProfileBadge';
+import { siteConfig } from '@/config/site';
 import styles from './About.module.css';
 
 const About = () => {
@@ -91,13 +93,11 @@ const About = () => {
 
       <div className={styles.container}>
         <header className={styles.header}>
-          <img
-            src="/avatar.jpg"
-            alt="Mila Lettmayer"
+          <ProfileBadge
+            alt={siteConfig.name}
+            imageSrc={siteConfig.profileImage}
+            initials={siteConfig.initials}
             className={styles.avatar}
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-            }}
           />
           <h1 className={styles.title}>About Me</h1>
           <p className={styles.subtitle}>

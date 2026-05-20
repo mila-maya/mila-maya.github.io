@@ -7,7 +7,6 @@ export interface Book {
   rating: string[];
   finished: string | null;
   url: string | null;
-  notionUrl: string;
   cover: string | null;
   takeaways: string[];
 }

@@ -1,14 +1,14 @@
 :root {
   /* Colors */
-  --primary-color: #007acc;
-  --primary-hover: #005fa3;
-  --text-color: #333;
-  --text-light: #555;
-  --background: #fdfdfd;
+  --primary-color: #0f6bb3;
+  --primary-hover: #0b4f85;
+  --text-color: #1c2733;
+  --text-light: #526274;
+  --background: #f7fafc;
   --background-light: #ffffff;
-  --border-color: #e1e1e1;
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --border-color: #d7e2ec;
+  --shadow-sm: 0 8px 24px rgba(15, 31, 51, 0.07);
+  --shadow-md: 0 18px 42px rgba(15, 31, 51, 0.12);
 
   /* Spacing */
   --spacing-xs: 0.5rem;
@@ -18,7 +18,7 @@
   --spacing-xl: 4rem;
 
   /* Typography */
-  --font-family: Arial, sans-serif;
+  --font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   --font-size-base: 1rem;
   --font-size-sm: 0.95rem;
   --font-size-lg: 1.25rem;
@@ -27,9 +27,9 @@
   --line-height: 1.6;
 
   /* Layout */
-  --container-max-width: 900px;
-  --border-radius: 8px;
-  --border-radius-sm: 4px;
+  --container-max-width: 1040px;
+  --border-radius: 16px;
+  --border-radius-sm: 10px;
 
   /* Transitions */
   --transition-fast: 0.2s ease;

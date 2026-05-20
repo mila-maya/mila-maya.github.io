@@ -7,7 +7,7 @@ import { books } from '@/data/books';
 import styles from './Books.module.css';
 
 const BOOKS_DESCRIPTION =
-  'A curated shelf of books that left a mark — click a book to reveal its five takeaways.';
+  'A curated shelf of books that left a mark - click a book to reveal five takeaways.';
 
 const ALL_ID = 'all';
 
@@ -32,7 +32,7 @@ const Books = () => {
 
   return (
     <div className={styles.container}>
-      <SEO title="Books - Mila Maya" description={BOOKS_DESCRIPTION} />
+      <SEO title="Books" description={BOOKS_DESCRIPTION} />
       <PageHeader title="Books" description={BOOKS_DESCRIPTION} />
 
       {filterOptions.length > 1 && (
@@ -58,3 +58,4 @@ const Books = () => {
 };
 
 export default Books;
+

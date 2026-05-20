@@ -1,9 +1,8 @@
-import type { BlogPost, Project } from '@/types/contentful.types';
+import type { BlogPost, Project } from '@/types/content.types';
 import { blogPosts as localBlogPosts } from '@/data/blogPosts';
 import { projects as localProjects } from '@/data/projects';
 
-// Using local data files instead of Contentful CMS
-// To add/edit content, simply update the files in src/data/blogPosts.ts and src/data/projects.ts
+// Content is stored locally so the GitHub Pages build has no CMS dependency.
 const legacyBlogSlugAliases: Record<string, string> = {
   'peak-finding-area-gain-synthetic-chromatogram':
     'peak-detection-deconvolution-overlapping-chromatograms'
@@ -15,9 +14,7 @@ const normalizeSlug = (value: string): string =>
     .replace(/^\/+|\/+$/g, '')
     .toLowerCase();
 
-// Fetch all blog posts
 export const getBlogPosts = async (limit = 100): Promise<BlogPost[]> => {
-  // Simulate async behavior (in case you want to switch to an API later)
   return new Promise((resolve) => {
     setTimeout(() => {
       const posts = [...localBlogPosts]
@@ -28,7 +25,6 @@ export const getBlogPosts = async (limit = 100): Promise<BlogPost[]> => {
   });
 };
 
-// Fetch a single blog post by slug
 export const getBlogPostBySlug = async (slug: string): Promise<BlogPost | null> => {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -40,7 +36,6 @@ export const getBlogPostBySlug = async (slug: string): Promise<BlogPost | null> 
   });
 };
 
-// Fetch all projects
 export const getProjects = async (): Promise<Project[]> => {
   return new Promise((resolve) => {
     setTimeout(() => {

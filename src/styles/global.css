@@ -15,7 +15,14 @@ body {
   font-family: var(--font-family);
   line-height: var(--line-height);
   color: var(--text-color);
-  background-color: var(--background);
+  background:
+    radial-gradient(circle at top left, rgba(15, 107, 179, 0.08), transparent 24%),
+    linear-gradient(180deg, var(--background) 0%, #ffffff 55%);
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
 }
 
 a {

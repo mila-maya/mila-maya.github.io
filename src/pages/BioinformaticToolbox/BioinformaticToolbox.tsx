@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import SEO from '@components/common/SEO/SEO';
+import { siteConfig } from '@/config/site';
 import type { SourceMode } from './types';
 import NcbiWorkflow from './components/NcbiWorkflow';
 import ManualWorkflow from './components/ManualWorkflow';
@@ -28,7 +29,7 @@ const BioinformaticToolbox = () => {
     <>
       <SEO
         title="Bioinformatic Toolbox"
-        description="Three independent bioinformatics workflows: NCBI annotation search, manual sequence-to-protein translation, and PDB structure lookup."
+        description="Four practical bioinformatics workflows: NCBI annotation search, manual sequence-to-protein translation, structure prediction, and PDB lookup."
       />
 
       <div className={styles.page}>
@@ -36,11 +37,22 @@ const BioinformaticToolbox = () => {
           <p className={styles.kicker}>Bioinformatic Toolbox</p>
           <h1 className={styles.title}>DNA &rarr; RNA &rarr; Protein &rarr; 3D Structure</h1>
           <p className={styles.subtitle}>
-            Three independent workflows for protein analysis — from sequence retrieval to structure prediction.
+            Four practical workflows for protein analysis - from sequence retrieval to structure
+            prediction.
           </p>
-          <Link to="/projects-and-posts#projects" className={styles.backLink}>
-            &larr; Back to Projects & Posts
-          </Link>
+          <div className={styles.heroActions}>
+            <Link to="/projects-and-posts#projects" className={styles.backLink}>
+              &larr; Back to Projects & Posts
+            </Link>
+            <a
+              href={siteConfig.bioinformaticToolboxSourceUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.sourceLink}
+            >
+              View Source &rarr;
+            </a>
+          </div>
         </header>
 
         <nav className={styles.tabBar} role="tablist">
@@ -71,3 +83,4 @@ const BioinformaticToolbox = () => {
 };
 
 export default BioinformaticToolbox;
+

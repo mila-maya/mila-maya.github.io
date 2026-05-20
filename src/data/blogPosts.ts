@@ -1,4 +1,4 @@
-import type { BlogPost } from '@/types/contentful.types';
+import type { BlogPost } from '@/types/content.types';
 
 // Add your blog posts here - just edit this file to add/update posts!
 export const blogPosts: BlogPost[] = [

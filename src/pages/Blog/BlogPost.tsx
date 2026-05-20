@@ -8,8 +8,8 @@ import rehypeSlug from 'rehype-slug';
 import rehypeRaw from 'rehype-raw';
 import SEO from '@/components/common/SEO/SEO';
 import PeakFindingPlayground from '@pages/PeakFindingPlayground/PeakFindingPlayground';
-import { getBlogPostBySlug } from '@/services/contentful';
-import type { BlogPost as BlogPostType } from '@/types/contentful.types';
+import { getBlogPostBySlug } from '@/services/content';
+import type { BlogPost as BlogPostType } from '@/types/content.types';
 import styles from './BlogPost.module.css';
 import 'highlight.js/styles/github.css';
 

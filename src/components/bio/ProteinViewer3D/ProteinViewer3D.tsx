@@ -88,9 +88,10 @@ const ProteinViewer3D = ({
   useEffect(() => {
     let cancelled = false;
     let resizeObserver: ResizeObserver | null = null;
+    const containerElement = containerRef.current;
 
     const renderViewer = async () => {
-      if (!containerRef.current || !pdbData.trim()) {
+      if (!containerElement || !pdbData.trim()) {
         return;
       }
 
@@ -100,14 +101,13 @@ const ProteinViewer3D = ({
       try {
         await load3DmolScript();
 
-        if (cancelled || !containerRef.current || !window.$3Dmol?.createViewer) {
+        if (cancelled || !containerElement || !window.$3Dmol?.createViewer) {
           return;
         }
 
-        const container = containerRef.current;
-        container.innerHTML = '';
+        containerElement.innerHTML = '';
 
-        const viewer = window.$3Dmol.createViewer(container, {
+        const viewer = window.$3Dmol.createViewer(containerElement, {
           backgroundColor
         });
         viewerRef.current = viewer;
@@ -170,7 +170,7 @@ const ProteinViewer3D = ({
           viewerRef.current.resize();
           viewerRef.current.render();
         });
-        resizeObserver.observe(container);
+        resizeObserver.observe(containerElement);
       } catch (viewerError) {
         const message = viewerError instanceof Error ? viewerError.message : 'Failed to render 3D view.';
         setError(message);
@@ -199,8 +199,8 @@ const ProteinViewer3D = ({
 
       viewerRef.current = null;
 
-      if (containerRef.current) {
-        containerRef.current.innerHTML = '';
+      if (containerElement) {
+        containerElement.innerHTML = '';
       }
     };
   }, [pdbData, height, backgroundColor, spin, viewerStyle]);

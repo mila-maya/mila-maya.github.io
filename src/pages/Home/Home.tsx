@@ -69,13 +69,6 @@ const Home = () => {
   const featuredProject = projects[0];
   const recentPosts = posts.slice(0, 2);
 
-  const proofPoints = [
-    { value: 'RNAnalytics', label: 'Production delivery' },
-    { value: `${posts.length || 3}`, label: 'Technical posts' },
-    { value: `${projects.length || 1}`, label: 'Interactive tools' },
-    { value: 'BOKU', label: 'Bioinformatics training' }
-  ];
-
   return (
     <>
       <SEO
@@ -109,14 +102,6 @@ const Home = () => {
               </a>
             </div>
 
-            <div className={styles.proofGrid}>
-              {proofPoints.map((item) => (
-                <article key={item.label} className={styles.proofCard}>
-                  <span className={styles.proofValue}>{item.value}</span>
-                  <span className={styles.proofLabel}>{item.label}</span>
-                </article>
-              ))}
-            </div>
           </div>
 
           <aside className={styles.heroAside}>

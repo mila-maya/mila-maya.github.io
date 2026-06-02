@@ -115,32 +115,6 @@
   color: var(--primary-color);
 }
 
-.proofGrid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.75rem;
-}
-
-.proofCard {
-  border: 1px solid rgba(15, 107, 179, 0.12);
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.8);
-  padding: 0.8rem 0.85rem;
-  display: grid;
-  gap: 0.25rem;
-}
-
-.proofValue {
-  font-size: 1.05rem;
-  font-weight: 800;
-  color: var(--text-color);
-}
-
-.proofLabel {
-  font-size: 0.83rem;
-  color: var(--text-light);
-}
-
 .heroAside {
   background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
   border: 1px solid #d6e6f7;
@@ -415,7 +389,6 @@
     max-width: 100%;
   }
 
-  .proofGrid,
   .featuredLayout {
     grid-template-columns: 1fr 1fr;
   }
@@ -446,7 +419,6 @@
     width: 100%;
   }
 
-  .proofGrid,
   .featuredLayout {
     grid-template-columns: 1fr;
   }

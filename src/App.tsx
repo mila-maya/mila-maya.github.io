@@ -12,11 +12,14 @@ const NotFound = lazy(() => import('@pages/NotFound/NotFound'));
 
 const routeFallback = <div style={{ padding: '2rem' }}>Loading...</div>;
 
-const ScrollToHash = () => {
-  const { hash } = useLocation();
+const ScrollToAnchor = () => {
+  const { hash, pathname } = useLocation();
 
   useEffect(() => {
-    if (!hash) return;
+    if (!hash) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
 
     const id = hash.slice(1);
     const timeout = window.setTimeout(() => {
@@ -24,7 +27,7 @@ const ScrollToHash = () => {
     }, 0);
 
     return () => window.clearTimeout(timeout);
-  }, [hash]);
+  }, [hash, pathname]);
 
   return null;
 };
@@ -32,7 +35,7 @@ const ScrollToHash = () => {
 function App() {
   return (
     <BrowserRouter>
-      <ScrollToHash />
+      <ScrollToAnchor />
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />

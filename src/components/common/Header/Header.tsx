@@ -8,22 +8,11 @@ const Header = () => {
       <div className={styles.container}>
         <div className={styles.headerContent}>
           <Link to="/" className={styles.brand}>
+            <img src="/favicon.svg" alt="" className={styles.brandIcon} />
             <span className={styles.brandName}>{siteConfig.name}</span>
-            <span className={styles.brandRole}>{siteConfig.headline}</span>
           </Link>
 
           <nav className={styles.nav}>
-            <NavLink
-              to="/"
-              className={({ isActive }) =>
-                `${styles.navLink} ${isActive ? styles.active : ''}`
-              }
-            >
-              Home
-            </NavLink>
-            <Link to={siteConfig.aboutUrl} className={styles.navLink}>
-              About
-            </Link>
             <NavLink
               to="/projects-and-posts"
               className={({ isActive }) =>

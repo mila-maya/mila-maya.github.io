@@ -44,7 +44,7 @@ const Header = () => {
               href={siteConfig.linkedInUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className={`${styles.actionLink} ${styles.actionPrimary}`}
+              className={styles.actionLink}
             >
               LinkedIn
             </a>

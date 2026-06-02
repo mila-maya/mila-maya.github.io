@@ -221,63 +221,6 @@
   color: var(--text-color);
 }
 
-.timeline {
-  display: grid;
-  gap: var(--spacing-sm);
-}
-
-.timelineItem {
-  border: 1px solid var(--border-color);
-  border-left: 4px solid var(--primary-color);
-  border-radius: var(--border-radius-sm);
-  background: var(--background-light);
-  padding: var(--spacing-md);
-}
-
-.period {
-  font-size: var(--font-size-sm);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--primary-color);
-  font-weight: 700;
-  margin-bottom: 0.4rem;
-}
-
-.itemTitle {
-  font-size: 1.05rem;
-  margin-bottom: 0.45rem;
-  color: var(--text-color);
-}
-
-.itemText {
-  color: var(--text-light);
-  line-height: 1.55;
-}
-
-.bulletList {
-  list-style: none;
-  display: grid;
-  gap: 0.7rem;
-}
-
-.bulletList li {
-  position: relative;
-  padding-left: 1.15rem;
-  color: var(--text-color);
-  line-height: 1.55;
-}
-
-.bulletList li::before {
-  content: '';
-  width: 0.45rem;
-  height: 0.45rem;
-  border-radius: 50%;
-  background: var(--primary-color);
-  position: absolute;
-  left: 0;
-  top: 0.58rem;
-}
-
 .skillGroups {
   display: grid;
   gap: var(--spacing-sm);

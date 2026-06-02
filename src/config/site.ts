@@ -14,7 +14,7 @@ export const siteConfig = {
   linkedInUrl: 'https://www.linkedin.com/in/mila-lettmayer/',
   defaultShareImage: '/images/blog/tda-theory/tda-combined-presentation.png',
   profileImage: undefined,
-  aboutUrl: '/about',
+  aboutUrl: '/#about',
   projectsUrl: '/projects-and-posts',
   booksUrl: '/books',
   thesisWorkflowUrl: '/blog/getting-started-masters-thesis-workflow',

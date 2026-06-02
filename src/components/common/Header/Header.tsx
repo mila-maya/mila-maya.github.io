@@ -21,14 +21,9 @@ const Header = () => {
             >
               Home
             </NavLink>
-            <NavLink
-              to={siteConfig.aboutUrl}
-              className={({ isActive }) =>
-                `${styles.navLink} ${isActive ? styles.active : ''}`
-              }
-            >
+            <Link to={siteConfig.aboutUrl} className={styles.navLink}>
               About
-            </NavLink>
+            </Link>
             <NavLink
               to="/projects-and-posts"
               className={({ isActive }) =>

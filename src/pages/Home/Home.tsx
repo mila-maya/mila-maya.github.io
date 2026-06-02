@@ -1,69 +1,16 @@
 import { Link } from 'react-router-dom';
 import BlogCard from '@components/blog/BlogCard/BlogCard';
+import ProfessionalTimeline from '@components/common/ProfessionalTimeline/ProfessionalTimeline';
 import ProfileBadge from '@components/common/ProfileBadge/ProfileBadge';
 import SEO from '@components/common/SEO/SEO';
 import ProjectCard from '@components/projects/ProjectCard/ProjectCard';
 import { siteConfig } from '@/config/site';
+import { focusAreas, professionalTimeline, skillGroups } from '@/data/profile';
 import { useBlogPosts } from '@hooks/useBlogPosts';
 import { useProjects } from '@hooks/useProjects';
 import styles from './Home.module.css';
 
 const Home = () => {
-  const timeline = [
-    {
-      period: 'Feb 2026 - Present',
-      title: 'Career Development',
-      detail:
-        'Deepening ML and AI skills through hands-on Python projects in model evaluation, dashboards, and financial analysis.'
-    },
-    {
-      period: 'Nov 2024 - Jan 2026',
-      title: 'Scientific Software Engineer (Part-time), RNAnalytics',
-      detail:
-        'Built production workflows for nanoparticle analysis, quality checks, and cloud platform integration.'
-    },
-    {
-      period: 'May 2017 - Jan 2026',
-      title: 'Dipl.-Ing. Biotechnology (Bioinformatics), BOKU',
-      detail:
-        'Master thesis on automated Taylorgram processing for nanoparticle size characterization.'
-    },
-    {
-      period: 'Mar 2012 - Apr 2017',
-      title: 'BSc Food and Biotechnology, BOKU',
-      detail: 'Built a strong base in molecular biology, genetics, and bioprocessing.'
-    }
-  ];
-
-  const rnAnalyticsImpact = [
-    'Built a Python pipeline for hydrodynamic size determination from TDA data.',
-    'Delivered a Dash app that replaced manual evaluation with batch processing and standardized outputs.',
-    'Implemented automated QC and plausibility checks to flag anomalous runs.',
-    'Integrated analysis modules into a Django + React cloud platform through APIs.'
-  ];
-
-  const skillGroups = [
-    {
-      title: 'Programming',
-      skills: ['Python', 'R', 'TypeScript', 'JavaScript', 'SQL']
-    },
-    {
-      title: 'Scientific and Data',
-      skills: ['Taylor Dispersion Analysis', 'PCA and clustering', 'Automated QC', 'Data visualization']
-    },
-    {
-      title: 'Product and Platform',
-      skills: ['Dash', 'Flask', 'Django', 'React', 'REST APIs', 'GitHub']
-    }
-  ];
-
-  const focusAreas = [
-    'ML model evaluation and applied AI workflows in Python',
-    'Taylor dispersion data processing and robust QC automation',
-    'Dashboards and end-to-end analysis pipelines',
-    'Scientific software architecture and API integration'
-  ];
-
   const { projects, loading: projectsLoading } = useProjects();
   const { posts, loading: postsLoading } = useBlogPosts();
   const featuredProject = projects[0];
@@ -140,9 +87,6 @@ const Home = () => {
       <section id="about" className={`${styles.section} ${styles.aboutSection}`}>
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>About My Work</h2>
-          <Link to={siteConfig.aboutUrl} className={styles.sectionCta}>
-            Full background
-          </Link>
         </div>
         <p className={styles.aboutIntro}>
           I build software that makes scientific analysis faster, more reliable, and easier to
@@ -152,23 +96,9 @@ const Home = () => {
         <div className={styles.aboutGrid}>
           <div className={styles.aboutColumn}>
             <h3 className={styles.subheading}>Professional Timeline</h3>
-            <div className={styles.timeline}>
-              {timeline.map((item) => (
-                <article key={`${item.period}-${item.title}`} className={styles.timelineItem}>
-                  <p className={styles.period}>{item.period}</p>
-                  <h4 className={styles.itemTitle}>{item.title}</h4>
-                  <p className={styles.itemText}>{item.detail}</p>
-                </article>
-              ))}
-            </div>
+            <ProfessionalTimeline items={professionalTimeline} />
           </div>
           <div className={styles.aboutColumn}>
-            <h3 className={styles.subheading}>RNAnalytics Impact</h3>
-            <ul className={styles.bulletList}>
-              {rnAnalyticsImpact.map((point) => (
-                <li key={point}>{point}</li>
-              ))}
-            </ul>
             <h3 className={styles.subheading}>Skills and Tools</h3>
             <div className={styles.skillGroups}>
               {skillGroups.map((group) => (

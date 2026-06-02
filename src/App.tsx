@@ -1,9 +1,8 @@
-import { Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Suspense, lazy, useEffect } from 'react';
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import MainLayout from '@layouts/MainLayout/MainLayout';
 import Home from '@pages/Home/Home';
 
-const About = lazy(() => import('@pages/About/About'));
 const ProjectsAndPosts = lazy(() => import('@pages/ProjectsAndPosts/ProjectsAndPosts'));
 const BlogPost = lazy(() => import('@pages/Blog/BlogPost'));
 const BioinformaticToolbox = lazy(() => import('@pages/BioinformaticToolbox/BioinformaticToolbox'));
@@ -13,13 +12,31 @@ const NotFound = lazy(() => import('@pages/NotFound/NotFound'));
 
 const routeFallback = <div style={{ padding: '2rem' }}>Loading...</div>;
 
+const ScrollToHash = () => {
+  const { hash } = useLocation();
+
+  useEffect(() => {
+    if (!hash) return;
+
+    const id = hash.slice(1);
+    const timeout = window.setTimeout(() => {
+      document.getElementById(id)?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    }, 0);
+
+    return () => window.clearTimeout(timeout);
+  }, [hash]);
+
+  return null;
+};
+
 function App() {
   return (
     <BrowserRouter>
+      <ScrollToHash />
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
-          <Route path="/about" element={<Suspense fallback={routeFallback}><About /></Suspense>} />
+          <Route path="/about" element={<Navigate to="/#about" replace />} />
           <Route path="/projects-and-posts" element={<Suspense fallback={routeFallback}><ProjectsAndPosts /></Suspense>} />
           <Route path="/books" element={<Suspense fallback={routeFallback}><Books /></Suspense>} />
           <Route path="/books/:slug" element={<Suspense fallback={routeFallback}><BookDetail /></Suspense>} />

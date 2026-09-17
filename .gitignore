@@ -48,3 +48,6 @@ tmp-*.js
 /.tmp_mocca/
 /.tmp_mocca_old/
 /.tmp_pkg/
+
+# Local research workspace
+/TDA_RNA/

@@ -23,6 +23,8 @@
 
 .imageContain {
   object-fit: contain;
+  /* Figures are dark line art on a transparent ground, so this tile stays
+     light in both themes - otherwise the plots vanish in dark mode. */
   background: #ffffff;
   padding: 0.25rem;
 }
@@ -77,8 +79,9 @@
 }
 
 .tag {
-  background: #f0f0f0;
-  color: var(--text-color);
+  background: var(--accent-wash);
+  color: var(--accent);
+  border: 1px solid var(--line);
   padding: 0.25rem 0.5rem;
   border-radius: var(--border-radius-sm);
   font-size: 0.875rem;

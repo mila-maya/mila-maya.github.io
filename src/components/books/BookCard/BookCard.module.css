@@ -21,7 +21,7 @@
 }
 
 .card:focus-visible {
-  outline: 3px solid rgba(0, 122, 204, 0.45);
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
 
@@ -49,7 +49,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--accent-contrast);
   font-size: 3rem;
   font-weight: bold;
 }
@@ -82,8 +82,9 @@
 }
 
 .tag {
-  background: #e9f2ff;
-  color: #1d5fae;
+  background: var(--accent-wash);
+  color: var(--accent);
+  border: 1px solid var(--line);
   padding: 0.2rem 0.55rem;
   border-radius: 999px;
   font-size: 0.72rem;

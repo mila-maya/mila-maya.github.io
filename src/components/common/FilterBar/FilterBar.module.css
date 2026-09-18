@@ -8,8 +8,8 @@
 
 .filter {
   border: 1px solid var(--border-color);
-  background: #fff;
-  color: var(--text-color);
+  background: var(--surface-raised);
+  color: var(--ink);
   padding: 0.45rem 0.9rem;
   border-radius: var(--border-radius-sm);
   font-weight: 600;
@@ -23,6 +23,6 @@
 
 .filterActive {
   background: var(--primary-color);
-  color: #fff;
+  color: var(--accent-contrast);
   border-color: var(--primary-color);
 }

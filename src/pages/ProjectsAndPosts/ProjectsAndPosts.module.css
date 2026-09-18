@@ -28,13 +28,13 @@
 }
 
 .projectTag {
-  background: #e9f2ff;
-  color: #1d5fae;
+  background: var(--accent-wash);
+  color: var(--accent);
 }
 
 .postTag {
-  background: #ecf8ee;
-  color: #1f7b3a;
+  background: var(--surface-sunken);
+  color: var(--ink-muted);
 }
 
 .loading {
@@ -47,7 +47,7 @@
 .error {
   text-align: center;
   padding: var(--spacing-xl);
-  color: #d32f2f;
+  color: var(--status-error-ink);
 }
 
 .empty {
@@ -59,7 +59,7 @@
 .partialError {
   margin-top: var(--spacing-md);
   text-align: center;
-  color: #9a4b00;
+  color: var(--status-error-ink);
   font-size: var(--font-size-sm);
 }
 

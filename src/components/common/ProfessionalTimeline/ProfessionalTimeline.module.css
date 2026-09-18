@@ -35,7 +35,7 @@
   font-size: 1.05rem;
   text-transform: uppercase;
   letter-spacing: 0.18em;
-  color: #2a8179;
+  color: var(--accent);
   font-weight: 800;
   line-height: 1;
 }
@@ -52,8 +52,9 @@
   height: 4.7rem;
   border: 1px solid var(--border-color);
   border-radius: 14px;
+  /* Holds external logos drawn in dark ink, so the tile stays light. */
   background: #ffffff;
-  box-shadow: 0 12px 28px rgba(15, 31, 51, 0.12);
+  box-shadow: var(--shadow-raised);
   display: flex;
   align-items: center;
   justify-content: center;

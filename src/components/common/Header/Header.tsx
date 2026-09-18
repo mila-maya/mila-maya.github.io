@@ -1,5 +1,4 @@
 import { Link, NavLink } from 'react-router-dom';
-import ThemeToggle from '@components/common/ThemeToggle/ThemeToggle';
 import { siteConfig } from '@/config/site';
 import styles from './Header.module.css';
 
@@ -39,7 +38,6 @@ const Header = () => {
           >
             GitHub
           </a>
-          <ThemeToggle />
         </div>
       </div>
     </header>

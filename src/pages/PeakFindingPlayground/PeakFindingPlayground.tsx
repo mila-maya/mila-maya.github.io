@@ -144,7 +144,9 @@ const DEFAULT_FIT: FitParams = {
 
 const FIT_MAX_ITERATIONS = 200000;
 
-const COLORS = ['#1f4fba', '#2ca02c', '#ff7f0e', '#9467bd', '#17a2b8', '#d62728'];
+// Categorical series colours. Orange is deliberately absent; the third slot
+// uses the ochre from the brand palette instead.
+const COLORS = ['#1f4fba', '#2ca02c', '#a87018', '#9467bd', '#17a2b8', '#d62728'];
 
 const cloneSyntheticParams = (params: SyntheticParams): SyntheticParams => ({
   ...params,

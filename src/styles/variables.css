@@ -1,6 +1,10 @@
 /*
  * At the Core - design tokens
  *
+ * The palette is taken from the KoriBot web app (apps/web/src/app/globals.css):
+ * warm cream ground, deep green ink, forest green accent. KoriBot has no dark
+ * theme, so the dark values below are derived from the same green family.
+ *
  * Two layers live here. The first is the palette and scale the redesign is
  * built on. The second re-expresses the names the older CSS modules already
  * use, so pages that have not been redesigned yet inherit the new look
@@ -12,33 +16,33 @@
 
 :root {
   /* --- Surfaces and ink ------------------------------------------------ */
-  --surface: #faf9f7;
-  --surface-raised: #ffffff;
-  --surface-sunken: #f1eee9;
+  --surface: #f7f4ed;
+  --surface-raised: #fffefa;
+  --surface-sunken: #f0ede5;
 
-  --ink: #1a1815;
-  --ink-muted: #5c5751;
-  --ink-faint: #8a837a;
+  --ink: #183027;
+  --ink-muted: #68756e;
+  --ink-faint: #89938e;
 
-  --line: #e2ddd5;
-  --line-strong: #cfc8bd;
+  --line: #d9ded8;
+  --line-strong: #c5cec7;
 
   /* One accent, used sparingly: links, the active nav item, the core motif. */
-  --accent: #a8451e;
-  --accent-hover: #8a3718;
-  --accent-contrast: #ffffff;
-  --accent-wash: rgba(168, 69, 30, 0.08);
+  --accent: #2d6d50;
+  --accent-hover: #20533c;
+  --accent-contrast: #fffefa;
+  --accent-wash: #dce8df;
 
 
   /* Status tints, used by the interactive tools. */
-  --status-info-bg: #eaf0f6;
-  --status-ok-bg: #e9f4ec;
-  --status-error-bg: #fdecec;
-  --status-error-ink: #8b1f1f;
-  --status-error-line: #e8b4b4;
+  --status-info-bg: #f0ede5;
+  --status-ok-bg: #dce8df;
+  --status-error-bg: #f7e8e4;
+  --status-error-ink: #963b32;
+  --status-error-line: #e0c3bb;
 
-  --shadow-raised: 0 1px 2px rgba(26, 24, 21, 0.05), 0 8px 24px rgba(26, 24, 21, 0.06);
-  --shadow-lifted: 0 2px 4px rgba(26, 24, 21, 0.06), 0 18px 42px rgba(26, 24, 21, 0.1);
+  --shadow-raised: 0 1px 2px rgb(10 36 25 / 5%), 0 8px 24px rgb(10 36 25 / 8%);
+  --shadow-lifted: 0 2px 4px rgb(10 36 25 / 6%), 0 22px 65px rgb(10 36 25 / 10%);
 
   /* --- Typography ------------------------------------------------------ */
   --font-serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
@@ -120,28 +124,28 @@
 /* Follow the system unless the visitor has explicitly chosen light. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --surface: #14120f;
-    --surface-raised: #1c1a16;
-    --surface-sunken: #0e0d0b;
+    --surface: #0f1613;
+    --surface-raised: #16201b;
+    --surface-sunken: #0a100d;
 
-    --ink: #ede9e2;
-    --ink-muted: #a39c91;
-    --ink-faint: #7a736a;
+    --ink: #e6ece8;
+    --ink-muted: #9aa8a0;
+    --ink-faint: #75827b;
 
-    --line: #2e2a24;
-    --line-strong: #443f37;
+    --line: #243029;
+    --line-strong: #35443b;
 
-    --accent: #e08a5f;
-    --accent-hover: #f0a57e;
-    --accent-contrast: #14120f;
-    --accent-wash: rgba(224, 138, 95, 0.12);
+    --accent: #5aa681;
+    --accent-hover: #74bd97;
+    --accent-contrast: #0a100d;
+    --accent-wash: rgb(90 166 129 / 12%);
 
 
-    --status-info-bg: #1a2029;
-    --status-ok-bg: #16231a;
-    --status-error-bg: #2a1616;
-    --status-error-ink: #f0a3a3;
-    --status-error-line: #5a2a2a;
+    --status-info-bg: #16201b;
+    --status-ok-bg: #16241c;
+    --status-error-bg: #2a1a17;
+    --status-error-ink: #e0a49a;
+    --status-error-line: #4a2e28;
 
     --shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35);
     --shadow-lifted: 0 2px 4px rgba(0, 0, 0, 0.45), 0 18px 42px rgba(0, 0, 0, 0.5);
@@ -152,21 +156,21 @@
 
 /* Explicit choice always wins over the system preference. */
 :root[data-theme='dark'] {
-  --surface: #14120f;
-  --surface-raised: #1c1a16;
-  --surface-sunken: #0e0d0b;
+  --surface: #0f1613;
+  --surface-raised: #16201b;
+  --surface-sunken: #0a100d;
 
-  --ink: #ede9e2;
-  --ink-muted: #a39c91;
-  --ink-faint: #7a736a;
+  --ink: #e6ece8;
+  --ink-muted: #9aa8a0;
+  --ink-faint: #75827b;
 
-  --line: #2e2a24;
-  --line-strong: #443f37;
+  --line: #243029;
+  --line-strong: #35443b;
 
-  --accent: #e08a5f;
-  --accent-hover: #f0a57e;
-  --accent-contrast: #14120f;
-  --accent-wash: rgba(224, 138, 95, 0.12);
+  --accent: #5aa681;
+  --accent-hover: #74bd97;
+  --accent-contrast: #0a100d;
+  --accent-wash: rgb(90 166 129 / 12%);
 
   --shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35);
   --shadow-lifted: 0 2px 4px rgba(0, 0, 0, 0.45), 0 18px 42px rgba(0, 0, 0, 0.5);

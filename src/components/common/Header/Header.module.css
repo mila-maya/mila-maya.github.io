@@ -121,10 +121,6 @@
   }
 
   .actions {
-    margin-left: auto;
-  }
-
-  .actionLink {
-    display: none;
+    padding-left: var(--space-sm);
   }
 }

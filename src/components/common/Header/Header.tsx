@@ -1,4 +1,5 @@
 import { Link, NavLink } from 'react-router-dom';
+import ThemeSwitch from '@components/common/ThemeSwitch/ThemeSwitch';
 import { siteConfig } from '@/config/site';
 import styles from './Header.module.css';
 
@@ -38,6 +39,7 @@ const Header = () => {
           >
             GitHub
           </a>
+          <ThemeSwitch />
         </div>
       </div>
     </header>

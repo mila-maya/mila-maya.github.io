@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import ThemeSwitch from '@components/common/ThemeSwitch/ThemeSwitch';
 import { siteConfig } from '@/config/site';
 import styles from './Footer.module.css';
 
@@ -46,12 +45,9 @@ const Footer = () => {
             </a>
           </nav>
         </div>
-        <div className={styles.bottomRow}>
-          <p className={styles.copyright}>
-            &copy; {currentYear} {siteConfig.name}
-          </p>
-          <ThemeSwitch />
-        </div>
+        <p className={styles.copyright}>
+          &copy; {currentYear} {siteConfig.name}
+        </p>
       </div>
     </footer>
   );

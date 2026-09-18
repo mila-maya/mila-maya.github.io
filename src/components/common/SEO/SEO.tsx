@@ -1,4 +1,3 @@
-import { Helmet } from 'react-helmet-async';
 import { useLocation } from 'react-router-dom';
 import { siteConfig } from '@/config/site';
 
@@ -18,6 +17,12 @@ const toAbsoluteUrl = (value: string): string => {
   return `${siteConfig.siteUrl}${value.startsWith('/') ? value : `/${value}`}`;
 };
 
+/**
+ * React hoists title, meta and link elements into <head> wherever they are
+ * rendered, so this component needs no provider and no helper library. The
+ * document shell deliberately carries none of these tags: hoisting appends,
+ * so a copy in index.html would show up as a duplicate.
+ */
 const SEO = ({
   title,
   description = siteConfig.description,
@@ -31,7 +36,7 @@ const SEO = ({
   const resolvedImage = image ? toAbsoluteUrl(image) : undefined;
 
   return (
-    <Helmet>
+    <>
       <title>{fullTitle}</title>
       <meta name="description" content={description} />
       <meta name="robots" content="index, follow" />
@@ -49,7 +54,7 @@ const SEO = ({
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={description} />
       {resolvedImage && <meta name="twitter:image" content={resolvedImage} />}
-    </Helmet>
+    </>
   );
 };
 

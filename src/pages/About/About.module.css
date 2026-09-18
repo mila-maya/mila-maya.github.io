@@ -1,0 +1,135 @@
+.container {
+  max-width: var(--measure-page);
+  margin: 0 auto;
+  padding: var(--space-lg) var(--space-md) var(--space-xl);
+}
+
+.lead {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: var(--space-lg);
+  align-items: start;
+  margin-top: var(--space-lg);
+}
+
+.leadText p {
+  max-width: var(--measure-prose);
+  font-size: var(--step-1);
+  color: var(--ink-muted);
+}
+
+.leadText p + p {
+  margin-top: var(--space-sm);
+}
+
+.focus {
+  background: var(--surface-sunken);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--space-md);
+}
+
+.avatar {
+  margin-bottom: var(--space-sm);
+}
+
+.focusTitle {
+  margin-bottom: var(--space-2xs);
+}
+
+.focusList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  font-size: var(--step--1);
+  color: var(--ink-muted);
+}
+
+.focusList li {
+  padding-left: var(--space-sm);
+  position: relative;
+}
+
+.focusList li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 5px;
+  height: 1px;
+  background: var(--accent);
+}
+
+.focusLinks {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--line);
+  font-size: var(--step--1);
+}
+
+.section {
+  margin-top: var(--space-xl);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--line);
+}
+
+.section > .label,
+.section > p:first-child {
+  margin-bottom: var(--space-md);
+}
+
+.sectionText {
+  max-width: var(--measure-prose);
+  color: var(--ink-muted);
+}
+
+.skillGroups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-md);
+}
+
+.skillGroupTitle {
+  font-size: var(--step-1);
+  margin-bottom: var(--space-2xs);
+}
+
+.skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3xs);
+}
+
+.skill {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  padding: 0.2rem 0.45rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  color: var(--ink-muted);
+  background: var(--surface-raised);
+}
+
+.downloads {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+  font-size: var(--step--1);
+  font-weight: 500;
+}
+
+@media (max-width: 860px) {
+  .lead {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding-inline: var(--space-sm);
+  }
+}

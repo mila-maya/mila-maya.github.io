@@ -1,0 +1,26 @@
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--ink-muted);
+  transition: color var(--ease), border-color var(--ease), background-color var(--ease);
+}
+
+.toggle:hover {
+  color: var(--accent);
+  border-color: var(--line-strong);
+  background: var(--accent-wash);
+}
+
+.icon {
+  width: 1.05rem;
+  height: 1.05rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+}

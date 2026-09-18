@@ -31,7 +31,9 @@ const SEO = ({
   type = 'website'
 }: SEOProps) => {
   const location = useLocation();
-  const fullTitle = title ? `${title} | ${siteConfig.name}` : `${siteConfig.name} | ${siteConfig.role}`;
+  const fullTitle = title
+    ? `${title} | ${siteConfig.brandName}`
+    : `${siteConfig.brandName} | ${siteConfig.name}, ${siteConfig.role}`;
   const resolvedUrl = toAbsoluteUrl(url ?? `${location.pathname}${location.search}`);
   const resolvedImage = image ? toAbsoluteUrl(image) : undefined;
 
@@ -43,7 +45,7 @@ const SEO = ({
       <link rel="canonical" href={resolvedUrl} />
 
       <meta property="og:type" content={type} />
-      <meta property="og:site_name" content={siteConfig.name} />
+      <meta property="og:site_name" content={siteConfig.brandName} />
       <meta property="og:url" content={resolvedUrl} />
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={description} />

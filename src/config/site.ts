@@ -1,11 +1,19 @@
 export const siteConfig = {
+  /* --- The publication ------------------------------------------------- */
+  brandName: 'At the Core',
+  brandWordmark: 'AT THE CORE',
+  tagline: 'Science, software, and the ideas underneath.',
+  brandBlurb: 'Tools, experiments, and stories about how things actually work.',
+
+  /* --- The person behind it -------------------------------------------- */
   name: 'Mila Lettmayer',
   shortName: 'Mila',
   initials: 'ML',
   role: 'Scientific Software Engineer',
   headline: 'Scientific software, bioinformatics, and applied ML',
   description:
-    'Scientific software engineer with a bioinformatics background, building reliable analysis pipelines, interactive tools, and practical ML workflows.',
+    'Tools, experiments and stories about scientific software, bioinformatics and applied machine learning, by Mila Lettmayer.',
+
   siteUrl: 'https://at-the-core.pages.dev',
   githubUrl: 'https://github.com/mila-maya',
   portfolioRepoUrl: 'https://github.com/mila-maya/mila-maya.github.io',
@@ -14,9 +22,19 @@ export const siteConfig = {
   linkedInUrl: 'https://www.linkedin.com/in/mila-lettmayer/',
   defaultShareImage: '/images/blog/tda-theory/tda-combined-presentation.png',
   profileImage: undefined,
-  aboutUrl: '/#about',
-  projectsUrl: '/projects-and-posts',
+
+  /* --- Routes ----------------------------------------------------------
+   * The three rooms of the site, plus what has not moved yet. The old
+   * combined list stays reachable until Phase 3 retires it.
+   * -------------------------------------------------------------------- */
+  exploreUrl: '/explore',
+  storiesUrl: '/stories',
+  aboutUrl: '/about',
+  peakFindingUrl: '/explore/peak-finding',
+  bioinformaticToolboxUrl: '/projects/bioinformatic-toolbox',
   booksUrl: '/books',
+  projectsUrl: '/projects-and-posts',
+
   thesisWorkflowUrl: '/blog/getting-started-masters-thesis-workflow',
   thesisPdfUrl: '/downloads/thesis-template.pdf',
   thesisTemplateUrl: '/downloads/thesis-template.zip',

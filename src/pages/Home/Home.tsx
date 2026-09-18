@@ -1,160 +1,153 @@
+import { Suspense, lazy } from 'react';
 import { Link } from 'react-router-dom';
 import BlogCard from '@components/blog/BlogCard/BlogCard';
-import ProfessionalTimeline from '@components/common/ProfessionalTimeline/ProfessionalTimeline';
-import ProfileBadge from '@components/common/ProfileBadge/ProfileBadge';
 import SEO from '@components/common/SEO/SEO';
-import ProjectCard from '@components/projects/ProjectCard/ProjectCard';
 import { siteConfig } from '@/config/site';
-import { focusAreas, professionalTimeline, skillGroups } from '@/data/profile';
 import { useBlogPosts } from '@hooks/useBlogPosts';
-import { useProjects } from '@hooks/useProjects';
 import styles from './Home.module.css';
 
+// The playground is by far the heaviest component on the site, so the
+// homepage loads it only once the rest of the page is on screen.
+const PeakFindingPlayground = lazy(
+  () => import('@pages/PeakFindingPlayground/PeakFindingPlayground')
+);
+
+const entryPoints = [
+  {
+    label: 'Surface',
+    caption: 'What we observe',
+    title: 'Explore',
+    description:
+      'Interactive tools you can actually run. Change the inputs and watch the method react.',
+    to: siteConfig.exploreUrl,
+    cta: 'Open the tools',
+  },
+  {
+    label: 'Mechanism',
+    caption: 'What is happening',
+    title: 'Stories',
+    description:
+      'Longer pieces that take one question and follow it down to the mechanism underneath.',
+    to: siteConfig.storiesUrl,
+    cta: 'Read the writing',
+  },
+  {
+    label: 'Core',
+    caption: 'Why it works',
+    title: 'About',
+    description:
+      'Mila Lettmayer builds scientific software for biotech and research teams. Background, work and contact.',
+    to: siteConfig.aboutUrl,
+    cta: 'Meet the author',
+  },
+];
+
 const Home = () => {
-  const { projects, loading: projectsLoading } = useProjects();
   const { posts, loading: postsLoading } = useBlogPosts();
-  const featuredProject = projects[0];
-  const recentPosts = posts.slice(0, 2);
+  const recentPosts = posts.slice(0, 3);
 
   return (
     <>
-      <SEO
-        description="Scientific software engineer with a bioinformatics background, sharing interactive tools, technical writing, and applied ML work."
-      />
+      <SEO description={siteConfig.description} />
 
-      <section className={styles.heroWrap}>
-        <div className={styles.hero}>
-          <div className={styles.heroMain}>
-            <span className={styles.kicker}>{siteConfig.headline}</span>
-            <h1 className={styles.heroTitle}>Hi, I&apos;m Mila Lettmayer.</h1>
-            <p className={styles.heroSubtitle}>
-              I build reliable analysis software for biotech and research teams. This site is my
-              working shelf for interactive tools, scientific write-ups, and practical notes from
-              bioinformatics and applied ML work.
-            </p>
-            <div className={styles.actions}>
-              <Link to={siteConfig.projectsUrl} className={`${styles.action} ${styles.primaryAction}`}>
-                Explore Projects & Posts
-              </Link>
-              <Link to={siteConfig.aboutUrl} className={`${styles.action} ${styles.secondaryAction}`}>
-                Read Full Background
-              </Link>
-              <a
-                href={siteConfig.githubUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`${styles.action} ${styles.ghostAction}`}
-              >
-                View GitHub
-              </a>
-            </div>
-
-          </div>
-
-          <aside className={styles.heroAside}>
-            <ProfileBadge
-              alt={siteConfig.name}
-              imageSrc={siteConfig.profileImage}
-              initials={siteConfig.initials}
-              className={styles.avatar}
-            />
-            <h2 className={styles.asideTitle}>Current Focus</h2>
-            <ul className={styles.focusList}>
-              {focusAreas.map((area) => (
-                <li key={area}>{area}</li>
-              ))}
-            </ul>
-            <div className={styles.asideLinks}>
-              <a
-                href={siteConfig.linkedInUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.asideLink}
-              >
-                LinkedIn
-              </a>
-              <Link to={siteConfig.thesisWorkflowUrl} className={styles.asideLink}>
-                Thesis Workflow
-              </Link>
-              <a href={siteConfig.thesisTemplateUrl} className={styles.asideLink}>
-                Template Download
-              </a>
-            </div>
-          </aside>
+      <section className={styles.hero}>
+        <div className={styles.heroInner}>
+          <h1 className={styles.wordmark}>
+            At the <span className={styles.wordmarkAccent}>Core</span>
+          </h1>
+          <p className={styles.tagline}>{siteConfig.tagline}</p>
+          <p className={styles.blurb}>{siteConfig.brandBlurb}</p>
+          <p className={`label ${styles.byline}`}>
+            by {siteConfig.name} &middot; {siteConfig.role}
+          </p>
         </div>
       </section>
 
-      <section id="about" className={`${styles.section} ${styles.aboutSection}`}>
-        <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>About My Work</h2>
-        </div>
-        <p className={styles.aboutIntro}>
-          I build software that makes scientific analysis faster, more reliable, and easier to
-          operate. My background combines biotechnology, bioinformatics, and production
-          engineering.
-        </p>
-        <div className={styles.aboutGrid}>
-          <div className={styles.aboutColumn}>
-            <h3 className={styles.subheading}>Professional Timeline</h3>
-            <ProfessionalTimeline items={professionalTimeline} />
+      <section className={styles.core}>
+        <div className={styles.coreInner}>
+          <p className="label">The current core</p>
+          <h2 className={styles.coreTitle}>
+            How do you find a peak in messy scientific data?
+          </h2>
+          <p className={styles.coreLead}>
+            Real chromatograms overlap, drift and hide behind noise. Start by building the mess
+            yourself &mdash; a synthetic signal with baseline drift, noise and peaks that run into
+            each other &mdash; and then watch an algorithm pull them apart again.
+          </p>
+
+          <div className={styles.coreStage}>
+            <Suspense
+              fallback={<p className={styles.stageFallback}>Loading the playground&hellip;</p>}
+            >
+              <PeakFindingPlayground embedded focusStep={1} />
+            </Suspense>
           </div>
-          <div className={styles.aboutColumn}>
-            <h3 className={styles.subheading}>Skills and Tools</h3>
-            <div className={styles.skillGroups}>
-              {skillGroups.map((group) => (
-                <article key={group.title} className={styles.skillGroup}>
-                  <h4 className={styles.skillGroupTitle}>{group.title}</h4>
-                  <div className={styles.skills}>
-                    {group.skills.map((skill) => (
-                      <span key={skill} className={styles.skill}>
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-                </article>
-              ))}
-            </div>
+
+          <div className={styles.coreActions}>
+            <Link to={siteConfig.peakFindingUrl} className={styles.primaryAction}>
+              Open the full playground {'->'}
+            </Link>
+            <Link
+              to="/blog/peak-detection-deconvolution-overlapping-chromatograms"
+              className={styles.secondaryAction}
+            >
+              Read the full story {'->'}
+            </Link>
           </div>
         </div>
       </section>
 
-      <section className={styles.section}>
-        <div className={styles.sectionHeader}>
-          <div>
-            <h2 className={styles.sectionTitle}>Featured Work</h2>
-            <p className={styles.sectionLead}>
-              A quick way to see what the site is really about before you browse everything.
-            </p>
+      <section className={styles.paths}>
+        <div className={styles.pathsInner}>
+          <ol className={styles.pathList}>
+            {entryPoints.map((entry) => (
+              <li key={entry.title} className={styles.path}>
+                <Link to={entry.to} className={styles.pathLink}>
+                  <span className={`label ${styles.pathLabel}`}>{entry.label}</span>
+                  <span className={styles.pathCaption}>{entry.caption}</span>
+                  <h3 className={styles.pathTitle}>{entry.title}</h3>
+                  <p className={styles.pathDescription}>{entry.description}</p>
+                  <span className={styles.pathCta}>{entry.cta} {'->'}</span>
+                </Link>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      <section className={styles.recent}>
+        <div className={styles.recentInner}>
+          <div className={styles.recentHeader}>
+            <p className="label">Recent</p>
+            <Link to={siteConfig.storiesUrl} className={styles.recentCta}>
+              All stories {'->'}
+            </Link>
           </div>
-          <Link to={siteConfig.projectsUrl} className={styles.sectionCta}>
-            All projects & posts
+
+          {postsLoading ? (
+            <p className={styles.stageFallback}>Loading posts&hellip;</p>
+          ) : (
+            <div className={styles.recentGrid}>
+              {recentPosts.map((post) => (
+                <BlogCard key={post.slug} post={post} />
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      <section className={styles.author}>
+        <div className={styles.authorInner}>
+          <p className="label">The author</p>
+          <p className={styles.authorText}>
+            I am <strong>{siteConfig.name}</strong>, a scientific software engineer with a
+            background in biotechnology and bioinformatics. I build analysis pipelines, interactive
+            tools and practical ML workflows &mdash; and I write about what is happening underneath
+            them.
+          </p>
+          <Link to={siteConfig.aboutUrl} className={styles.authorLink}>
+            Read more about my work {'->'}
           </Link>
-        </div>
-
-        <div className={styles.featuredLayout}>
-          <div className={styles.featuredColumn}>
-            <h3 className={styles.subheading}>Featured Project</h3>
-            {projectsLoading ? (
-              <p className={styles.statusText}>Loading project...</p>
-            ) : featuredProject ? (
-              <ProjectCard project={featuredProject} />
-            ) : (
-              <p className={styles.statusText}>Project details coming soon.</p>
-            )}
-          </div>
-
-          <div className={styles.featuredColumn}>
-            <h3 className={styles.subheading}>Recent Writing</h3>
-            <div className={styles.stack}>
-              {postsLoading ? (
-                <p className={styles.statusText}>Loading posts...</p>
-              ) : recentPosts.length > 0 ? (
-                recentPosts.map((post) => <BlogCard key={post.slug} post={post} />)
-              ) : (
-                <p className={styles.statusText}>Posts coming soon.</p>
-              )}
-            </div>
-          </div>
         </div>
       </section>
     </>
@@ -162,4 +155,3 @@ const Home = () => {
 };
 
 export default Home;
-

@@ -12,28 +12,55 @@ html {
 }
 
 body {
-  font-family: var(--font-family);
-  line-height: var(--line-height);
-  color: var(--text-color);
-  background:
-    radial-gradient(circle at top left, rgba(15, 107, 179, 0.08), transparent 24%),
-    linear-gradient(180deg, var(--background) 0%, #ffffff 55%);
+  font-family: var(--font-sans);
+  font-size: var(--step-0);
+  line-height: var(--leading-normal);
+  color: var(--ink);
+  background: var(--surface);
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transition: background-color var(--ease), color var(--ease);
 }
 
 #root {
   min-height: 100vh;
 }
 
+/* Serif headings are what separates scientific editorial from dev portfolio. */
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  line-height: var(--leading-tight);
+  letter-spacing: -0.015em;
+  color: var(--ink);
+}
+
 a {
   text-decoration: none;
-  color: var(--primary-color);
-  transition: color var(--transition-fast);
+  color: var(--accent);
+  transition: color var(--ease);
 }
 
 a:hover {
-  color: var(--primary-hover);
+  color: var(--accent-hover);
   text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+/* Keyboard users could not see where they were before this. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-contrast);
 }
 
 img {
@@ -46,30 +73,63 @@ button {
   cursor: pointer;
 }
 
+hr {
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+
 /* Container utility */
 .container {
   max-width: var(--container-max-width);
   margin: 0 auto;
-  padding: var(--spacing-lg);
+  padding: var(--space-md);
+}
+
+/* Prose stays narrow even when the page is wide: diagrams need the width,
+   running text does not. */
+.prose {
+  max-width: var(--measure-prose);
+}
+
+/* The signature element: SURFACE / MECHANISM / CORE and other data labels. */
+.label {
+  font-family: var(--font-mono);
+  font-size: var(--label-size);
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  color: var(--ink-faint);
 }
 
 /* Section utility */
 .section {
-  padding: var(--spacing-xl) 0;
+  padding: var(--space-xl) 0;
 }
 
 .section-title {
-  font-size: var(--font-size-xl);
-  margin-bottom: var(--spacing-sm);
+  font-size: var(--step-3);
+  margin-bottom: var(--space-sm);
   position: relative;
 }
 
 .section-title::after {
   content: '';
   width: 50px;
-  height: 3px;
-  background: var(--primary-color);
+  height: 2px;
+  background: var(--accent);
   position: absolute;
   bottom: -8px;
   left: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

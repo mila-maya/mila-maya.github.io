@@ -1,36 +1,175 @@
+/*
+ * At the Core - design tokens
+ *
+ * Two layers live here. The first is the palette and scale the redesign is
+ * built on. The second re-expresses the names the older CSS modules already
+ * use, so pages that have not been redesigned yet inherit the new look
+ * instead of drifting away from it.
+ *
+ * Dark mode follows the system by default and can be overridden per visitor
+ * by setting data-theme on <html>.
+ */
+
 :root {
-  /* Colors */
-  --primary-color: #0f6bb3;
-  --primary-hover: #0b4f85;
-  --text-color: #1c2733;
-  --text-light: #526274;
-  --background: #f7fafc;
-  --background-light: #ffffff;
-  --border-color: #d7e2ec;
-  --shadow-sm: 0 8px 24px rgba(15, 31, 51, 0.07);
-  --shadow-md: 0 18px 42px rgba(15, 31, 51, 0.12);
+  /* --- Surfaces and ink ------------------------------------------------ */
+  --surface: #faf9f7;
+  --surface-raised: #ffffff;
+  --surface-sunken: #f1eee9;
 
-  /* Spacing */
-  --spacing-xs: 0.5rem;
-  --spacing-sm: 1rem;
-  --spacing-md: 1.5rem;
-  --spacing-lg: 2rem;
-  --spacing-xl: 4rem;
+  --ink: #1a1815;
+  --ink-muted: #5c5751;
+  --ink-faint: #8a837a;
 
-  /* Typography */
-  --font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-  --font-size-base: 1rem;
-  --font-size-sm: 0.95rem;
-  --font-size-lg: 1.25rem;
-  --font-size-xl: 2rem;
-  --font-size-xxl: 3rem;
-  --line-height: 1.6;
+  --line: #e2ddd5;
+  --line-strong: #cfc8bd;
 
-  /* Layout */
-  --container-max-width: 1040px;
-  --border-radius: 16px;
-  --border-radius-sm: 10px;
+  /* One accent, used sparingly: links, the active nav item, the core motif. */
+  --accent: #a8451e;
+  --accent-hover: #8a3718;
+  --accent-contrast: #ffffff;
+  --accent-wash: rgba(168, 69, 30, 0.08);
 
-  /* Transitions */
-  --transition-fast: 0.2s ease;
+
+  /* Status tints, used by the interactive tools. */
+  --status-info-bg: #eaf0f6;
+  --status-ok-bg: #e9f4ec;
+  --status-error-bg: #fdecec;
+  --status-error-ink: #8b1f1f;
+  --status-error-line: #e8b4b4;
+
+  --shadow-raised: 0 1px 2px rgba(26, 24, 21, 0.05), 0 8px 24px rgba(26, 24, 21, 0.06);
+  --shadow-lifted: 0 2px 4px rgba(26, 24, 21, 0.06), 0 18px 42px rgba(26, 24, 21, 0.1);
+
+  /* --- Typography ------------------------------------------------------ */
+  --font-serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Consolas, monospace;
+
+  --step--1: 0.875rem;
+  --step-0: 1rem;
+  --step-1: 1.125rem;
+  --step-2: clamp(1.35rem, 0.6vw + 1.2rem, 1.6rem);
+  --step-3: clamp(1.7rem, 1.2vw + 1.4rem, 2.2rem);
+  --step-4: clamp(2.2rem, 2.4vw + 1.6rem, 3.2rem);
+  --step-5: clamp(2.8rem, 5vw + 1.4rem, 5.5rem);
+
+  --leading-tight: 1.15;
+  --leading-snug: 1.35;
+  --leading-normal: 1.65;
+
+  /* Monospace labels are the signature element: SURFACE / MECHANISM / CORE */
+  --label-size: 0.72rem;
+  --label-tracking: 0.16em;
+
+  /* --- Space and shape ------------------------------------------------- */
+  --space-3xs: 0.25rem;
+  --space-2xs: 0.5rem;
+  --space-xs: 0.75rem;
+  --space-sm: 1rem;
+  --space-md: 1.5rem;
+  --space-lg: 2.5rem;
+  --space-xl: 4rem;
+  --space-2xl: 6rem;
+
+  --measure-page: 1200px;
+  --measure-prose: 680px;
+
+  /* Sharp corners read as precise; rounded ones read as app chrome. */
+  --radius: 4px;
+  --radius-sm: 2px;
+
+  --ease: 0.2s cubic-bezier(0.2, 0, 0, 1);
+
+  /* --- Compatibility layer --------------------------------------------
+   * Names the pages we have not touched yet still reference. Mapping them
+   * here means the whole site picks up the new palette in one step, and
+   * each alias can be deleted as its page is redesigned.
+   * ------------------------------------------------------------------- */
+  --primary-color: var(--accent);
+  --primary-hover: var(--accent-hover);
+  --text-color: var(--ink);
+  --text-light: var(--ink-muted);
+  --background: var(--surface);
+  --background-light: var(--surface-raised);
+  --border-color: var(--line);
+  --shadow-sm: var(--shadow-raised);
+  --shadow-md: var(--shadow-lifted);
+
+  --spacing-xs: var(--space-2xs);
+  --spacing-sm: var(--space-sm);
+  --spacing-md: var(--space-md);
+  --spacing-lg: var(--space-lg);
+  --spacing-xl: var(--space-xl);
+
+  --font-family: var(--font-sans);
+  --font-size-base: var(--step-0);
+  --font-size-sm: var(--step--1);
+  --font-size-lg: var(--step-1);
+  --font-size-xl: var(--step-3);
+  --font-size-xxl: var(--step-4);
+  --line-height: var(--leading-normal);
+
+  --container-max-width: var(--measure-page);
+  --border-radius: var(--radius);
+  --border-radius-sm: var(--radius-sm);
+  --transition-fast: var(--ease);
+
+  color-scheme: light;
+}
+
+/* Follow the system unless the visitor has explicitly chosen light. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --surface: #14120f;
+    --surface-raised: #1c1a16;
+    --surface-sunken: #0e0d0b;
+
+    --ink: #ede9e2;
+    --ink-muted: #a39c91;
+    --ink-faint: #7a736a;
+
+    --line: #2e2a24;
+    --line-strong: #443f37;
+
+    --accent: #e08a5f;
+    --accent-hover: #f0a57e;
+    --accent-contrast: #14120f;
+    --accent-wash: rgba(224, 138, 95, 0.12);
+
+
+    --status-info-bg: #1a2029;
+    --status-ok-bg: #16231a;
+    --status-error-bg: #2a1616;
+    --status-error-ink: #f0a3a3;
+    --status-error-line: #5a2a2a;
+
+    --shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35);
+    --shadow-lifted: 0 2px 4px rgba(0, 0, 0, 0.45), 0 18px 42px rgba(0, 0, 0, 0.5);
+
+    color-scheme: dark;
+  }
+}
+
+/* Explicit choice always wins over the system preference. */
+:root[data-theme='dark'] {
+  --surface: #14120f;
+  --surface-raised: #1c1a16;
+  --surface-sunken: #0e0d0b;
+
+  --ink: #ede9e2;
+  --ink-muted: #a39c91;
+  --ink-faint: #7a736a;
+
+  --line: #2e2a24;
+  --line-strong: #443f37;
+
+  --accent: #e08a5f;
+  --accent-hover: #f0a57e;
+  --accent-contrast: #14120f;
+  --accent-wash: rgba(224, 138, 95, 0.12);
+
+  --shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-lifted: 0 2px 4px rgba(0, 0, 0, 0.45), 0 18px 42px rgba(0, 0, 0, 0.5);
+
+  color-scheme: dark;
 }

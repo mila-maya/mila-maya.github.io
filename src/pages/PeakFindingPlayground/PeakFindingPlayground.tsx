@@ -548,7 +548,7 @@ const LinePlot = ({ x, lines, title, xLabel, yLabel }: { x: number[]; lines: Plo
     <div className={styles.plotCard}>
       <h3>{title}</h3>
       <svg viewBox={`0 0 ${width} ${height}`} className={styles.plotSvg}>
-        <rect x={left} y={top} width={innerWidth} height={innerHeight} fill="#fff" stroke="#d8deea" />
+        <rect x={left} y={top} width={innerWidth} height={innerHeight} className={styles.plotArea} />
         {lines.map((line) => {
           if (!line.fillTo || line.y.length < 2 || line.fillTo.length === 0) {
             return null;
@@ -592,13 +592,12 @@ const LinePlot = ({ x, lines, title, xLabel, yLabel }: { x: number[]; lines: Plo
               cy={mapY(point.y)}
               r={3.4}
               fill={line.color}
-              stroke="#ffffff"
-              strokeWidth={1}
+              className={styles.pointHalo}
             />
           ))
         )}
-        <line x1={left} x2={left} y1={top} y2={top + innerHeight} stroke="#5f6b7a" />
-        <line x1={left} x2={left + innerWidth} y1={top + innerHeight} y2={top + innerHeight} stroke="#5f6b7a" />
+        <line x1={left} x2={left} y1={top} y2={top + innerHeight} className={styles.axisLine} />
+        <line x1={left} x2={left + innerWidth} y1={top + innerHeight} y2={top + innerHeight} className={styles.axisLine} />
         <text x={left + innerWidth / 2} y={height - 10} className={styles.axisText}>{xLabel}</text>
         <text x={15} y={top + innerHeight / 2} className={styles.axisText} transform={`rotate(-90 15 ${top + innerHeight / 2})`}>{yLabel}</text>
       </svg>
@@ -846,7 +845,7 @@ json.dumps(result)
     });
 
     return [
-      { label: 'Signal', color: '#243447', y: peakResult.signal },
+      { label: 'Signal', color: '#4d7ea8', y: peakResult.signal },
       { label: 't0_i centers', color: '#dc2626', y: [], points: centerPoints },
     ];
   }, [peakResult, syntheticResult]);

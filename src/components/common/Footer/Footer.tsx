@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { siteConfig } from '@/config/site';
 import styles from './Footer.module.css';
 
@@ -9,14 +10,23 @@ const Footer = () => {
       <div className={styles.container}>
         <div className={styles.topRow}>
           <div className={styles.copy}>
-            <p className={styles.title}>Code, writing, and practical scientific tooling.</p>
-            <p className={styles.subtitle}>
-              Use GitHub for the code, LinkedIn for the background, and the thesis template if you
-              want the most immediately reusable download on the site.
-            </p>
+            <p className={`label ${styles.wordmark}`}>{siteConfig.brandWordmark}</p>
+            <p className={styles.subtitle}>{siteConfig.tagline}</p>
           </div>
 
-          <div className={styles.links}>
+          <nav className={styles.links} aria-label="Footer">
+            <Link to={siteConfig.exploreUrl} className={styles.link}>
+              Explore
+            </Link>
+            <Link to={siteConfig.storiesUrl} className={styles.link}>
+              Stories
+            </Link>
+            <Link to={siteConfig.aboutUrl} className={styles.link}>
+              About
+            </Link>
+            <Link to={siteConfig.booksUrl} className={styles.link}>
+              Books
+            </Link>
             <a
               href={siteConfig.githubUrl}
               target="_blank"
@@ -33,15 +43,11 @@ const Footer = () => {
             >
               LinkedIn
             </a>
-            <a href={siteConfig.thesisTemplateUrl} className={styles.link}>
-              Thesis Template
-            </a>
-            <a href={siteConfig.projectsUrl} className={styles.link}>
-              Projects & Posts
-            </a>
-          </div>
+          </nav>
         </div>
-        <p className={styles.copyright}>(c) {currentYear} Mila. All rights reserved.</p>
+        <p className={styles.copyright}>
+          &copy; {currentYear} {siteConfig.name}
+        </p>
       </div>
     </footer>
   );

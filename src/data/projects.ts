@@ -1,8 +1,23 @@
 import type { Project } from '@/types/content.types';
 import dnaProteinImage from '../../content/dna-protein_1.png';
 
-// Portfolio projects shown on the home and projects pages.
+// The interactive pieces of the site. Both are listed under Explore; the
+// toolbox keeps its original route until Phase 2 moves it.
 export const projects: Project[] = [
+  {
+    title: 'Peak Finding Playground',
+    slug: 'peak-finding',
+    description:
+      'Build a synthetic chromatogram with noise, baseline drift and overlapping peaks, then run detection and multi-Gaussian fitting over it step by step and watch which peaks survive.',
+    technologies: ['React', 'TypeScript', 'Pyodide', 'Signal Processing', 'Chromatography'],
+    featuredImage: {
+      url: '/images/blog/peak-deconvolution/gaussian-fitting.svg',
+      title: 'Multi-Gaussian fit through overlapping chromatographic peaks'
+    },
+    cardUrl: '/explore/peak-finding',
+    cardCta: 'Open the playground',
+    displayOrder: 1
+  },
   {
     title: 'Bioinformatic Toolbox',
     slug: 'bioinformatic-toolbox',
@@ -15,6 +30,7 @@ export const projects: Project[] = [
       title: 'DNA to protein workflow visualization'
     },
     cardUrl: '/projects/bioinformatic-toolbox',
-    displayOrder: 1
+    cardCta: 'Open the toolbox',
+    displayOrder: 2
   }
 ];

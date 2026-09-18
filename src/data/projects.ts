@@ -1,8 +1,7 @@
 import type { Project } from '@/types/content.types';
 import dnaProteinImage from '../../content/dna-protein_1.png';
 
-// The interactive pieces of the site. Both are listed under Explore; the
-// toolbox keeps its original route until Phase 2 moves it.
+// The interactive pieces of the site, both listed under Explore.
 export const projects: Project[] = [
   {
     title: 'Peak Finding Playground',
@@ -29,7 +28,7 @@ export const projects: Project[] = [
       url: dnaProteinImage,
       title: 'DNA to protein workflow visualization'
     },
-    cardUrl: '/projects/bioinformatic-toolbox',
+    cardUrl: '/explore/bioinformatic-toolbox',
     cardCta: 'Open the toolbox',
     displayOrder: 2
   }

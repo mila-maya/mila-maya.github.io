@@ -24,16 +24,14 @@ export const siteConfig = {
   profileImage: undefined,
 
   /* --- Routes ----------------------------------------------------------
-   * The three rooms of the site, plus what has not moved yet. The old
-   * combined list stays reachable until Phase 3 retires it.
+   * The three rooms of the site. Everything now lives under one of them.
    * -------------------------------------------------------------------- */
   exploreUrl: '/explore',
   storiesUrl: '/stories',
   aboutUrl: '/about',
   peakFindingUrl: '/explore/peak-finding',
-  bioinformaticToolboxUrl: '/projects/bioinformatic-toolbox',
+  bioinformaticToolboxUrl: '/explore/bioinformatic-toolbox',
   booksUrl: '/books',
-  projectsUrl: '/projects-and-posts',
 
   thesisWorkflowUrl: '/blog/getting-started-masters-thesis-workflow',
   thesisPdfUrl: '/downloads/thesis-template.pdf',

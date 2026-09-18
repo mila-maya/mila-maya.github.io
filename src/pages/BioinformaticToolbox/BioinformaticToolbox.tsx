@@ -41,8 +41,8 @@ const BioinformaticToolbox = () => {
             prediction.
           </p>
           <div className={styles.heroActions}>
-            <Link to="/projects-and-posts#projects" className={styles.backLink}>
-              &larr; Back to Projects & Posts
+            <Link to="/explore" className={styles.backLink}>
+              &larr; Back to Explore
             </Link>
             <a
               href={siteConfig.bioinformaticToolboxSourceUrl}

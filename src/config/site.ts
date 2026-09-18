@@ -6,7 +6,7 @@ export const siteConfig = {
   headline: 'Scientific software, bioinformatics, and applied ML',
   description:
     'Scientific software engineer with a bioinformatics background, building reliable analysis pipelines, interactive tools, and practical ML workflows.',
-  siteUrl: 'https://mila-maya.github.io',
+  siteUrl: 'https://at-the-core.pages.dev',
   githubUrl: 'https://github.com/mila-maya',
   portfolioRepoUrl: 'https://github.com/mila-maya/mila-maya.github.io',
   bioinformaticToolboxSourceUrl:

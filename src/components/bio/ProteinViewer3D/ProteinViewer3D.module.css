@@ -18,10 +18,11 @@
 
 .styleButton,
 .styleButtonActive {
-  border: 1px solid #bfd0dc;
+  border: 1px solid var(--line-strong);
   border-radius: var(--border-radius-sm);
   padding: 0.24rem 0.52rem;
-  background: #fff;
+  background: var(--surface-raised);
+  color: var(--ink);
   color: var(--text-color);
   font-size: 0.78rem;
   font-weight: 700;
@@ -29,20 +30,22 @@
 }
 
 .styleButton:hover {
-  background: #f4f8fb;
+  background: var(--accent-wash);
 }
 
 .styleButtonActive {
-  background: #0d4f7e;
-  border-color: #0d4f7e;
-  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-contrast);
 }
 
 .viewer {
   width: 100%;
   min-height: 240px;
-  border: 1px solid #bfd0dc;
+  border: 1px solid var(--line);
   border-radius: var(--border-radius-sm);
+  /* Molecular structures are conventionally viewed on a light ground, and
+     the 3Dmol canvas draws over this, so it stays white in both themes. */
   background: #ffffff;
   overflow: hidden;
   position: relative;
@@ -54,9 +57,9 @@
 }
 
 .error {
-  color: #b00020;
-  background: #ffe9ec;
-  border: 1px solid #ffbdc8;
+  color: var(--status-error-ink);
+  background: var(--status-error-bg);
+  border: 1px solid var(--status-error-line);
   border-radius: var(--border-radius-sm);
   padding: 0.35rem 0.5rem;
   font-size: 0.85rem;

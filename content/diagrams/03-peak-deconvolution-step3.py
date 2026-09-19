@@ -81,7 +81,7 @@ def main() -> None:
     ax.plot(t, baseline_fit, color="#6b7280", lw=1.6, linestyle=(0, (4, 3)))
 
     component_styles = [
-        ("#ff7f0e", (0, (2, 2))),
+        ("#a87018", (0, (2, 2))),
         ("#9467bd", (0, (1, 2))),
         ("#17a2b8", (0, (2, 2))),
         ("#d62728", (0, (2, 2))),

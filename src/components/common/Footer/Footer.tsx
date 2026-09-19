@@ -35,14 +35,6 @@ const Footer = () => {
             >
               GitHub
             </a>
-            <a
-              href={siteConfig.linkedInUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.link}
-            >
-              LinkedIn
-            </a>
           </nav>
         </div>
         <p className={styles.copyright}>

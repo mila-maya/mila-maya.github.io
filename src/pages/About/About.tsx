@@ -45,9 +45,6 @@ const About = () => {
               ))}
             </ul>
             <div className={styles.focusLinks}>
-              <a href={siteConfig.linkedInUrl} target="_blank" rel="noopener noreferrer">
-                LinkedIn
-              </a>
               <a href={siteConfig.githubUrl} target="_blank" rel="noopener noreferrer">
                 GitHub
               </a>

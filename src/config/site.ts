@@ -19,7 +19,6 @@ export const siteConfig = {
   portfolioRepoUrl: 'https://github.com/mila-maya/mila-maya.github.io',
   bioinformaticToolboxSourceUrl:
     'https://github.com/mila-maya/mila-maya.github.io/tree/main/src/pages/BioinformaticToolbox',
-  linkedInUrl: 'https://www.linkedin.com/in/mila-lettmayer/',
   defaultShareImage: '/images/blog/tda-theory/tda-combined-presentation.png',
   profileImage: undefined,
 

@@ -13,8 +13,8 @@ export const projects: Project[] = [
       url: '/images/blog/peak-deconvolution/gaussian-fitting.svg',
       title: 'Multi-Gaussian fit through overlapping chromatographic peaks'
     },
-    cardUrl: '/blog/peak-detection-deconvolution-overlapping-chromatograms',
-    cardCta: 'Read the write-up and run it',
+    cardUrl: '/explore/peak-finding',
+    cardCta: 'Open the playground',
     displayOrder: 1
   },
   {

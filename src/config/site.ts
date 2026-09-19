@@ -28,14 +28,7 @@ export const siteConfig = {
   exploreUrl: '/explore',
   storiesUrl: '/stories',
   aboutUrl: '/about',
-  /** The bare tool. Reachable directly, but nothing links here - see peakFindingPostUrl. */
   peakFindingUrl: '/explore/peak-finding',
-  /**
-   * Where the playground is actually sent to. Standalone it shows tables of
-   * A_i, t0_i and sigma_i with nothing defining them; the post introduces the
-   * symbols two paragraphs above the tool.
-   */
-  peakFindingPostUrl: '/blog/peak-detection-deconvolution-overlapping-chromatograms',
   bioinformaticToolboxUrl: '/explore/bioinformatic-toolbox',
   booksUrl: '/books',
 

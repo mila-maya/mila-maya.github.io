@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import SEO from '@components/common/SEO/SEO';
+import { pageMeta } from '@/config/routeMeta';
 import styles from './PeakFindingPlayground.module.css';
 
 type RuntimeStatus = 'loading' | 'ready' | 'error';
@@ -877,12 +878,7 @@ json.dumps(result)
   return (
     <section className={`${styles.page} ${embedded ? styles.embedded : ''}`}>
       {!embedded && (
-        <SEO
-          title="Peak Finding Playground (Pyodide)"
-          description="Interactive in-browser peak finding and multi-Gaussian fitting."
-          url="https://mila-maya.github.io/blog/peak-detection-deconvolution-overlapping-chromatograms"
-          type="article"
-        />
+        <SEO {...pageMeta.peakFinding} />
       )}
 
       {embedded && !compactEmbedded ? (

@@ -2,6 +2,7 @@ import { Suspense, lazy } from 'react';
 import { Link } from 'react-router-dom';
 import BlogCard from '@components/blog/BlogCard/BlogCard';
 import SEO from '@components/common/SEO/SEO';
+import { pageMeta } from '@/config/routeMeta';
 import { siteConfig } from '@/config/site';
 import { useBlogPosts } from '@hooks/useBlogPosts';
 import styles from './Home.module.css';
@@ -48,7 +49,7 @@ const Home = () => {
 
   return (
     <>
-      <SEO description={siteConfig.description} />
+      <SEO {...pageMeta.home} />
 
       <section className={styles.hero}>
         <div className={styles.heroInner}>

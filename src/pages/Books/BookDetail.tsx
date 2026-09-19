@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { format } from 'date-fns';
 import SEO from '@components/common/SEO/SEO';
+import { bookMeta } from '@/config/routeMeta';
 import { books } from '@/data/books';
 import styles from './BookDetail.module.css';
 
@@ -31,15 +32,7 @@ const BookDetail = () => {
 
   return (
     <>
-      <SEO
-        title={`${book.title} | Books`}
-        description={
-          book.takeaways[0] ??
-          `Takeaways from ${book.title}${authorLine ? ' by ' + authorLine : ''}.`
-        }
-        image={book.cover ?? undefined}
-        type="article"
-      />
+      <SEO {...bookMeta(book)} />
 
       <article className={styles.container}>
         <Link to="/books" className={styles.backLink}>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import SEO from '@components/common/SEO/SEO';
+import { pageMeta } from '@/config/routeMeta';
 import { siteConfig } from '@/config/site';
 import type { SourceMode } from './types';
 import NcbiWorkflow from './components/NcbiWorkflow';
@@ -27,10 +28,7 @@ const BioinformaticToolbox = () => {
 
   return (
     <>
-      <SEO
-        title="Bioinformatic Toolbox"
-        description="Four practical bioinformatics workflows: NCBI annotation search, manual sequence-to-protein translation, structure prediction, and PDB lookup."
-      />
+      <SEO {...pageMeta.bioinformaticToolbox} />
 
       <div className={styles.page}>
         <header className={styles.hero}>

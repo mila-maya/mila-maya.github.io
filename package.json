@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "npm run sync:thesis && tsc && vite build",
+    "build": "npm run sync:thesis && tsc && vite build && node scripts/prerender.mjs",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "sync:thesis": "node scripts/sync-thesis-template.mjs --skip-pdfs",

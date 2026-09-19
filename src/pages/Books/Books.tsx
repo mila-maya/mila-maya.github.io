@@ -3,11 +3,9 @@ import SEO from '@components/common/SEO/SEO';
 import PageHeader from '@components/common/PageHeader/PageHeader';
 import FilterBar, { type FilterOption } from '@components/common/FilterBar/FilterBar';
 import BookCard from '@components/books/BookCard/BookCard';
+import { pageMeta } from '@/config/routeMeta';
 import { books } from '@/data/books';
 import styles from './Books.module.css';
-
-const BOOKS_DESCRIPTION =
-  'A curated shelf of books that left a mark - click a book to reveal five takeaways.';
 
 const ALL_ID = 'all';
 
@@ -32,8 +30,8 @@ const Books = () => {
 
   return (
     <div className={styles.container}>
-      <SEO title="Books" description={BOOKS_DESCRIPTION} />
-      <PageHeader title="Books" description={BOOKS_DESCRIPTION} />
+      <SEO title="Books" description={pageMeta.books.description} />
+      <PageHeader title="Books" description={pageMeta.books.description} />
 
       {filterOptions.length > 1 && (
         <FilterBar

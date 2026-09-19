@@ -1,61 +1,47 @@
 import { useLocation } from 'react-router-dom';
+import { resolveMeta, type RouteMeta } from '@/config/routeMeta';
 import { siteConfig } from '@/config/site';
 
-interface SEOProps {
-  title?: string;
-  description?: string;
-  image?: string;
-  url?: string;
-  type?: string;
-}
-
-const toAbsoluteUrl = (value: string): string => {
-  if (/^https?:\/\//i.test(value)) {
-    return value;
-  }
-
-  return `${siteConfig.siteUrl}${value.startsWith('/') ? value : `/${value}`}`;
-};
+type SEOProps = Partial<RouteMeta>;
 
 /**
  * React hoists title, meta and link elements into <head> wherever they are
  * rendered, so this component needs no provider and no helper library. The
- * document shell deliberately carries none of these tags: hoisting appends,
- * so a copy in index.html would show up as a duplicate.
+ * document shell deliberately carries none of these tags: hoisting appends, so
+ * a copy in index.html would show up as a duplicate.
+ *
+ * The values come from resolveMeta, the same function scripts/prerender.mjs
+ * uses, so the rendered page and the static HTML cannot disagree.
  */
-const SEO = ({
-  title,
-  description = siteConfig.description,
-  image = siteConfig.defaultShareImage,
-  url,
-  type = 'website'
-}: SEOProps) => {
+const SEO = ({ path, title, description, image, type }: SEOProps) => {
   const location = useLocation();
-  const fullTitle = title
-    ? `${title} | ${siteConfig.brandName}`
-    : `${siteConfig.brandName} | ${siteConfig.name}, ${siteConfig.role}`;
-  const resolvedUrl = toAbsoluteUrl(url ?? `${location.pathname}${location.search}`);
-  const resolvedImage = image ? toAbsoluteUrl(image) : undefined;
+  const meta = resolveMeta({
+    path: path ?? `${location.pathname}${location.search}`,
+    title,
+    description: description ?? siteConfig.description,
+    image,
+    type,
+  });
 
   return (
     <>
-      <title>{fullTitle}</title>
-      <meta name="description" content={description} />
+      <title>{meta.fullTitle}</title>
+      <meta name="description" content={meta.description} />
       <meta name="robots" content="index, follow" />
-      <link rel="canonical" href={resolvedUrl} />
+      <link rel="canonical" href={meta.url} />
 
-      <meta property="og:type" content={type} />
-      <meta property="og:site_name" content={siteConfig.brandName} />
-      <meta property="og:url" content={resolvedUrl} />
-      <meta property="og:title" content={fullTitle} />
-      <meta property="og:description" content={description} />
-      {resolvedImage && <meta property="og:image" content={resolvedImage} />}
+      <meta property="og:type" content={meta.type} />
+      <meta property="og:site_name" content={meta.siteName} />
+      <meta property="og:url" content={meta.url} />
+      <meta property="og:title" content={meta.fullTitle} />
+      <meta property="og:description" content={meta.description} />
+      {meta.image && <meta property="og:image" content={meta.image} />}
 
-      <meta name="twitter:card" content={resolvedImage ? 'summary_large_image' : 'summary'} />
-      <meta name="twitter:url" content={resolvedUrl} />
-      <meta name="twitter:title" content={fullTitle} />
-      <meta name="twitter:description" content={description} />
-      {resolvedImage && <meta name="twitter:image" content={resolvedImage} />}
+      <meta name="twitter:card" content={meta.image ? 'summary_large_image' : 'summary'} />
+      <meta name="twitter:url" content={meta.url} />
+      <meta name="twitter:title" content={meta.fullTitle} />
+      <meta name="twitter:description" content={meta.description} />
+      {meta.image && <meta name="twitter:image" content={meta.image} />}
     </>
   );
 };

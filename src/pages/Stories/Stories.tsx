@@ -1,21 +1,19 @@
 import SEO from '@components/common/SEO/SEO';
 import PageHeader from '@components/common/PageHeader/PageHeader';
 import BlogCard from '@components/blog/BlogCard/BlogCard';
+import { pageMeta } from '@/config/routeMeta';
 import { useBlogPosts } from '@hooks/useBlogPosts';
 import styles from '@/styles/listPage.module.css';
-
-const STORIES_DESCRIPTION =
-  'Longer pieces that take one question and follow it down to the mechanism underneath: chromatography, nanoparticle sizing, and the practical side of scientific work.';
 
 const Stories = () => {
   const { posts, loading, error } = useBlogPosts();
 
   return (
     <>
-      <SEO title="Stories" description={STORIES_DESCRIPTION} />
+      <SEO title="Stories" description={pageMeta.stories.description} />
 
       <div className={styles.container}>
-        <PageHeader title="Stories" description={STORIES_DESCRIPTION} />
+        <PageHeader title="Stories" description={pageMeta.stories.description} />
 
         {loading ? (
           <p className={styles.status}>Loading stories...</p>

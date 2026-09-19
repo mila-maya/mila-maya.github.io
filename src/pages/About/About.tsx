@@ -3,19 +3,17 @@ import ProfessionalTimeline from '@components/common/ProfessionalTimeline/Profes
 import ProfileBadge from '@components/common/ProfileBadge/ProfileBadge';
 import SEO from '@components/common/SEO/SEO';
 import { siteConfig } from '@/config/site';
+import { pageMeta } from '@/config/routeMeta';
 import { focusAreas, professionalTimeline, skillGroups } from '@/data/profile';
 import styles from './About.module.css';
-
-const ABOUT_DESCRIPTION =
-  'Mila Lettmayer, scientific software engineer: background in biotechnology and bioinformatics, production analysis pipelines, and interactive scientific tooling.';
 
 const About = () => {
   return (
     <>
-      <SEO title="About" description={ABOUT_DESCRIPTION} />
+      <SEO title="About" description={pageMeta.about.description} />
 
       <div className={styles.container}>
-        <PageHeader title="About" description={ABOUT_DESCRIPTION} />
+        <PageHeader title="About" description={pageMeta.about.description} />
 
         <div className={styles.lead}>
           <div className={styles.leadText}>

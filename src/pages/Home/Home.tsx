@@ -85,14 +85,8 @@ const Home = () => {
           </div>
 
           <div className={styles.coreActions}>
-            <Link to={siteConfig.peakFindingUrl} className={styles.primaryAction}>
-              Open the full playground {'->'}
-            </Link>
-            <Link
-              to="/blog/peak-detection-deconvolution-overlapping-chromatograms"
-              className={styles.secondaryAction}
-            >
-              Read the full story {'->'}
+            <Link to={siteConfig.peakFindingPostUrl} className={styles.primaryAction}>
+              Read the full story and run every step {'->'}
             </Link>
           </div>
         </div>

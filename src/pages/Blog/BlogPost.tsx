@@ -8,6 +8,7 @@ import rehypeSlug from 'rehype-slug';
 import rehypeRaw from 'rehype-raw';
 import SEO from '@/components/common/SEO/SEO';
 import PeakFindingPlayground from '@pages/PeakFindingPlayground/PeakFindingPlayground';
+import { blogPostMeta } from '@/config/routeMeta';
 import { getBlogPostBySlug } from '@/services/content';
 import type { BlogPost as BlogPostType } from '@/types/content.types';
 import styles from './BlogPost.module.css';
@@ -89,16 +90,11 @@ const BlogPost = () => {
 
   return (
     <>
-      <SEO
-        title={post.title}
-        description={post.excerpt}
-        image={post.featuredImage?.url}
-        type="article"
-      />
+      <SEO {...blogPostMeta(post)} />
 
       <article className={styles.container}>
-        <Link to="/projects-and-posts#posts" className={styles.backLink}>
-          {'<-'} Back to Projects & Posts
+        <Link to="/stories" className={styles.backLink}>
+          {'<-'} Back to Stories
         </Link>
 
         <header className={styles.header}>

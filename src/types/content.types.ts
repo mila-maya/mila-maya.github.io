@@ -22,6 +22,8 @@ export interface Project {
   githubUrl?: string;
   liveUrl?: string;
   cardUrl?: string;
+  /** Label for the card link; defaults to a generic one. */
+  cardCta?: string;
   hideLinks?: boolean;
   featuredImage?: {
     url: string;

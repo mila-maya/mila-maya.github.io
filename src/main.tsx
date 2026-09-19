@@ -1,20 +1,16 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { HelmetProvider } from 'react-helmet-async';
 import App from './App.tsx'
 import './styles/global.css'
 
-// Handle SPA routing redirect from 404.html (for GitHub Pages)
-const redirect = sessionStorage.getItem('redirect');
-if (redirect && redirect !== location.href) {
-  sessionStorage.removeItem('redirect');
-  history.replaceState(null, '', redirect);
-}
+// scripts/prerender.mjs writes this route's head tags into the static HTML so
+// crawlers that do not run JavaScript still get them. React hoists its own and
+// appends rather than replaces, so remove them before it does - otherwise every
+// page ships two titles and two canonicals that disagree.
+document.head.querySelectorAll('[data-prerendered]').forEach((tag) => tag.remove())
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <HelmetProvider>
-      <App />
-    </HelmetProvider>
+    <App />
   </React.StrictMode>,
 )

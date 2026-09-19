@@ -4,37 +4,38 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mila Lettmayer | Scientific Software Engineer</title>
-    <meta
-      name="description"
-      content="Scientific software engineer with a bioinformatics background, sharing interactive tools, technical writing, and applied ML work."
-    />
-    <meta name="theme-color" content="#0f6bb3" />
-    <link rel="canonical" href="https://mila-maya.github.io" />
 
-    <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Mila Lettmayer" />
-    <meta property="og:title" content="Mila Lettmayer | Scientific Software Engineer" />
-    <meta
-      property="og:description"
-      content="Scientific software engineer with a bioinformatics background, sharing interactive tools, technical writing, and applied ML work."
-    />
-    <meta property="og:url" content="https://mila-maya.github.io" />
-    <meta
-      property="og:image"
-      content="https://mila-maya.github.io/images/blog/tda-theory/tda-combined-presentation.png"
+    <meta name="theme-color" content="#f7f4ed" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0f1613" media="(prefers-color-scheme: dark)" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap"
     />
 
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Mila Lettmayer | Scientific Software Engineer" />
-    <meta
-      name="twitter:description"
-      content="Scientific software engineer with a bioinformatics background, sharing interactive tools, technical writing, and applied ML work."
-    />
-    <meta
-      name="twitter:image"
-      content="https://mila-maya.github.io/images/blog/tda-theory/tda-combined-presentation.png"
-    />
+    <script>
+      // Apply the stored theme before first paint, otherwise a visitor who
+      // chose dark sees a white flash on every load.
+      (function () {
+        try {
+          var stored = localStorage.getItem('theme');
+          if (stored === 'dark' || stored === 'light') {
+            document.documentElement.setAttribute('data-theme', stored);
+          }
+        } catch (e) {
+          /* private mode or blocked storage: fall back to the system setting */
+        }
+      })();
+    </script>
+
+    <!--
+      Title, description, canonical and social tags come from the SEO component
+      and are hoisted into <head> by React. Copies here would duplicate every
+      tag, because hoisting appends rather than replaces. Crawlers that do not
+      run JS see none of them until build-time pre-rendering lands.
+    -->
   </head>
   <body>
     <div id="root"></div>

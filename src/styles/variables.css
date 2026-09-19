@@ -1,36 +1,189 @@
+/*
+ * At the Core - design tokens
+ *
+ * The palette is taken from the KoriBot web app (apps/web/src/app/globals.css):
+ * warm cream ground, deep green ink, forest green accent. KoriBot has no dark
+ * theme, so the dark values below are derived from the same green family.
+ *
+ * Two layers live here. The first is the palette and scale the redesign is
+ * built on. The second re-expresses the names the older CSS modules already
+ * use, so pages that have not been redesigned yet inherit the new look
+ * instead of drifting away from it.
+ *
+ * Dark mode follows the system by default and can be overridden per visitor
+ * by setting data-theme on <html>.
+ */
+
 :root {
-  /* Colors */
-  --primary-color: #0f6bb3;
-  --primary-hover: #0b4f85;
-  --text-color: #1c2733;
-  --text-light: #526274;
-  --background: #f7fafc;
-  --background-light: #ffffff;
-  --border-color: #d7e2ec;
-  --shadow-sm: 0 8px 24px rgba(15, 31, 51, 0.07);
-  --shadow-md: 0 18px 42px rgba(15, 31, 51, 0.12);
+  /* --- Surfaces and ink ------------------------------------------------ */
+  --surface: #f7f4ed;
+  --surface-raised: #fffefa;
+  --surface-sunken: #f0ede5;
 
-  /* Spacing */
-  --spacing-xs: 0.5rem;
-  --spacing-sm: 1rem;
-  --spacing-md: 1.5rem;
-  --spacing-lg: 2rem;
-  --spacing-xl: 4rem;
+  --ink: #183027;
+  --ink-muted: #68756e;
+  --ink-faint: #89938e;
 
-  /* Typography */
-  --font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-  --font-size-base: 1rem;
-  --font-size-sm: 0.95rem;
-  --font-size-lg: 1.25rem;
-  --font-size-xl: 2rem;
-  --font-size-xxl: 3rem;
-  --line-height: 1.6;
+  --line: #d9ded8;
+  --line-strong: #c5cec7;
 
-  /* Layout */
-  --container-max-width: 1040px;
-  --border-radius: 16px;
-  --border-radius-sm: 10px;
+  /* One accent, used sparingly: links, the active nav item, the core motif. */
+  --accent: #2d6d50;
+  --accent-hover: #20533c;
+  --accent-contrast: #fffefa;
+  --accent-wash: #dce8df;
 
-  /* Transitions */
-  --transition-fast: 0.2s ease;
+
+  /* Status tints, used by the interactive tools. */
+  --status-info-bg: #f0ede5;
+  --status-ok-bg: #dce8df;
+  --status-error-bg: #f7e8e4;
+  --status-error-ink: #963b32;
+  --status-error-line: #e0c3bb;
+  --status-ok-ink: #20533c;
+  --status-ok-line: #a9c9b5;
+  --status-warn-bg: #f6eddc;
+  --status-warn-ink: #8a5a12;
+  --status-warn-line: #ddc79b;
+
+  --shadow-raised: 0 1px 2px rgb(10 36 25 / 5%), 0 8px 24px rgb(10 36 25 / 8%);
+  --shadow-lifted: 0 2px 4px rgb(10 36 25 / 6%), 0 22px 65px rgb(10 36 25 / 10%);
+
+  /* --- Typography ------------------------------------------------------ */
+  --font-serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Consolas, monospace;
+
+  --step--1: 0.875rem;
+  --step-0: 1rem;
+  --step-1: 1.125rem;
+  --step-2: clamp(1.35rem, 0.6vw + 1.2rem, 1.6rem);
+  --step-3: clamp(1.7rem, 1.2vw + 1.4rem, 2.2rem);
+  --step-4: clamp(2.2rem, 2.4vw + 1.6rem, 3.2rem);
+  --step-5: clamp(2.8rem, 5vw + 1.4rem, 5.5rem);
+
+  --leading-tight: 1.15;
+  --leading-snug: 1.35;
+  --leading-normal: 1.65;
+
+  /* Monospace labels are the signature element: SURFACE / MECHANISM / CORE */
+  --label-size: 0.72rem;
+  --label-tracking: 0.16em;
+
+  /* --- Space and shape ------------------------------------------------- */
+  --space-3xs: 0.25rem;
+  --space-2xs: 0.5rem;
+  --space-xs: 0.75rem;
+  --space-sm: 1rem;
+  --space-md: 1.5rem;
+  --space-lg: 2.5rem;
+  --space-xl: 4rem;
+  --space-2xl: 6rem;
+
+  --measure-page: 1200px;
+  --measure-prose: 680px;
+
+  /* Sharp corners read as precise; rounded ones read as app chrome. */
+  --radius: 4px;
+  --radius-sm: 2px;
+
+  --ease: 0.2s cubic-bezier(0.2, 0, 0, 1);
+
+  /* --- Compatibility layer --------------------------------------------
+   * Names the pages we have not touched yet still reference. Mapping them
+   * here means the whole site picks up the new palette in one step, and
+   * each alias can be deleted as its page is redesigned.
+   * ------------------------------------------------------------------- */
+  --primary-color: var(--accent);
+  --primary-hover: var(--accent-hover);
+  --text-color: var(--ink);
+  --text-light: var(--ink-muted);
+  --background: var(--surface);
+  --background-light: var(--surface-raised);
+  --border-color: var(--line);
+  --shadow-sm: var(--shadow-raised);
+  --shadow-md: var(--shadow-lifted);
+
+  --spacing-xs: var(--space-2xs);
+  --spacing-sm: var(--space-sm);
+  --spacing-md: var(--space-md);
+  --spacing-lg: var(--space-lg);
+  --spacing-xl: var(--space-xl);
+
+  --font-family: var(--font-sans);
+  --font-size-base: var(--step-0);
+  --font-size-sm: var(--step--1);
+  --font-size-lg: var(--step-1);
+  --font-size-xl: var(--step-3);
+  --font-size-xxl: var(--step-4);
+  --line-height: var(--leading-normal);
+
+  --container-max-width: var(--measure-page);
+  --border-radius: var(--radius);
+  --border-radius-sm: var(--radius-sm);
+  --transition-fast: var(--ease);
+
+  color-scheme: light;
+}
+
+/* Follow the system unless the visitor has explicitly chosen light. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --surface: #0f1613;
+    --surface-raised: #16201b;
+    --surface-sunken: #0a100d;
+
+    --ink: #e6ece8;
+    --ink-muted: #9aa8a0;
+    --ink-faint: #75827b;
+
+    --line: #243029;
+    --line-strong: #35443b;
+
+    --accent: #5aa681;
+    --accent-hover: #74bd97;
+    --accent-contrast: #0a100d;
+    --accent-wash: rgb(90 166 129 / 12%);
+
+
+    --status-info-bg: #16201b;
+    --status-ok-bg: #16241c;
+    --status-error-bg: #2a1a17;
+    --status-error-ink: #e0a49a;
+    --status-error-line: #4a2e28;
+    --status-ok-ink: #7cc49b;
+    --status-ok-line: #2c4a39;
+    --status-warn-bg: #241c10;
+    --status-warn-ink: #d9ae63;
+    --status-warn-line: #4a3a1f;
+
+    --shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35);
+    --shadow-lifted: 0 2px 4px rgba(0, 0, 0, 0.45), 0 18px 42px rgba(0, 0, 0, 0.5);
+
+    color-scheme: dark;
+  }
+}
+
+/* Explicit choice always wins over the system preference. */
+:root[data-theme='dark'] {
+  --surface: #0f1613;
+  --surface-raised: #16201b;
+  --surface-sunken: #0a100d;
+
+  --ink: #e6ece8;
+  --ink-muted: #9aa8a0;
+  --ink-faint: #75827b;
+
+  --line: #243029;
+  --line-strong: #35443b;
+
+  --accent: #5aa681;
+  --accent-hover: #74bd97;
+  --accent-contrast: #0a100d;
+  --accent-wash: rgb(90 166 129 / 12%);
+
+  --shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-lifted: 0 2px 4px rgba(0, 0, 0, 0.45), 0 18px 42px rgba(0, 0, 0, 0.5);
+
+  color-scheme: dark;
 }

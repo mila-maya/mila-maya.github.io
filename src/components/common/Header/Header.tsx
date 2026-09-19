@@ -1,54 +1,45 @@
 import { Link, NavLink } from 'react-router-dom';
+import ThemeSwitch from '@components/common/ThemeSwitch/ThemeSwitch';
 import { siteConfig } from '@/config/site';
 import styles from './Header.module.css';
+
+const navItems = [
+  { to: siteConfig.exploreUrl, label: 'Explore' },
+  { to: siteConfig.storiesUrl, label: 'Stories' },
+  { to: siteConfig.aboutUrl, label: 'About' },
+];
 
 const Header = () => {
   return (
     <header className={styles.header}>
-      <div className={styles.container}>
-        <div className={styles.headerContent}>
-          <Link to="/" className={styles.brand}>
-            <img src="/favicon.svg" alt="" className={styles.brandIcon} />
-            <span className={styles.brandName}>{siteConfig.name}</span>
-          </Link>
+      <div className={styles.inner}>
+        <Link to="/" className={styles.brand} aria-label={`${siteConfig.brandName} - home`}>
+          <span className={styles.brandLead}>At the</span>
+          <span className={styles.brandCore}>Core</span>
+        </Link>
 
-          <nav className={styles.nav}>
+        <nav className={styles.nav} aria-label="Main">
+          {navItems.map((item) => (
             <NavLink
-              to="/projects-and-posts"
-              className={({ isActive }) =>
-                `${styles.navLink} ${isActive ? styles.active : ''}`
-              }
+              key={item.to}
+              to={item.to}
+              className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ''}`}
             >
-              Projects & Posts
+              {item.label}
             </NavLink>
-            <NavLink
-              to="/books"
-              className={({ isActive }) =>
-                `${styles.navLink} ${isActive ? styles.active : ''}`
-              }
-            >
-              Books
-            </NavLink>
-          </nav>
+          ))}
+        </nav>
 
-          <div className={styles.actions}>
-            <a
-              href={siteConfig.githubUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.actionLink}
-            >
-              GitHub
-            </a>
-            <a
-              href={siteConfig.linkedInUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.actionLink}
-            >
-              LinkedIn
-            </a>
-          </div>
+        <div className={styles.actions}>
+          <a
+            href={siteConfig.githubUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.actionLink}
+          >
+            GitHub
+          </a>
+          <ThemeSwitch />
         </div>
       </div>
     </header>

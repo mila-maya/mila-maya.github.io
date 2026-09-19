@@ -3359,7 +3359,7 @@ z
 "/>
     </defs>
     <g clip-path="url(#p1b956b896f)">
-     <use xlink:href="#mc5c3088ed5" x="0" y="294.798125" style="fill: #ff7f0e; fill-opacity: 0.18"/>
+     <use xlink:href="#mc5c3088ed5" x="0" y="294.798125" style="fill: #a87018; fill-opacity: 0.18"/>
     </g>
    </g>
    <g id="matplotlib.axis_3">
@@ -3938,7 +3938,7 @@ L 703.571032 263.518625
 L 737.103586 263.540852 
 L 849.198125 263.574288 
 L 849.198125 263.574288 
-" clip-path="url(#p1b956b896f)" style="fill: none; stroke-dasharray: 5.18,2.24; stroke-dashoffset: 0; stroke: #ff7f0e; stroke-width: 1.4"/>
+" clip-path="url(#p1b956b896f)" style="fill: none; stroke-dasharray: 5.18,2.24; stroke-dashoffset: 0; stroke: #a87018; stroke-width: 1.4"/>
    </g>
    <g id="line2d_9">
     <path d="M 447.765547 262.101623 
@@ -4149,7 +4149,7 @@ z
      <path d="M 456.478125 49.654687 
 L 466.478125 49.654687 
 L 476.478125 49.654687 
-" style="fill: none; stroke-dasharray: 5.18,2.24; stroke-dashoffset: 0; stroke: #ff7f0e; stroke-width: 1.4"/>
+" style="fill: none; stroke-dasharray: 5.18,2.24; stroke-dashoffset: 0; stroke: #a87018; stroke-width: 1.4"/>
     </g>
     <g id="text_11">
      <!-- Component 1 -->

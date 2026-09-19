@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { format } from 'date-fns';
 import SEO from '@components/common/SEO/SEO';
+import { bookMeta } from '@/config/routeMeta';
 import { books } from '@/data/books';
 import styles from './BookDetail.module.css';
 
@@ -31,15 +32,7 @@ const BookDetail = () => {
 
   return (
     <>
-      <SEO
-        title={`${book.title} | Books`}
-        description={
-          book.takeaways[0] ??
-          `Takeaways from ${book.title}${authorLine ? ' by ' + authorLine : ''}.`
-        }
-        image={book.cover ?? undefined}
-        type="article"
-      />
+      <SEO {...bookMeta(book)} />
 
       <article className={styles.container}>
         <Link to="/books" className={styles.backLink}>
@@ -99,18 +92,16 @@ const BookDetail = () => {
           </div>
         </header>
 
-        <section className={styles.takeawaysSection}>
-          <h2 className={styles.sectionTitle}>Main Takeaways</h2>
-          {book.takeaways.length > 0 ? (
+        {book.takeaways.length > 0 && (
+          <section className={styles.takeawaysSection}>
+            <h2 className={styles.sectionTitle}>Main Takeaways</h2>
             <ol className={styles.takeaways}>
-              {book.takeaways.map((t, i) => (
-                <li key={i}>{t}</li>
+              {book.takeaways.map((takeaway, index) => (
+                <li key={index}>{takeaway}</li>
               ))}
             </ol>
-          ) : (
-            <p className={styles.empty}>Takeaways coming soon.</p>
-          )}
-        </section>
+          </section>
+        )}
       </article>
     </>
   );

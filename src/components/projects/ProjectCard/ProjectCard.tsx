@@ -36,7 +36,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
         <div className={styles.links}>
           {project.cardUrl && project.cardUrl.startsWith('/') && (
             <Link to={project.cardUrl} className={`${styles.link} ${styles.primaryLink}`}>
-              Open Case Study {'->'}
+              {project.cardCta ?? 'Open Case Study'} {'->'}
             </Link>
           )}
           {project.cardUrl && !project.cardUrl.startsWith('/') && (
@@ -46,7 +46,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
               rel="noopener noreferrer"
               className={`${styles.link} ${styles.primaryLink}`}
             >
-              Open Project {'->'}
+              {project.cardCta ?? 'Open Project'} {'->'}
             </a>
           )}
           {project.githubUrl && (

@@ -1,0 +1,45 @@
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-raised);
+}
+
+.option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.85rem;
+  height: 1.6rem;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--ink-faint);
+  transition: color var(--ease), background-color var(--ease);
+}
+
+.option:hover {
+  color: var(--ink);
+  background: var(--accent-wash);
+}
+
+.active {
+  color: var(--accent-contrast);
+  background: var(--accent);
+}
+
+.active:hover {
+  color: var(--accent-contrast);
+  background: var(--accent-hover);
+}
+
+.icon {
+  width: 0.95rem;
+  height: 0.95rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+}

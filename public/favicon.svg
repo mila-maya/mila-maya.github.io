@@ -1,12 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="14" fill="#0f6bb3"/>
-  <text
-    x="32"
-    y="39"
-    text-anchor="middle"
-    font-family="Arial, Helvetica, sans-serif"
-    font-size="24"
-    font-weight="700"
-    fill="#ffffff"
-  >ML</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="At the Core">
+  <!-- Surface, mechanism, core: the same three layers the site is organised around.
+       Kept to two rings and a solid centre so it still reads at 16 pixels. -->
+  <rect width="64" height="64" rx="14" fill="#2d6d50"/>
+  <g fill="none" stroke="#f7f4ed" stroke-width="4">
+    <circle cx="32" cy="32" r="22"/>
+    <circle cx="32" cy="32" r="13"/>
+  </g>
+  <circle cx="32" cy="32" r="5.5" fill="#f7f4ed"/>
 </svg>

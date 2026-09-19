@@ -33,22 +33,22 @@
 }
 
 .loading {
-  background: #f3f8ff;
+  background: var(--status-info-bg);
 }
 
 .ready {
-  background: #effcf2;
+  background: var(--status-ok-bg);
 }
 
 .error {
-  background: #fff2f2;
-  color: #8b1f1f;
+  background: var(--status-error-bg);
+  color: var(--status-error-ink);
 }
 
 .errorBox {
-  border: 1px solid #eab5b5;
-  background: #fff4f4;
-  color: #7f1d1d;
+  border: 1px solid var(--status-error-line);
+  background: var(--status-error-bg);
+  color: var(--status-error-ink);
   border-radius: var(--border-radius-sm);
   padding: 0.65rem 0.85rem;
 }
@@ -60,7 +60,7 @@
 }
 
 .card {
-  background: #fff;
+  background: var(--surface-raised);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius-sm);
   padding: var(--spacing-sm);
@@ -83,7 +83,7 @@
 
 .fieldGrid input {
   width: 100%;
-  border: 1px solid #ced8e5;
+  border: 1px solid var(--line-strong);
   border-radius: 0.45rem;
   padding: 0.38rem 0.52rem;
   font-size: 0.95rem;
@@ -118,9 +118,9 @@
 }
 
 .componentCard {
-  border: 1px solid #d9e1ec;
+  border: 1px solid var(--line);
   border-radius: 0.45rem;
-  background: #fbfcfe;
+  background: var(--surface-sunken);
   padding: 0.55rem;
   display: grid;
   gap: 0.45rem;
@@ -152,7 +152,7 @@
   border-radius: 0.45rem;
   padding: 0.5rem 0.75rem;
   background: var(--primary-color);
-  color: #fff;
+  color: var(--accent-contrast);
   font-weight: 600;
 }
 
@@ -174,14 +174,14 @@
 
 .table th,
 .table td {
-  border: 1px solid #d9e1ec;
+  border: 1px solid var(--line);
   padding: 0.42rem 0.5rem;
   text-align: left;
 }
 
 .table input {
   width: 100%;
-  border: 1px solid #ced8e5;
+  border: 1px solid var(--line-strong);
   border-radius: 0.35rem;
   padding: 0.3rem 0.4rem;
 }
@@ -189,7 +189,7 @@
 .plotCard {
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius-sm);
-  background: #fff;
+  background: var(--surface-raised);
   padding: var(--spacing-sm);
   display: grid;
   gap: 0.55rem;
@@ -202,7 +202,7 @@
 
 .axisText {
   font-size: 0.86rem;
-  fill: #374151;
+  fill: var(--ink-muted);
 }
 
 .legendRow {
@@ -233,4 +233,28 @@
   .fieldGrid {
     grid-template-columns: 1fr;
   }
+}
+
+/* SVG chrome for the plots. Custom properties are not valid in presentation
+   attributes, so the plot frame, axes and point halos are styled here rather
+   than with fill=/stroke= on the elements themselves. */
+.plotArea {
+  fill: var(--surface-raised);
+  stroke: var(--line);
+}
+
+.axisLine {
+  stroke: var(--line-strong);
+}
+
+.pointHalo {
+  stroke: var(--surface-raised);
+  stroke-width: 1;
+}
+
+/* Inputs inherit the page surface instead of the user agent default. */
+.fieldGrid input,
+.table input {
+  background: var(--surface-raised);
+  color: var(--ink);
 }

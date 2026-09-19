@@ -188,12 +188,12 @@ def plot_shared_t0_multi_gauss(ax):
         t,
         baseline_fit,
         baseline_fit + A1_fit * g1_fit,
-        color="#ff7f0e",
+        color="#a87018",
         alpha=0.18,
         linewidth=0.0,
     )
     ax.plot(t, best_yhat, "-", color="#2ca02c", lw=2.2, label="TDA Fit (Gaussian sum)")
-    ax.plot(t, comp1, "--", lw=1.4, color="#ff7f0e", label="Component 1")
+    ax.plot(t, comp1, "--", lw=1.4, color="#a87018", label="Component 1")
     ax.plot(t, comp2, ":", lw=1.6, color="#9467bd", label="Component 2")
     ax.axvline(best_t0, color="k", linestyle=":", linewidth=1.2)
     ax.set_xlim(tmin, t.max())

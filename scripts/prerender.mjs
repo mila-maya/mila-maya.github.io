@@ -93,10 +93,14 @@ for (const route of routes) {
   seen.add(route.path);
 
   const html = shell.replace('</head>', `${headTags(resolveMeta(route))}\n  </head>`);
+  // Flat files, not directories. Cloudflare Pages serves foo.html at /foo as
+  // is, whereas foo/index.html makes it redirect /foo to /foo/ - that would
+  // cost every shared link a hop and leave each canonical pointing at a URL
+  // that itself redirects.
   const target =
     route.path === '/'
       ? path.join(distDir, 'index.html')
-      : path.join(distDir, route.path.replace(/^\//, ''), 'index.html');
+      : path.join(distDir, `${route.path.slice(1)}.html`);
 
   await mkdir(path.dirname(target), { recursive: true });
   await writeFile(target, html, 'utf8');

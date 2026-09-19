@@ -92,18 +92,16 @@ const BookDetail = () => {
           </div>
         </header>
 
-        <section className={styles.takeawaysSection}>
-          <h2 className={styles.sectionTitle}>Main Takeaways</h2>
-          {book.takeaways.length > 0 ? (
+        {book.takeaways.length > 0 && (
+          <section className={styles.takeawaysSection}>
+            <h2 className={styles.sectionTitle}>Main Takeaways</h2>
             <ol className={styles.takeaways}>
-              {book.takeaways.map((t, i) => (
-                <li key={i}>{t}</li>
+              {book.takeaways.map((takeaway, index) => (
+                <li key={index}>{takeaway}</li>
               ))}
             </ol>
-          ) : (
-            <p className={styles.empty}>Takeaways coming soon.</p>
-          )}
-        </section>
+          </section>
+        )}
       </article>
     </>
   );

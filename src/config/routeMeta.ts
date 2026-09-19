@@ -62,7 +62,7 @@ export const pageMeta = {
     path: siteConfig.booksUrl,
     title: 'Books',
     description:
-      'A curated shelf of books that left a mark - click a book to reveal five takeaways.',
+      'Books that left a mark: what I read, how I rated it and when. A record rather than a set of reviews.',
   },
 } satisfies Record<string, RouteMeta>;
 
@@ -76,13 +76,20 @@ export const blogPostMeta = (post: BlogPost): RouteMeta => ({
 
 export const bookMeta = (book: Book): RouteMeta => {
   const authorLine = book.authors.join(', ');
+  const facts = [
+    authorLine ? `by ${authorLine}` : null,
+    book.rating[0] ?? null,
+    book.finished ? `read ${book.finished.slice(0, 4)}` : null,
+  ]
+    .filter(Boolean)
+    .join(' · ');
 
   return {
     path: `/books/${book.slug}`,
     title: `${book.title} | Books`,
-    description:
-      book.takeaways[0] ??
-      `Takeaways from ${book.title}${authorLine ? ` by ${authorLine}` : ''}.`,
+    // Only promises takeaways once an entry actually has some. Every entry is
+    // currently without, and a preview card that offers them would be a lie.
+    description: book.takeaways[0] ?? `${book.title}${facts ? ` — ${facts}` : ''}.`,
     image: book.cover ?? undefined,
     type: 'article',
   };

@@ -88,9 +88,18 @@ const ProfessionalTimeline = ({ items }: ProfessionalTimelineProps) => {
               <p className={styles.detail}>{item.detail}</p>
               {item.bullets && (
                 <ul className={styles.bullets}>
-                  {item.bullets.map((point) => (
-                    <li key={point}>{point}</li>
-                  ))}
+                  {item.bullets.map((point) =>
+                    typeof point === 'string' ? (
+                      <li key={point}>{point}</li>
+                    ) : (
+                      // Year first, in its own column, so the list can be
+                      // scanned by date rather than read line by line.
+                      <li key={`${point.year}-${point.what}`} className={styles.datedBullet}>
+                        <span className={styles.bulletYear}>{point.year}</span>
+                        <span>{point.what}</span>
+                      </li>
+                    )
+                  )}
                 </ul>
               )}
             </div>

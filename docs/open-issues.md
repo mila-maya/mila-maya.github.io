@@ -95,3 +95,7 @@ five takeaways per book. The section reappears by itself once an entry has any.
   homepage, one on About, one in the books description. Rewritten without.
   The nine in `blogPosts.ts` and the five in the thesis abstract are hers and
   stay untouched. 2026-09-20.
+- **CS50 years sat at the end of each line.** "…with Python, 2024." buried the
+  one thing the list is scanned by. A timeline bullet may now carry its own
+  year, rendered in a leading column like the timeline's own years and the
+  toolbox history. 2026-09-20.

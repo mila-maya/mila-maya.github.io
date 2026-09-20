@@ -28,9 +28,12 @@ export const siteConfig = {
   exploreUrl: '/explore',
   storiesUrl: '/stories',
   aboutUrl: '/about',
+  /** Kept only so the old path can redirect; the playground itself lives in the post. */
   peakFindingUrl: '/explore/peak-finding',
+  peakFindingPostUrl: '/blog/peak-detection-deconvolution-overlapping-chromatograms',
   bioinformaticToolboxUrl: '/explore/bioinformatic-toolbox',
   booksUrl: '/books',
+  projectsUrl: '/projects-and-posts',
 
   thesisWorkflowUrl: '/blog/getting-started-masters-thesis-workflow',
   thesisPdfUrl: '/downloads/thesis-template.pdf',

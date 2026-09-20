@@ -4,9 +4,8 @@ import { siteConfig } from '@/config/site';
 import styles from './Header.module.css';
 
 const navItems = [
-  { to: siteConfig.exploreUrl, label: 'Explore' },
-  { to: siteConfig.storiesUrl, label: 'Stories' },
-  { to: siteConfig.aboutUrl, label: 'About' },
+  { to: siteConfig.projectsUrl, label: 'Projects & Posts' },
+  { to: siteConfig.booksUrl, label: 'Books' },
 ];
 
 const Header = () => {

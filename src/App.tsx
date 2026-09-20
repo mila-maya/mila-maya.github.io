@@ -1,14 +1,13 @@
 import { Suspense, lazy, useEffect } from 'react';
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import MainLayout from '@layouts/MainLayout/MainLayout';
+import { siteConfig } from '@/config/site';
 import Home from '@pages/Home/Home';
 
 const Explore = lazy(() => import('@pages/Explore/Explore'));
+const ProjectsAndPosts = lazy(() => import('@pages/ProjectsAndPosts/ProjectsAndPosts'));
 const Stories = lazy(() => import('@pages/Stories/Stories'));
 const About = lazy(() => import('@pages/About/About'));
-const PeakFindingPlayground = lazy(
-  () => import('@pages/PeakFindingPlayground/PeakFindingPlayground')
-);
 const BlogPost = lazy(() => import('@pages/Blog/BlogPost'));
 const BioinformaticToolbox = lazy(() => import('@pages/BioinformaticToolbox/BioinformaticToolbox'));
 const Books = lazy(() => import('@pages/Books/Books'));
@@ -47,7 +46,10 @@ function App() {
 
           {/* The three rooms of the site. */}
           <Route path="/explore" element={<Suspense fallback={routeFallback}><Explore /></Suspense>} />
-          <Route path="/explore/peak-finding" element={<Suspense fallback={routeFallback}><PeakFindingPlayground /></Suspense>} />
+          {/* The playground lives inside the post that explains it; these paths
+              only point there, the way they did before the redesign. */}
+          <Route path="/explore/peak-finding" element={<Navigate to={siteConfig.peakFindingPostUrl} replace />} />
+          <Route path="/projects-and-posts" element={<Suspense fallback={routeFallback}><ProjectsAndPosts /></Suspense>} />
           <Route path="/explore/bioinformatic-toolbox" element={<Suspense fallback={routeFallback}><BioinformaticToolbox /></Suspense>} />
           <Route path="/stories" element={<Suspense fallback={routeFallback}><Stories /></Suspense>} />
           <Route path="/about" element={<Suspense fallback={routeFallback}><About /></Suspense>} />

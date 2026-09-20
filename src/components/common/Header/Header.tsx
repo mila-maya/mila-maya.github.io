@@ -4,7 +4,7 @@ import { siteConfig } from '@/config/site';
 import styles from './Header.module.css';
 
 const navItems = [
-  { to: siteConfig.projectsUrl, label: 'Projects & Posts' },
+  { to: siteConfig.exploreUrl, label: 'Explore' },
   { to: siteConfig.booksUrl, label: 'Books' },
 ];
 

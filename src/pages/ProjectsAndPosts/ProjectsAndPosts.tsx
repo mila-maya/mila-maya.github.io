@@ -66,10 +66,10 @@ const ProjectsAndPosts = () => {
 
   return (
     <>
-      <SEO title="Projects & Posts" description={PROJECTS_AND_POSTS_DESCRIPTION} />
+      <SEO title="Explore" description={PROJECTS_AND_POSTS_DESCRIPTION} />
 
       <div className={styles.container}>
-        <PageHeader title="Projects & Posts" description={PROJECTS_AND_POSTS_DESCRIPTION} />
+        <PageHeader title="Explore" description={PROJECTS_AND_POSTS_DESCRIPTION} />
 
         <FilterBar
           options={FILTER_OPTIONS}

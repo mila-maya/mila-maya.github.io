@@ -4,10 +4,8 @@ import MainLayout from '@layouts/MainLayout/MainLayout';
 import { siteConfig } from '@/config/site';
 import Home from '@pages/Home/Home';
 
-const Explore = lazy(() => import('@pages/Explore/Explore'));
 const ProjectsAndPosts = lazy(() => import('@pages/ProjectsAndPosts/ProjectsAndPosts'));
 const TaylorBoard = lazy(() => import('@pages/TaylorBoard/TaylorBoard'));
-const Stories = lazy(() => import('@pages/Stories/Stories'));
 const About = lazy(() => import('@pages/About/About'));
 const BlogPost = lazy(() => import('@pages/Blog/BlogPost'));
 const BioinformaticToolbox = lazy(() => import('@pages/BioinformaticToolbox/BioinformaticToolbox'));
@@ -46,19 +44,20 @@ function App() {
           <Route path="/" element={<Home />} />
 
           {/* The three rooms of the site. */}
-          <Route path="/explore" element={<Suspense fallback={routeFallback}><Explore /></Suspense>} />
+          {/* One room holding both projects and the writing that belongs to them. */}
+          <Route path="/explore" element={<Suspense fallback={routeFallback}><ProjectsAndPosts /></Suspense>} />
           {/* The playground lives inside the post that explains it; these paths
               only point there, the way they did before the redesign. */}
           <Route path="/explore/peak-finding" element={<Navigate to={siteConfig.peakFindingPostUrl} replace />} />
-          <Route path="/projects-and-posts" element={<Suspense fallback={routeFallback}><ProjectsAndPosts /></Suspense>} />
+          <Route path="/projects-and-posts" element={<Navigate to={siteConfig.exploreUrl} replace />} />
+          <Route path="/stories" element={<Navigate to={siteConfig.exploreUrl} replace />} />
           <Route path="/projects/taylor-board" element={<Suspense fallback={routeFallback}><TaylorBoard /></Suspense>} />
-          <Route path="/explore/bioinformatic-toolbox" element={<Suspense fallback={routeFallback}><BioinformaticToolbox /></Suspense>} />
-          <Route path="/stories" element={<Suspense fallback={routeFallback}><Stories /></Suspense>} />
+          <Route path="/explore/bioinformatic-toolbox" element={<Navigate to={siteConfig.bioinformaticToolboxUrl} replace />} />
           <Route path="/about" element={<Suspense fallback={routeFallback}><About /></Suspense>} />
 
           {/* The toolbox moved under Explore; its old path stays as a redirect
               so links shared before the move still land in the right place. */}
-          <Route path="/projects/bioinformatic-toolbox" element={<Navigate to="/explore/bioinformatic-toolbox" replace />} />
+          <Route path="/projects/bioinformatic-toolbox" element={<Suspense fallback={routeFallback}><BioinformaticToolbox /></Suspense>} />
           <Route path="/books" element={<Suspense fallback={routeFallback}><Books /></Suspense>} />
           <Route path="/books/:slug" element={<Suspense fallback={routeFallback}><BookDetail /></Suspense>} />
           <Route path="/blog/:slug" element={<Suspense fallback={routeFallback}><BlogPost /></Suspense>} />

@@ -39,7 +39,7 @@ const BioinformaticToolbox = () => {
             prediction.
           </p>
           <div className={styles.heroActions}>
-            <Link to="/explore" className={styles.backLink}>
+            <Link to={siteConfig.exploreUrl} className={styles.backLink}>
               &larr; Back to Explore
             </Link>
             <a

@@ -25,16 +25,15 @@ export const siteConfig = {
   /* --- Routes ----------------------------------------------------------
    * The three rooms of the site. Everything now lives under one of them.
    * -------------------------------------------------------------------- */
+  /** The one room: both projects and the writing that belongs to them. */
   exploreUrl: '/explore',
-  storiesUrl: '/stories',
   aboutUrl: '/about',
   /** Kept only so the old path can redirect; the playground itself lives in the post. */
   peakFindingUrl: '/explore/peak-finding',
   peakFindingPostUrl: '/blog/peak-detection-deconvolution-overlapping-chromatograms',
-  bioinformaticToolboxUrl: '/explore/bioinformatic-toolbox',
+  bioinformaticToolboxUrl: '/projects/bioinformatic-toolbox',
   taylorBoardUrl: '/projects/taylor-board',
   booksUrl: '/books',
-  projectsUrl: '/projects-and-posts',
 
   thesisWorkflowUrl: '/blog/getting-started-masters-thesis-workflow',
   thesisPdfUrl: '/downloads/thesis-template.pdf',

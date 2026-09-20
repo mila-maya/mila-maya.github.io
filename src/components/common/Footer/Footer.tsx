@@ -18,9 +18,6 @@ const Footer = () => {
             <Link to={siteConfig.exploreUrl} className={styles.link}>
               Explore
             </Link>
-            <Link to={siteConfig.storiesUrl} className={styles.link}>
-              Stories
-            </Link>
             <Link to={siteConfig.aboutUrl} className={styles.link}>
               About
             </Link>

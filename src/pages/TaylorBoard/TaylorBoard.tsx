@@ -57,8 +57,8 @@ const TaylorBoard = () => (
     <SEO {...pageMeta.taylorBoard} />
 
     <article className={styles.container}>
-      <Link to={siteConfig.projectsUrl} className={styles.backLink}>
-        {'<-'} Back to Projects &amp; Posts
+      <Link to={siteConfig.exploreUrl} className={styles.backLink}>
+        {'<-'} Back to Explore
       </Link>
 
       <header className={styles.header}>

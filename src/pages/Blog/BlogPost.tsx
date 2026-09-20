@@ -9,6 +9,7 @@ import rehypeRaw from 'rehype-raw';
 import SEO from '@/components/common/SEO/SEO';
 import PeakFindingPlayground from '@pages/PeakFindingPlayground/PeakFindingPlayground';
 import { blogPostMeta } from '@/config/routeMeta';
+import { siteConfig } from '@/config/site';
 import { getBlogPostBySlug } from '@/services/content';
 import type { BlogPost as BlogPostType } from '@/types/content.types';
 import styles from './BlogPost.module.css';
@@ -93,8 +94,8 @@ const BlogPost = () => {
       <SEO {...blogPostMeta(post)} />
 
       <article className={styles.container}>
-        <Link to="/stories" className={styles.backLink}>
-          {'<-'} Back to Stories
+        <Link to={siteConfig.exploreUrl} className={styles.backLink}>
+          {'<-'} Back to Explore
         </Link>
 
         <header className={styles.header}>

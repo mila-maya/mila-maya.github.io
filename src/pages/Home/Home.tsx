@@ -20,7 +20,7 @@ const entryPoints = [
     title: 'Projects',
     description:
       'Interactive tools you can actually run. Change the inputs and watch the method react.',
-    to: `${siteConfig.projectsUrl}#projects`,
+    to: `${siteConfig.exploreUrl}#projects`,
     cta: 'Open the tools',
   },
   {
@@ -29,7 +29,7 @@ const entryPoints = [
     title: 'Posts',
     description:
       'Longer pieces that take one question and follow it down to the mechanism underneath.',
-    to: `${siteConfig.projectsUrl}#posts`,
+    to: `${siteConfig.exploreUrl}#posts`,
     cta: 'Read the writing',
   },
   {
@@ -117,7 +117,7 @@ const Home = () => {
         <div className={styles.recentInner}>
           <div className={styles.recentHeader}>
             <p className="label">Recent</p>
-            <Link to={`${siteConfig.projectsUrl}#posts`} className={styles.recentCta}>
+            <Link to={`${siteConfig.exploreUrl}#posts`} className={styles.recentCta}>
               All posts {'->'}
             </Link>
           </div>

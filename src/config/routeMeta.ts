@@ -31,7 +31,7 @@ export const pageMeta = {
     path: siteConfig.exploreUrl,
     title: 'Explore',
     description:
-      'Interactive tools you can actually run. Change the inputs, watch the method react, and see where it breaks.',
+      'Two projects and the writing that belongs to them: automated nanoparticle sizing from Taylorgrams, and a bioinformatics toolbox that has been rebuilt three times.',
   },
   peakFinding: {
     path: siteConfig.peakFindingUrl,
@@ -51,12 +51,6 @@ export const pageMeta = {
     title: 'Bioinformatic Toolbox',
     description:
       'Four practical bioinformatics workflows: NCBI annotation search, manual sequence-to-protein translation, structure prediction, and PDB lookup.',
-  },
-  stories: {
-    path: siteConfig.storiesUrl,
-    title: 'Stories',
-    description:
-      'Longer pieces that take one question and follow it down to the mechanism underneath: chromatography, nanoparticle sizing, and the practical side of scientific work.',
   },
   about: {
     path: siteConfig.aboutUrl,

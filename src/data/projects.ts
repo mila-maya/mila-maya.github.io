@@ -28,7 +28,7 @@ export const projects: Project[] = [
       url: dnaProteinImage,
       title: 'DNA to protein workflow visualization'
     },
-    cardUrl: '/explore/bioinformatic-toolbox',
+    cardUrl: '/projects/bioinformatic-toolbox',
     cardCta: 'Open the toolbox',
     displayOrder: 2
   }

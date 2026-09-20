@@ -9,12 +9,15 @@ const ProfessionalTimeline = ({ items }: ProfessionalTimelineProps) => {
   return (
     <div className={styles.timeline}>
       {items.map((item) => {
-        const year = item.period.split(' - ')[0];
+        // Both ends, not just the start: without the end year a reader cannot
+        // see when a degree finished or how long a role lasted.
+        const [startYear, endYear] = item.period.split(' - ');
 
         return (
           <article key={`${item.period}-${item.title}`} className={styles.item}>
             <p className={styles.year} aria-label={item.period}>
-              {year}
+              <span className={styles.yearStart}>{startYear}</span>
+              {endYear && <span className={styles.yearEnd}>&ndash;&#8201;{endYear}</span>}
             </p>
             <div className={styles.marker}>
               <span className={styles.iconFrame}>

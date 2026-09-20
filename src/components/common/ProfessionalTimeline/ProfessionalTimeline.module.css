@@ -30,14 +30,30 @@
 }
 
 .year {
-  padding-top: 1.18rem;
-  text-align: right;
+  padding-top: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.2rem;
+  line-height: 1;
+}
+
+.yearStart {
   font-size: 1.05rem;
   text-transform: uppercase;
   letter-spacing: 0.18em;
   color: var(--accent);
   font-weight: 800;
-  line-height: 1;
+}
+
+/* The end of the span, quieter than the start so the column still scans as a
+   list of years rather than a list of ranges. */
+.yearEnd {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-faint);
+  white-space: nowrap;
 }
 
 .marker {

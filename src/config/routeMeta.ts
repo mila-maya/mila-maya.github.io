@@ -40,6 +40,12 @@ export const pageMeta = {
       'Build a synthetic chromatogram with noise, drift and overlapping peaks, then run detection and multi-Gaussian fitting over it in the browser.',
     type: 'article',
   },
+  taylorBoard: {
+    path: siteConfig.taylorBoardUrl,
+    title: 'Automated Taylorgram Processing',
+    description:
+      'Master thesis: Taylor Board, a web application that automates Taylor dispersion analysis from raw instrument files through peak detection and Gaussian fitting to nanoparticle size.',
+  },
   bioinformaticToolbox: {
     path: siteConfig.bioinformaticToolboxUrl,
     title: 'Bioinformatic Toolbox',

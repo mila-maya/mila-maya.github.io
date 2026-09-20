@@ -32,6 +32,7 @@ export const siteConfig = {
   peakFindingUrl: '/explore/peak-finding',
   peakFindingPostUrl: '/blog/peak-detection-deconvolution-overlapping-chromatograms',
   bioinformaticToolboxUrl: '/explore/bioinformatic-toolbox',
+  taylorBoardUrl: '/projects/taylor-board',
   booksUrl: '/books',
   projectsUrl: '/projects-and-posts',
 

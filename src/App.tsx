@@ -6,6 +6,7 @@ import Home from '@pages/Home/Home';
 
 const Explore = lazy(() => import('@pages/Explore/Explore'));
 const ProjectsAndPosts = lazy(() => import('@pages/ProjectsAndPosts/ProjectsAndPosts'));
+const TaylorBoard = lazy(() => import('@pages/TaylorBoard/TaylorBoard'));
 const Stories = lazy(() => import('@pages/Stories/Stories'));
 const About = lazy(() => import('@pages/About/About'));
 const BlogPost = lazy(() => import('@pages/Blog/BlogPost'));
@@ -50,6 +51,7 @@ function App() {
               only point there, the way they did before the redesign. */}
           <Route path="/explore/peak-finding" element={<Navigate to={siteConfig.peakFindingPostUrl} replace />} />
           <Route path="/projects-and-posts" element={<Suspense fallback={routeFallback}><ProjectsAndPosts /></Suspense>} />
+          <Route path="/projects/taylor-board" element={<Suspense fallback={routeFallback}><TaylorBoard /></Suspense>} />
           <Route path="/explore/bioinformatic-toolbox" element={<Suspense fallback={routeFallback}><BioinformaticToolbox /></Suspense>} />
           <Route path="/stories" element={<Suspense fallback={routeFallback}><Stories /></Suspense>} />
           <Route path="/about" element={<Suspense fallback={routeFallback}><About /></Suspense>} />

@@ -4,17 +4,17 @@ import dnaProteinImage from '../../content/dna-protein_1.png';
 // The interactive pieces of the site, both listed under Explore.
 export const projects: Project[] = [
   {
-    title: 'Peak Finding Playground',
-    slug: 'peak-finding',
+    title: 'Automated Taylorgram Processing',
+    slug: 'taylor-board',
     description:
-      'Build a synthetic chromatogram with noise, baseline drift and overlapping peaks, then run detection and multi-Gaussian fitting over it step by step and watch which peaks survive.',
-    technologies: ['React', 'TypeScript', 'Pyodide', 'Signal Processing', 'Chromatography'],
+      'Master thesis. Taylor Board automates Taylor dispersion analysis end to end: raw instrument files, peak detection, Gaussian fitting, size calculation, and validity checks that keep results inside the Taylor regime.',
+    technologies: ['Python', 'Signal Processing', 'Chromatography', 'Nanoparticle Sizing'],
     featuredImage: {
-      url: '/images/blog/peak-deconvolution/gaussian-fitting.svg',
-      title: 'Multi-Gaussian fit through overlapping chromatographic peaks'
+      url: '/images/blog/tda-theory/tda-combined-presentation.png',
+      title: 'Taylor dispersion analysis principle'
     },
-    cardUrl: '/explore/peak-finding',
-    cardCta: 'Open the playground',
+    cardUrl: '/projects/taylor-board',
+    cardCta: 'Open the project',
     displayOrder: 1
   },
   {

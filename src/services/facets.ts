@@ -17,6 +17,8 @@ export interface FacetedItem {
   summary: string;
   href: string;
   origin?: Origin;
+  /** The item's own preview picture, for cards that show one. */
+  image?: { url: string; alt: string };
   /** Topics and tools together: the item's own tags or technologies. */
   labels: string[];
 }
@@ -29,6 +31,9 @@ export const allItems = (): FacetedItem[] => [
     summary: project.description,
     href: project.cardUrl ?? `/projects/${project.slug}`,
     origin: project.origin,
+    image: project.featuredImage
+      ? { url: project.featuredImage.url, alt: project.featuredImage.title || project.title }
+      : undefined,
     labels: project.technologies ?? [],
   })),
   ...blogPosts.map((post) => ({
@@ -38,6 +43,9 @@ export const allItems = (): FacetedItem[] => [
     summary: post.excerpt,
     href: `/blog/${post.slug}`,
     origin: post.origin,
+    image: post.featuredImage
+      ? { url: post.featuredImage.url, alt: post.featuredImage.title || post.title }
+      : undefined,
     labels: post.tags ?? [],
   })),
 ];

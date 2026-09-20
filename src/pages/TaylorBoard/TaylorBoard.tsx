@@ -81,7 +81,7 @@ const TaylorBoard = () => (
             className={styles.figureImage}
           />
           <figcaption className={styles.figureCaption}>
-            Peak region, deconvolution, resolution &mdash; the graphical abstract from the thesis.
+            The graphical abstract from the thesis: peak region, deconvolution, resolution.
           </figcaption>
         </figure>
       </div>
@@ -92,6 +92,9 @@ const TaylorBoard = () => (
           {parts.map((part) => (
             <li key={part.slug}>
               <Link to={part.href} className={styles.part}>
+                {part.image && (
+                  <img src={part.image.url} alt={part.image.alt} className={styles.partImage} />
+                )}
                 <span className={styles.partLabel}>{part.title}</span>
                 <span className={styles.partHint}>{part.summary}</span>
               </Link>

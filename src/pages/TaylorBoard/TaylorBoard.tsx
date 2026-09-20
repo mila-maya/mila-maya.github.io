@@ -68,21 +68,38 @@ const TaylorBoard = () => (
         </h1>
       </header>
 
-      <ul className={styles.highlights}>
+      <div className={styles.body}>
+        <div className={styles.bodyText}>
+          <ul className={styles.highlights}>
         {HIGHLIGHTS.map((item) => (
           <li key={item.value} className={styles.highlight}>
             <span className={styles.highlightValue}>{item.value}</span>
             <span className={styles.highlightText}>{item.text}</span>
-          </li>
-        ))}
-      </ul>
+              </li>
+            ))}
+          </ul>
 
-      <section className={styles.abstract}>
-        <p className={`label ${styles.abstractLabel}`}>Abstract</p>
-        {ABSTRACT.map((paragraph) => (
-          <p key={paragraph.slice(0, 40)}>{paragraph}</p>
-        ))}
-      </section>
+          <section className={styles.abstract}>
+            <p className={`label ${styles.abstractLabel}`}>Abstract</p>
+            {ABSTRACT.map((paragraph) => (
+              <p key={paragraph.slice(0, 40)}>{paragraph}</p>
+            ))}
+          </section>
+        </div>
+
+        {/* The graphical abstract from the thesis itself: the noisy peak, the
+            deconvolution that separates it, and the two sizes that come out. */}
+        <figure className={styles.figure}>
+          <img
+            src="/images/projects/taylor-board-abstract.svg"
+            alt="Three stages: a noisy Taylorgram peak region, the deconvolution separating two overlapping Gaussians, and a magnified view resolving two particle sizes."
+            className={styles.figureImage}
+          />
+          <figcaption className={styles.figureCaption}>
+            Peak region, deconvolution, resolution &mdash; the graphical abstract from the thesis.
+          </figcaption>
+        </figure>
+      </div>
 
       <section className={styles.parts}>
         <p className={`label ${styles.partsLabel}`}>Published from this work</p>

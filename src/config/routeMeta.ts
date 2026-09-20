@@ -1,6 +1,9 @@
 import { siteConfig } from './site';
 import { blogPosts } from '../data/blogPosts';
 import { books } from '../data/books';
+import { projects } from '../data/projects';
+import { toolboxWorkflows } from '../data/toolboxWorkflows';
+import { countWordCapitalised, listPhrase } from '../utils/counting';
 import type { BlogPost } from '../types/content.types';
 import type { Book } from '../types/book.types';
 
@@ -30,8 +33,11 @@ export const pageMeta = {
   explore: {
     path: siteConfig.exploreUrl,
     title: 'Explore',
-    description:
-      'Two projects you can look into: automated nanoparticle sizing from Taylorgrams, and a bioinformatics toolbox rebuilt across three courses and four implementations.',
+    // Counted and named from the data. Written out by hand, this sentence said
+    // "Two projects" and would have kept saying it after the third was added.
+    description: `${countWordCapitalised(projects.length)} projects you can open and take apart: ${listPhrase(
+      projects.map((project) => project.title)
+    )}.`,
   },
   peakFinding: {
     path: siteConfig.peakFindingUrl,
@@ -49,8 +55,11 @@ export const pageMeta = {
   bioinformaticToolbox: {
     path: siteConfig.bioinformaticToolboxUrl,
     title: 'Bioinformatic Toolbox',
-    description:
-      'Four practical bioinformatics workflows: NCBI annotation search, manual sequence-to-protein translation, structure prediction, and PDB lookup.',
+    description: `${countWordCapitalised(
+      toolboxWorkflows.length
+    )} practical bioinformatics workflows: ${listPhrase(
+      toolboxWorkflows.map((workflow) => workflow.summary)
+    )}.`,
   },
   stories: {
     path: siteConfig.storiesUrl,

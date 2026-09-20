@@ -5,24 +5,14 @@ import { pageMeta } from '@/config/routeMeta';
 import { siteConfig } from '@/config/site';
 import { projects } from '@/data/projects';
 import type { SourceMode } from './types';
+import { toolboxWorkflows } from '@/data/toolboxWorkflows';
+import { countWordCapitalised } from '@/utils/counting';
 import NcbiWorkflow from './components/NcbiWorkflow';
 import ManualWorkflow from './components/ManualWorkflow';
 import AaWorkflow from './components/AaWorkflow';
 import PdbSearch from './components/PdbSearch';
 import styles from './BioinformaticToolbox.module.css';
 
-interface WorkflowTab {
-  id: SourceMode;
-  label: string;
-  description: string;
-}
-
-const WORKFLOW_TABS: WorkflowTab[] = [
-  { id: 'ncbi', label: 'NCBI Search', description: 'Fetch annotated proteins from GenBank records' },
-  { id: 'manual', label: 'Sequence to Protein', description: 'Six-frame ORF scan from raw DNA / RNA' },
-  { id: 'aa', label: 'Protein to Structure', description: 'Predict 3D structure from amino acid sequence' },
-  { id: 'pdb', label: 'PDB Search', description: 'Look up known 3D structures by PDB ID' }
-];
 
 // Provenance lives with the project data, not in this component.
 const toolboxHistory = projects.find((p) => p.slug === 'bioinformatic-toolbox')?.provenance;
@@ -39,8 +29,8 @@ const BioinformaticToolbox = () => {
           <p className={styles.kicker}>Bioinformatic Toolbox</p>
           <h1 className={styles.title}>DNA &rarr; RNA &rarr; Protein &rarr; 3D Structure</h1>
           <p className={styles.subtitle}>
-            Four practical workflows for protein analysis - from sequence retrieval to structure
-            prediction.
+            {countWordCapitalised(toolboxWorkflows.length)} practical workflows for protein analysis, from
+            sequence retrieval to structure prediction.
           </p>
           <div className={styles.heroActions}>
             <Link to={siteConfig.exploreUrl} className={styles.backLink}>
@@ -72,7 +62,7 @@ const BioinformaticToolbox = () => {
         </header>
 
         <nav className={styles.tabBar} role="tablist">
-          {WORKFLOW_TABS.map((tab) => (
+          {toolboxWorkflows.map((tab) => (
             <button
               key={tab.id}
               type="button"

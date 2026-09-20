@@ -73,6 +73,16 @@ await build({
   format: 'esm',
   platform: 'node',
   tsconfig: path.join(root, 'tsconfig.json'),
+  // The data files import images so a bundler can hash them. Here the image is
+  // only ever a string in a meta tag, so it becomes its own path rather than
+  // its bytes: esbuild has no loader for these otherwise and the build stops.
+  loader: {
+    '.png': 'file',
+    '.jpg': 'file',
+    '.jpeg': 'file',
+    '.svg': 'file',
+    '.webp': 'file',
+  },
   logLevel: 'warning',
 });
 

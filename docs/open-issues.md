@@ -102,3 +102,18 @@ five takeaways per book. The section reappears by itself once an entry has any.
 - **Docker was missing, and the tools had no marks.** Added Docker and gave
   every tool with a brand its Simple Icons mark, inlined as ten SVG paths
   rather than a dependency. Reference: mlett.dev. 2026-09-20.
+- **The thesis named only BOKU.** It was carried out at RNAnalytics, which no
+  line on the site said, so the overlapping timeline entries had no explanation.
+  Now "Master thesis at RNAnalytics, BOKU 2026" on the card, in the kicker and
+  in the timeline, and the thesis has its own station, 2025-2026. 2026-09-20.
+- **Counts were written out by hand.** "Two projects", "Four workflows", "Four
+  CS50 certificates" would each have gone wrong the day the data changed. They
+  now count the array. src/utils/counting.ts. 2026-09-20.
+- **The prerender could not read image imports.** Pointing routeMeta at the
+  project data pulled a .png into its esbuild bundle and the build stopped.
+  The script now loads image types as files. 2026-09-20.
+- **The card said what a card does.** "Open the toolbox" under a card that is
+  itself the link. The whole card is now the target, the title is a title
+  again, and the card answers the pointer. 2026-09-20.
+- **Two hero links sat on different lines.** .backLink carried a margin-top of
+  its own on top of the row's. 2026-09-20.

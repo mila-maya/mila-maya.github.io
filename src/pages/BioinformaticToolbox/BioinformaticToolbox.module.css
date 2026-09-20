@@ -37,15 +37,18 @@
   line-height: 1.6;
 }
 
+/* Sits inside .heroActions, which already carries the top margin. Its own
+   margin-top pushed it a line below "View Source" beside it. */
 .backLink {
   display: inline-flex;
-  margin-top: 0.9rem;
+  align-items: center;
   font-weight: 700;
 }
 
 .heroActions {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0.8rem;
   margin-top: 0.9rem;
 }

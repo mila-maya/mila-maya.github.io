@@ -99,3 +99,6 @@ five takeaways per book. The section reappears by itself once an entry has any.
   one thing the list is scanned by. A timeline bullet may now carry its own
   year, rendered in a leading column like the timeline's own years and the
   toolbox history. 2026-09-20.
+- **Docker was missing, and the tools had no marks.** Added Docker and gave
+  every tool with a brand its Simple Icons mark, inlined as ten SVG paths
+  rather than a dependency. Reference: mlett.dev. 2026-09-20.

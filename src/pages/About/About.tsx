@@ -5,6 +5,7 @@ import SEO from '@components/common/SEO/SEO';
 import { siteConfig } from '@/config/site';
 import { pageMeta } from '@/config/routeMeta';
 import { focusAreas, professionalTimeline, skillGroups } from '@/data/profile';
+import { markForSkill } from '@/data/toolMarks';
 import styles from './About.module.css';
 
 const About = () => {
@@ -62,11 +63,26 @@ const About = () => {
               <article key={group.title} className={styles.skillGroup}>
                 <h3 className={styles.skillGroupTitle}>{group.title}</h3>
                 <div className={styles.skills}>
-                  {group.skills.map((skill) => (
-                    <span key={skill} className={styles.skill}>
-                      {skill}
-                    </span>
-                  ))}
+                  {group.skills.map((skill) => {
+                    const mark = markForSkill(skill);
+
+                    return (
+                      <span key={skill} className={styles.skill}>
+                        {mark && (
+                          <svg
+                            className={styles.skillMark}
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                            aria-hidden="true"
+                            focusable="false"
+                          >
+                            <path d={mark.path} />
+                          </svg>
+                        )}
+                        {skill}
+                      </span>
+                    );
+                  })}
                 </div>
               </article>
             ))}

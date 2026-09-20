@@ -104,6 +104,9 @@
 }
 
 .skill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   font-family: var(--font-mono);
   font-size: 0.72rem;
   padding: 0.2rem 0.45rem;
@@ -111,6 +114,14 @@
   border-radius: var(--radius-sm);
   color: var(--ink-muted);
   background: var(--surface-raised);
+}
+
+/* The brand mark, where a tool has one. Methods carry their name alone. */
+.skillMark {
+  width: 0.9rem;
+  height: 0.9rem;
+  flex: none;
+  color: var(--accent);
 }
 
 .downloads {

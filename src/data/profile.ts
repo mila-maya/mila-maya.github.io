@@ -125,7 +125,7 @@ export const skillGroups: SkillGroup[] = [
   },
   {
     title: 'Product and Platform',
-    skills: ['Dash', 'Flask', 'Django', 'React', 'REST APIs', 'GitHub']
+    skills: ['Dash', 'Flask', 'Django', 'React', 'REST APIs', 'Docker', 'GitHub']
   }
 ];
 

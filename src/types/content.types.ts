@@ -22,8 +22,23 @@ export interface BlogPost {
   category?: string;
 }
 
+/**
+ * How a project got here: the stages it went through before this version.
+ *
+ * Separate from Origin above, which only says which body of work something
+ * belongs to. A project can carry both: the toolbox came out of Harvard CS50
+ * (the origin) across four implementations (the provenance).
+ */
+export interface Provenance {
+  /** One line for the card. */
+  summary: string;
+  /** The stages it went through, oldest first. */
+  history?: { year: string; what: string }[];
+}
+
 export interface Project {
   origin?: Origin;
+  provenance?: Provenance;
   title: string;
   slug: string;
   description: string;

@@ -17,19 +17,25 @@ export interface SkillGroup {
 export const professionalTimeline: TimelineItem[] = [
   {
     period: '2026 - Present',
-    title: 'Career Development',
+    title: 'Kori, personal project',
     icon: {
       src: '/favicon.svg',
-      alt: 'Mila Lettmayer homepage icon'
+      alt: 'At the Core icon'
     },
     detail:
-      'Focused on strengthening ML and AI skills through hands-on Python projects in model evaluation, dashboards, and financial data analysis.'
+      'Building Kori, a household and meal planning application, as a full-stack project: an explicit relational domain model in PostgreSQL behind a typed API, with a Next.js front end.',
+    bullets: [
+      'Modelled the domain explicitly rather than by convention: recipes hold ordered ingredient lines with nested options, and whether a recipe is vegetarian, vegan or gluten-free is derived from what its ingredients are made of rather than typed on the recipe.',
+      'Django with a typed Django Ninja API over PostgreSQL, and Django Admin for data work.',
+      'Next.js interfaces for food, recipes, menu planning and the pantry, in light and dark themes.',
+      'Developed in reviewed phases with explicit gates, so each stage is finished and approved before the next begins.'
+    ]
   },
   {
     period: '2024 - 2026',
     title: 'Scientific Software Engineer, RNAnalytics',
     icon: {
-      src: 'https://www.rnanalytics.eu/.cm4all/uproc.php/0/Logo%20Lockup_Black.svg?_=197606d7a88',
+      src: '/images/logos/rnanalytics.png',
       alt: 'RNAnalytics logo'
     },
     detail:
@@ -45,10 +51,26 @@ export const professionalTimeline: TimelineItem[] = [
     ]
   },
   {
+    period: '2023 - 2024',
+    title: 'Harvard CS50, online',
+    icon: {
+      src: '/favicon.svg',
+      alt: 'At the Core icon'
+    },
+    detail:
+      'Four CS50 certificates taken alongside the diploma studies, from Python and computer science fundamentals through web programming to applied AI.',
+    bullets: [
+      "CS50's Introduction to Artificial Intelligence with Python, 2024.",
+      "CS50's Web Programming with Python and JavaScript, 2024.",
+      'CS50x, Introduction to Computer Science, 2024. Final project: the Bioinformatic Toolbox as a Flask web application.',
+      "CS50's Introduction to Programming with Python, 2023. Final project: a command line tool for nucleotide translation, which later became the Bioinformatic Toolbox."
+    ]
+  },
+  {
     period: '2017 - 2026',
     title: 'Dipl.-Ing. Biotechnology / Bioinformatics, BOKU',
     icon: {
-      src: 'https://boku.ac.at/fileadmin/data/themen/Marketing/Downloads/BOKU_Hauptlogo_RGB.svg',
+      src: '/images/logos/boku.svg',
       alt: 'BOKU University logo'
     },
     detail:
@@ -64,7 +86,7 @@ export const professionalTimeline: TimelineItem[] = [
     period: '2012 - 2017',
     title: 'BSc Food and Biotechnology, BOKU',
     icon: {
-      src: 'https://boku.ac.at/fileadmin/data/themen/Marketing/Downloads/BOKU_Hauptlogo_RGB.svg',
+      src: '/images/logos/boku.svg',
       alt: 'BOKU University logo'
     },
     detail: 'Developed strong foundations in molecular biology, genetics, and bioprocessing.'

@@ -10,7 +10,7 @@
   position: absolute;
   top: 0.6rem;
   bottom: 0.6rem;
-  left: 8.1rem;
+  left: 9.1rem;
   width: 1px;
   background: linear-gradient(
     180deg,
@@ -24,20 +24,40 @@
 .item {
   position: relative;
   display: grid;
-  grid-template-columns: 4.6rem 5rem minmax(0, 1fr);
+  grid-template-columns: 5.6rem 5rem minmax(0, 1fr);
   column-gap: 1rem;
   align-items: start;
 }
 
+/* Both ends of the span carry the same weight, stacked and right aligned.
+   Monospace so the digits line up exactly down the column, and so the years
+   speak in the same voice as the labels elsewhere on the site. */
 .year {
-  padding-top: 1.18rem;
-  text-align: right;
-  font-size: 1.05rem;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
+  padding-top: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.05rem;
+  font-family: var(--font-mono);
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The start only places the entry in time, so it stays small. */
+.yearStart {
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: var(--ink-faint);
+}
+
+/* The end is what a reader looks for - when a degree finished, how long a role
+   lasted - so it carries the size, the weight and the accent. */
+.yearEnd {
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   color: var(--accent);
-  font-weight: 800;
-  line-height: 1;
+  white-space: nowrap;
 }
 
 .marker {
@@ -114,18 +134,24 @@
   }
 
   .timeline::before {
-    left: 5.75rem;
+    left: 7.25rem;
   }
 
   .item {
-    grid-template-columns: 3.1rem 3.9rem minmax(0, 1fr);
+    grid-template-columns: 4.6rem 3.9rem minmax(0, 1fr);
     column-gap: 0.7rem;
   }
 
   .year {
-    padding-top: 0.95rem;
-    font-size: 0.82rem;
-    letter-spacing: 0.12em;
+    padding-top: 0.7rem;
+  }
+
+  .yearStart {
+    font-size: 0.66rem;
+  }
+
+  .yearEnd {
+    font-size: 1rem;
   }
 
   .iconFrame {
@@ -135,7 +161,31 @@
     padding: 0.4rem;
   }
 
+  .iconFallback {
+    font-size: 0.42rem;
+    padding: 0.1rem;
+  }
+
   .content {
     padding-top: 0.25rem;
   }
+}
+
+/* Shown when a logo fails to load, so a dead image never looks like a bug. */
+.iconFallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-family: var(--font-mono);
+  padding: 0.22rem;
+  font-size: 0.52rem;
+  font-weight: 500;
+  line-height: 1.15;
+  text-align: center;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+  overflow: hidden;
+  color: var(--ink-muted);
 }

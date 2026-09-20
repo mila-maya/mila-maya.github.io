@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import SEO from '@components/common/SEO/SEO';
 import { pageMeta } from '@/config/routeMeta';
 import { siteConfig } from '@/config/site';
+import { projects } from '@/data/projects';
 import type { SourceMode } from './types';
 import NcbiWorkflow from './components/NcbiWorkflow';
 import ManualWorkflow from './components/ManualWorkflow';
@@ -22,6 +23,9 @@ const WORKFLOW_TABS: WorkflowTab[] = [
   { id: 'aa', label: 'Protein to Structure', description: 'Predict 3D structure from amino acid sequence' },
   { id: 'pdb', label: 'PDB Search', description: 'Look up known 3D structures by PDB ID' }
 ];
+
+// Provenance lives with the project data, not in this component.
+const toolboxHistory = projects.find((p) => p.slug === 'bioinformatic-toolbox')?.provenance;
 
 const BioinformaticToolbox = () => {
   const [sourceMode, setSourceMode] = useState<SourceMode>('ncbi');
@@ -51,6 +55,20 @@ const BioinformaticToolbox = () => {
               View Source &rarr;
             </a>
           </div>
+
+          {toolboxHistory?.history && toolboxHistory.history.length > 0 && (
+            <section className={styles.origin}>
+              <p className={`label ${styles.originLabel}`}>Where this comes from</p>
+              <ol className={styles.originList}>
+                {toolboxHistory.history.map((stage) => (
+                  <li key={stage.year} className={styles.originStage}>
+                    <span className={styles.originYear}>{stage.year}</span>
+                    <span>{stage.what}</span>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          )}
         </header>
 
         <nav className={styles.tabBar} role="tablist">

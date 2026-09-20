@@ -11,8 +11,12 @@ export const blogPosts: BlogPost[] = [
 
 ## Step 1 - Build a synthetic chromatogram (overlapping peaks)
 
+Before you can test a peak finder, you need data where you already know the answer. This step builds exactly that: a drifting baseline, three Gaussian peaks laid on top of it, and random noise added so it behaves like a real measurement.
+
+Each peak is described by three numbers you can set below: <i>A</i><sub>i</sub> how tall it is, <i>t</i><sub>0,i</sub> when it comes out, and <i>&sigma;</i><sub>i</sub> how wide it spreads. Move two peaks close together and they stop being separable by eye. That is the whole problem.
+
 <details>
-<summary><strong>Theory and algorithm</strong></summary>
+<summary><strong>The maths behind it</strong></summary>
 
 Model the signal as baseline plus Gaussian components:
 
@@ -31,7 +35,7 @@ Algorithm:
 </details>
 
 <details>
-<summary><strong>Python snippet</strong></summary>
+<summary><strong>The same thing in Python</strong></summary>
 
 ~~~python
 import numpy as np
@@ -63,8 +67,12 @@ plt.show()
 
 ## Step 2 - MOCCA-style peak picking and significance filtering
 
+Finding maxima is easy. Noise produces hundreds of them. This step takes every local maximum and then discards the ones that do not matter, judged by how far a peak rises above its surroundings and how much area it covers compared to all the others.
+
+What survives is not a fit yet. It is a set of starting points: where a peak sits and roughly how tall it is. Its width is deliberately left to step 3.
+
 <details>
-<summary><strong>Theory and algorithm</strong></summary>
+<summary><strong>The maths behind it</strong></summary>
 
 Peak picking is maxima-first on the measured signal <i>S</i>(<i>t</i>), followed by significance filtering [<a href="#pf-ref-2">2</a>].  
 For each candidate peak <i>i</i>, compute area over its local prominence-base interval:
@@ -83,7 +91,7 @@ Apply a minimum center spacing &Delta;<i>t</i><sub>min</sub> to the retained set
 </details>
 
 <details>
-<summary><strong>Python snippet</strong></summary>
+<summary><strong>The same thing in Python</strong></summary>
 
 ~~~python
 from scipy.signal import find_peaks
@@ -152,8 +160,12 @@ for r in kept:
 
 ## Step 3 - Fit multi-Gaussian model from detected guesses
 
+Now the starting points become a model: a sum of Gaussians plus a straight baseline, fitted to the measured signal all at once.
+
+The interesting part is deciding how many components to use. The fit runs with one peak, then two, then three, and <i>R</i><sup>2</sup> tracks how much of the signal is explained. More components always fit better, so a component is only kept if it improves <i>R</i><sup>2</sup> by more than the minimum gain you set. Otherwise the simpler model wins.
+
 <details>
-<summary><strong>Theory and algorithm</strong></summary>
+<summary><strong>The maths behind it</strong></summary>
 
 Fit the measured signal with a Gaussian sum plus linear baseline:
 
@@ -171,7 +183,7 @@ Adaptive component selection [<a href="#pf-ref-2">2</a>,<a href="#pf-ref-3">3</a
 </details>
 
 <details>
-<summary><strong>Python snippet</strong></summary>
+<summary><strong>The same thing in Python</strong></summary>
 
 ~~~python
 from scipy.optimize import curve_fit

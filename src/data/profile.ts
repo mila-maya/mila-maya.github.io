@@ -35,7 +35,7 @@ export const professionalTimeline: TimelineItem[] = [
     period: '2024 - 2026',
     title: 'Scientific Software Engineer, RNAnalytics',
     icon: {
-      src: 'https://www.rnanalytics.eu/.cm4all/uproc.php/0/Logo%20Lockup_Black.svg?_=197606d7a88',
+      src: '/images/logos/rnanalytics.png',
       alt: 'RNAnalytics logo'
     },
     detail:

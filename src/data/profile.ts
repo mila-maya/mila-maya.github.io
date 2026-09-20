@@ -17,13 +17,19 @@ export interface SkillGroup {
 export const professionalTimeline: TimelineItem[] = [
   {
     period: '2026 - Present',
-    title: 'Career Development',
+    title: 'Kori, personal project',
     icon: {
       src: '/favicon.svg',
-      alt: 'Mila Lettmayer homepage icon'
+      alt: 'At the Core icon'
     },
     detail:
-      'Focused on strengthening ML and AI skills through hands-on Python projects in model evaluation, dashboards, and financial data analysis.'
+      'Building Kori, a household and meal planning application, as a full-stack project: an explicit relational domain model in PostgreSQL behind a typed API, with a Next.js front end.',
+    bullets: [
+      'Modelled the domain explicitly rather than by convention: recipes hold ordered ingredient lines with nested options, and whether a recipe is vegetarian, vegan or gluten-free is derived from what its ingredients are made of rather than typed on the recipe.',
+      'Django with a typed Django Ninja API over PostgreSQL, and Django Admin for data work.',
+      'Next.js interfaces for food, recipes, menu planning and the pantry, in light and dark themes.',
+      'Developed in reviewed phases with explicit gates, so each stage is finished and approved before the next begins.'
+    ]
   },
   {
     period: '2024 - 2026',

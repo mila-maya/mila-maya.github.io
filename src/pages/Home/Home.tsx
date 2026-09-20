@@ -17,19 +17,19 @@ const entryPoints = [
   {
     label: 'Surface',
     caption: 'What we observe',
-    title: 'Explore',
+    title: 'Projects',
     description:
       'Interactive tools you can actually run. Change the inputs and watch the method react.',
-    to: siteConfig.exploreUrl,
+    to: `${siteConfig.projectsUrl}#projects`,
     cta: 'Open the tools',
   },
   {
     label: 'Mechanism',
     caption: 'What is happening',
-    title: 'Stories',
+    title: 'Posts',
     description:
       'Longer pieces that take one question and follow it down to the mechanism underneath.',
-    to: siteConfig.storiesUrl,
+    to: `${siteConfig.projectsUrl}#posts`,
     cta: 'Read the writing',
   },
   {
@@ -85,14 +85,11 @@ const Home = () => {
           </div>
 
           <div className={styles.coreActions}>
-            <Link to={siteConfig.peakFindingUrl} className={styles.primaryAction}>
-              Open the full playground {'->'}
+            <Link to={siteConfig.peakFindingPostUrl} className={styles.primaryAction}>
+              Read the full story and run every step {'->'}
             </Link>
-            <Link
-              to="/blog/peak-detection-deconvolution-overlapping-chromatograms"
-              className={styles.secondaryAction}
-            >
-              Read the full story {'->'}
+            <Link to={siteConfig.taylorBoardUrl} className={styles.secondaryAction}>
+              The project it came from {'->'}
             </Link>
           </div>
         </div>
@@ -120,8 +117,8 @@ const Home = () => {
         <div className={styles.recentInner}>
           <div className={styles.recentHeader}>
             <p className="label">Recent</p>
-            <Link to={siteConfig.storiesUrl} className={styles.recentCta}>
-              All stories {'->'}
+            <Link to={`${siteConfig.projectsUrl}#posts`} className={styles.recentCta}>
+              All posts {'->'}
             </Link>
           </div>
 

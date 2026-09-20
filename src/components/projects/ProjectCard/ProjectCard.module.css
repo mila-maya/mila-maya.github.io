@@ -1,18 +1,32 @@
 .card {
+  position: relative;
   background: var(--background-light);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   padding: var(--spacing-md);
   box-shadow: var(--shadow-sm);
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast),
+    border-color var(--transition-fast),
+    background-color var(--transition-fast);
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
+/*
+ * The whole card is the target, so the whole card answers the pointer:
+ * it lifts, its border takes the accent and its ground warms. The title is
+ * left alone. It is a heading, and styling it as a link would say the text
+ * is the thing to aim at when the card already is.
+ */
 .card:hover {
   transform: translateY(-5px);
   box-shadow: var(--shadow-md);
+  border-color: var(--accent);
+  background: var(--accent-wash);
+  cursor: pointer;
 }
 
 .image {
@@ -43,6 +57,27 @@
   color: var(--text-color);
 }
 
+/* The title carries the link, and its ::after makes the whole card the target. */
+.cardLink,
+.cardLink:hover,
+.cardLink:focus {
+  color: inherit;
+  text-decoration: none;
+}
+
+.cardLink::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+/* Keyboard focus lands on the title link, so the card shows the ring. */
+.card:has(.cardLink:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
 .description {
   font-size: var(--font-size-sm);
   color: var(--text-light);
@@ -65,51 +100,6 @@
   padding: 0.25rem 0.5rem;
   border-radius: var(--border-radius-sm);
   font-size: 0.875rem;
-}
-
-.links {
-  display: flex;
-  gap: 0.6rem;
-  margin-top: auto;
-  flex-wrap: wrap;
-}
-
-.link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem 0.82rem;
-  border-radius: 999px;
-  border: 1px solid var(--line);
-  background: var(--surface-raised);
-  color: var(--primary-color);
-  font-weight: bold;
-  font-size: var(--font-size-sm);
-  text-decoration: none;
-  transition:
-    color var(--transition-fast),
-    background var(--transition-fast),
-    border-color var(--transition-fast),
-    transform var(--transition-fast);
-}
-
-.link:hover {
-  color: var(--primary-hover);
-  background: var(--accent-wash);
-  text-decoration: none;
-  transform: translateY(-1px);
-}
-
-.primaryLink {
-  background: var(--primary-color);
-  border-color: var(--primary-color);
-  color: var(--accent-contrast);
-}
-
-.primaryLink:hover {
-  background: var(--primary-hover);
-  border-color: var(--primary-hover);
-  color: var(--accent-contrast);
 }
 
 /* Where it came from, in the same monospace voice as the site labels. */

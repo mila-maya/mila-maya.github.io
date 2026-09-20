@@ -20,7 +20,11 @@ export const siteConfig = {
   bioinformaticToolboxSourceUrl:
     'https://github.com/mila-maya/mila-maya.github.io/tree/main/src/pages/BioinformaticToolbox',
   defaultShareImage: '/images/blog/tda-theory/tda-combined-presentation.png',
-  profileImage: undefined,
+  /* Her GitHub avatar, served from this repo rather than from
+     avatars.githubusercontent.com: an image on somebody else's host can go
+     away without anyone noticing, which is how the RNAnalytics logo broke.
+     The badge still falls back to her initials if it ever fails to load. */
+  profileImage: '/images/mila-github.jpg',
 
   /* --- Routes ----------------------------------------------------------
    * The three rooms of the site. Everything now lives under one of them.

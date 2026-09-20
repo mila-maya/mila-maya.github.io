@@ -20,8 +20,8 @@ const About = () => {
             <p>
               I build software that makes scientific analysis faster, more reliable and easier to
               operate. My background combines biotechnology, bioinformatics and production
-              engineering &mdash; which mostly means I have seen both how an assay actually behaves
-              in the lab and what it takes to run its analysis every day without surprises.
+              engineering. That mostly means I have seen both how an assay actually behaves in the
+              lab and what it takes to run its analysis every day without surprises.
             </p>
             <p>
               At the Core is where that work becomes visible: the tools under Explore, the

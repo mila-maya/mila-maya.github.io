@@ -72,8 +72,8 @@ const Home = () => {
           </h2>
           <p className={styles.coreLead}>
             Real chromatograms overlap, drift and hide behind noise. Start by building the mess
-            yourself &mdash; a synthetic signal with baseline drift, noise and peaks that run into
-            each other &mdash; and then watch an algorithm pull them apart again.
+            yourself: a synthetic signal with baseline drift, noise and peaks that run into each
+            other. Then watch an algorithm pull them apart again.
           </p>
 
           <div className={styles.coreStage}>
@@ -140,8 +140,7 @@ const Home = () => {
           <p className={styles.authorText}>
             I am <strong>{siteConfig.name}</strong>, a scientific software engineer with a
             background in biotechnology and bioinformatics. I build analysis pipelines, interactive
-            tools and practical ML workflows &mdash; and I write about what is happening underneath
-            them.
+            tools and practical ML workflows, and I write about what is happening underneath them.
           </p>
           <Link to={siteConfig.aboutUrl} className={styles.authorLink}>
             Read more about my work {'->'}

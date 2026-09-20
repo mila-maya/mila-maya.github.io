@@ -95,7 +95,7 @@ export const bookMeta = (book: Book): RouteMeta => {
     title: `${book.title} | Books`,
     // Only promises takeaways once an entry actually has some. Every entry is
     // currently without, and a preview card that offers them would be a lie.
-    description: book.takeaways[0] ?? `${book.title}${facts ? ` — ${facts}` : ''}.`,
+    description: book.takeaways[0] ?? `${book.title}${facts ? `, ${facts}` : ''}.`,
     image: book.cover ?? undefined,
     type: 'article',
   };

@@ -88,3 +88,10 @@ five takeaways per book. The section reappears by itself once an entry has any.
 - **The standalone playground page was a duplicate.** It had been consolidated
   into the post before the redesign; the redesign resurrected it. Reverted to a
   redirect, 2026-09-20.
+- **"Published from this work" had no previews.** The three cards on the thesis
+  project page showed title and summary only, although all three posts carry a
+  `featuredImage`. `FacetedItem` now carries the picture too. 2026-09-20.
+- **Em dashes read as machine-written.** Five of them were mine: three on the
+  homepage, one on About, one in the books description. Rewritten without.
+  The nine in `blogPosts.ts` and the five in the thesis abstract are hers and
+  stay untouched. 2026-09-20.

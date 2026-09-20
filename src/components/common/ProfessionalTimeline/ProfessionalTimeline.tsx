@@ -72,9 +72,11 @@ const ProfessionalTimeline = ({ items }: ProfessionalTimelineProps) => {
 
         return (
           <article key={`${item.period}-${item.title}`} className={styles.item}>
+            {/* End above start: the most recent year is what a reader looks
+                for, so it sits on top and carries the weight. */}
             <p className={styles.year} aria-label={item.period}>
-              <span className={styles.yearStart}>{startYear}</span>
               {endYear && <span className={styles.yearEnd}>{endYear}</span>}
+              <span className={styles.yearStart}>{startYear}</span>
             </p>
             <div className={styles.marker}>
               <span className={styles.iconFrame}>

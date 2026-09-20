@@ -47,7 +47,10 @@ const TaylorBoard = () => (
       </Link>
 
       <header className={styles.header}>
-        <p className={`label ${styles.kicker}`}>Master thesis &middot; BOKU</p>
+        <p className={`label ${styles.kicker}`}>
+          Master thesis &middot; <span className={styles.brand}>RNAnalytics</span> &middot; BOKU
+          2026
+        </p>
         <h1 className={styles.title}>
           Automated Taylorgram Processing for Nanoparticle Size Characterization
         </h1>

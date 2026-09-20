@@ -67,7 +67,7 @@ export const professionalTimeline: TimelineItem[] = [
       alt: 'At the Core icon'
     },
     detail:
-      'Four CS50 certificates taken alongside the diploma studies, from Python and computer science fundamentals through web programming to applied AI.',
+      'CS50 certificates taken alongside the diploma studies, from Python and computer science fundamentals through web programming to applied AI.',
     bullets: [
       { year: '2024', what: "CS50's Introduction to Artificial Intelligence with Python." },
       { year: '2024', what: "CS50's Web Programming with Python and JavaScript." },
@@ -82,6 +82,25 @@ export const professionalTimeline: TimelineItem[] = [
     ]
   },
   {
+    // Its own station rather than four bullets inside the degree: it is the
+    // piece of work two posts, a playground and a project page all come out of,
+    // and buried under the diploma none of that had anywhere to point.
+    period: '2025 - 2026',
+    title: 'Master thesis, Automated Taylorgram Processing',
+    icon: {
+      src: '/images/logos/boku.svg',
+      alt: 'BOKU University logo'
+    },
+    detail:
+      'Carried out at RNAnalytics for the BOKU diploma: automated Taylorgram processing for nanoparticle size characterization.',
+    bullets: [
+      'Automated peak detection, multi-Gaussian fitting, and diameter calculation with built-in validity checks.',
+      'Used physics-based synthetic Taylorgrams to validate robustness and guide parameter tuning.',
+      'Benchmarked against DLS with polystyrene standards and observed TDA values about 7 percent lower than volume-weighted DLS.',
+      'Introduced marker-free elution-time validation by predicting residence times from experimental configuration.'
+    ]
+  },
+  {
     period: '2017 - 2026',
     title: 'Dipl.-Ing. Biotechnology / Bioinformatics, BOKU',
     icon: {
@@ -89,13 +108,7 @@ export const professionalTimeline: TimelineItem[] = [
       alt: 'BOKU University logo'
     },
     detail:
-      'Master thesis focused on automated Taylorgram processing for nanoparticle size characterization.',
-    bullets: [
-      'Automated peak detection, multi-Gaussian fitting, and diameter calculation with built-in validity checks.',
-      'Used physics-based synthetic Taylorgrams to validate robustness and guide parameter tuning.',
-      'Benchmarked against DLS with polystyrene standards and observed TDA values about 7 percent lower than volume-weighted DLS.',
-      'Introduced marker-free elution-time validation by predicting residence times from experimental configuration.'
-    ]
+      'Master programme in biotechnology at the University of Natural Resources and Life Sciences, with the emphasis on bioinformatics.'
   },
   {
     period: '2012 - 2017',
@@ -111,7 +124,7 @@ export const professionalTimeline: TimelineItem[] = [
 export const skillGroups: SkillGroup[] = [
   {
     title: 'Programming',
-    skills: ['Python', 'R', 'TypeScript', 'JavaScript', 'SQL']
+    skills: ['Python', 'R', 'TypeScript', 'JavaScript', 'PostgreSQL']
   },
   {
     title: 'Scientific and Data',

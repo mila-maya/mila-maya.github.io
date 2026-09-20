@@ -18,6 +18,14 @@
   margin-bottom: var(--space-2xs);
 }
 
+/*
+ * The label style upper-cases everything, which turns RNAnalytics into
+ * RNANALYTICS and loses the capital inside. A company writes its own name.
+ */
+.brand {
+  text-transform: none;
+}
+
 .title {
   font-size: var(--step-4);
 }

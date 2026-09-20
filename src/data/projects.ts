@@ -8,14 +8,16 @@ export const projects: Project[] = [
     slug: 'taylor-board',
     origin: 'Master thesis',
     description:
-      'Master thesis. Taylor Board automates Taylor dispersion analysis end to end: raw instrument files, peak detection, Gaussian fitting, size calculation, and validity checks that keep results inside the Taylor regime.',
+      'Taylor Board automates Taylor dispersion analysis end to end: raw instrument files, peak detection, Gaussian fitting, size calculation, and validity checks that keep results inside the Taylor regime.',
     technologies: ['Python', 'Signal Processing', 'Chromatography', 'Nanoparticle Sizing'],
     featuredImage: {
       url: '/images/blog/tda-theory/tda-combined-presentation.png',
       title: 'Taylor dispersion analysis principle'
     },
     cardUrl: '/projects/taylor-board',
-    cardCta: 'Open the project',
+    provenance: {
+      summary: 'Master thesis at RNAnalytics, BOKU 2026',
+    },
     displayOrder: 1
   },
   {
@@ -31,7 +33,6 @@ export const projects: Project[] = [
       title: 'DNA to protein workflow visualization'
     },
     cardUrl: '/projects/bioinformatic-toolbox',
-    cardCta: 'Open the toolbox',
     provenance: {
       summary: 'Harvard CS50x final project, 2024',
       history: [

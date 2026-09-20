@@ -5,7 +5,8 @@ import styles from './Header.module.css';
 
 const navItems = [
   { to: siteConfig.exploreUrl, label: 'Explore' },
-  { to: siteConfig.booksUrl, label: 'Books' },
+  { to: siteConfig.storiesUrl, label: 'Stories' },
+  { to: siteConfig.aboutUrl, label: 'About' },
 ];
 
 const Header = () => {

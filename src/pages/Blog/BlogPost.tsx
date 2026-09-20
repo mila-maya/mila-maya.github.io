@@ -94,8 +94,8 @@ const BlogPost = () => {
       <SEO {...blogPostMeta(post)} />
 
       <article className={styles.container}>
-        <Link to={siteConfig.exploreUrl} className={styles.backLink}>
-          {'<-'} Back to Explore
+        <Link to={siteConfig.storiesUrl} className={styles.backLink}>
+          {'<-'} Back to Stories
         </Link>
 
         <header className={styles.header}>

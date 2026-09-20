@@ -4,7 +4,8 @@ import MainLayout from '@layouts/MainLayout/MainLayout';
 import { siteConfig } from '@/config/site';
 import Home from '@pages/Home/Home';
 
-const ProjectsAndPosts = lazy(() => import('@pages/ProjectsAndPosts/ProjectsAndPosts'));
+const Explore = lazy(() => import('@pages/Explore/Explore'));
+const Stories = lazy(() => import('@pages/Stories/Stories'));
 const TaylorBoard = lazy(() => import('@pages/TaylorBoard/TaylorBoard'));
 const About = lazy(() => import('@pages/About/About'));
 const BlogPost = lazy(() => import('@pages/Blog/BlogPost'));
@@ -44,13 +45,12 @@ function App() {
           <Route path="/" element={<Home />} />
 
           {/* The three rooms of the site. */}
-          {/* One room holding both projects and the writing that belongs to them. */}
-          <Route path="/explore" element={<Suspense fallback={routeFallback}><ProjectsAndPosts /></Suspense>} />
+          <Route path="/explore" element={<Suspense fallback={routeFallback}><Explore /></Suspense>} />
+          <Route path="/stories" element={<Suspense fallback={routeFallback}><Stories /></Suspense>} />
           {/* The playground lives inside the post that explains it; these paths
               only point there, the way they did before the redesign. */}
           <Route path="/explore/peak-finding" element={<Navigate to={siteConfig.peakFindingPostUrl} replace />} />
           <Route path="/projects-and-posts" element={<Navigate to={siteConfig.exploreUrl} replace />} />
-          <Route path="/stories" element={<Navigate to={siteConfig.exploreUrl} replace />} />
           <Route path="/projects/taylor-board" element={<Suspense fallback={routeFallback}><TaylorBoard /></Suspense>} />
           <Route path="/explore/bioinformatic-toolbox" element={<Navigate to={siteConfig.bioinformaticToolboxUrl} replace />} />
           <Route path="/about" element={<Suspense fallback={routeFallback}><About /></Suspense>} />

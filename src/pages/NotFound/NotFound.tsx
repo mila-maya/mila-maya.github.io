@@ -6,8 +6,8 @@ import styles from './NotFound.module.css';
 // Some paths were retired rather than redirected, so this page is a real
 // landing spot for old links and offers the three rooms instead of a dead end.
 const destinations = [
-  { to: siteConfig.exploreUrl, label: 'Explore', hint: 'Projects and writing' },
-  { to: siteConfig.booksUrl, label: 'Books', hint: 'A reading record' },
+  { to: siteConfig.exploreUrl, label: 'Explore', hint: 'Projects you can run' },
+  { to: siteConfig.storiesUrl, label: 'Stories', hint: 'Writing' },
   { to: siteConfig.aboutUrl, label: 'About', hint: 'The author' },
 ];
 

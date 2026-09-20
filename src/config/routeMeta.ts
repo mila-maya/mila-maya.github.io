@@ -31,7 +31,7 @@ export const pageMeta = {
     path: siteConfig.exploreUrl,
     title: 'Explore',
     description:
-      'Two projects and the writing that belongs to them: automated nanoparticle sizing from Taylorgrams, and a bioinformatics toolbox that has been rebuilt three times.',
+      'Two projects you can look into: automated nanoparticle sizing from Taylorgrams, and a bioinformatics toolbox rebuilt across three courses and four implementations.',
   },
   peakFinding: {
     path: siteConfig.peakFindingUrl,
@@ -51,6 +51,12 @@ export const pageMeta = {
     title: 'Bioinformatic Toolbox',
     description:
       'Four practical bioinformatics workflows: NCBI annotation search, manual sequence-to-protein translation, structure prediction, and PDB lookup.',
+  },
+  stories: {
+    path: siteConfig.storiesUrl,
+    title: 'Stories',
+    description:
+      'The writing that came out of the projects: the physics behind Taylor dispersion, the peak finding algorithm, and the setup the thesis was written with.',
   },
   about: {
     path: siteConfig.aboutUrl,

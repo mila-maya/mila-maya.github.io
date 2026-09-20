@@ -161,7 +161,31 @@
     padding: 0.4rem;
   }
 
+  .iconFallback {
+    font-size: 0.42rem;
+    padding: 0.1rem;
+  }
+
   .content {
     padding-top: 0.25rem;
   }
+}
+
+/* Shown when a logo fails to load, so a dead image never looks like a bug. */
+.iconFallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-family: var(--font-mono);
+  padding: 0.22rem;
+  font-size: 0.52rem;
+  font-weight: 500;
+  line-height: 1.15;
+  text-align: center;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+  overflow: hidden;
+  color: var(--ink-muted);
 }

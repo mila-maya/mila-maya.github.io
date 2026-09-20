@@ -70,7 +70,7 @@ export const professionalTimeline: TimelineItem[] = [
     period: '2017 - 2026',
     title: 'Dipl.-Ing. Biotechnology / Bioinformatics, BOKU',
     icon: {
-      src: 'https://boku.ac.at/fileadmin/data/themen/Marketing/Downloads/BOKU_Hauptlogo_RGB.svg',
+      src: '/images/logos/boku.svg',
       alt: 'BOKU University logo'
     },
     detail:
@@ -86,7 +86,7 @@ export const professionalTimeline: TimelineItem[] = [
     period: '2012 - 2017',
     title: 'BSc Food and Biotechnology, BOKU',
     icon: {
-      src: 'https://boku.ac.at/fileadmin/data/themen/Marketing/Downloads/BOKU_Hauptlogo_RGB.svg',
+      src: '/images/logos/boku.svg',
       alt: 'BOKU University logo'
     },
     detail: 'Developed strong foundations in molecular biology, genetics, and bioprocessing.'

@@ -86,10 +86,10 @@
   color: var(--ink-muted);
 }
 
+/* One group under the other, so each grid of tiles gets the full width. */
 .skillGroups {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: var(--space-md);
+  gap: var(--space-lg);
 }
 
 .skillGroupTitle {
@@ -97,29 +97,46 @@
   margin-bottom: var(--space-2xs);
 }
 
+/*
+ * Tiles rather than inline chips: at this size the mark is the thing being
+ * read, and a chip cannot give it room. Columns fill to whatever fits, so a
+ * group of five and a group of seven both stay tidy.
+ */
 .skills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3xs);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
+  gap: var(--space-2xs);
 }
 
 .skill {
-  display: inline-flex;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.35rem;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 6rem;
+  padding: var(--space-2xs) 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-raised);
+  color: var(--ink-muted);
   font-family: var(--font-mono);
   font-size: 0.72rem;
-  padding: 0.2rem 0.45rem;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  color: var(--ink-muted);
-  background: var(--surface-raised);
+  line-height: 1.35;
+  text-align: center;
+  transition:
+    border-color var(--ease),
+    background-color var(--ease);
 }
 
-/* The brand mark, where a tool has one. Methods carry their name alone. */
+.skill:hover {
+  border-color: var(--accent);
+  background: var(--accent-wash);
+}
+
 .skillMark {
-  width: 0.9rem;
-  height: 0.9rem;
+  width: 1.75rem;
+  height: 1.75rem;
   flex: none;
   color: var(--accent);
 }

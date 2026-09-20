@@ -45,6 +45,22 @@ export const professionalTimeline: TimelineItem[] = [
     ]
   },
   {
+    period: '2023 - 2024',
+    title: 'Harvard CS50, online',
+    icon: {
+      src: '/favicon.svg',
+      alt: 'At the Core icon'
+    },
+    detail:
+      'Four CS50 certificates taken alongside the diploma studies, from Python and computer science fundamentals through web programming to applied AI.',
+    bullets: [
+      "CS50's Introduction to Programming with Python, 2023. Final project: a command line tool for nucleotide translation, which later became the Bioinformatic Toolbox.",
+      'CS50x, Introduction to Computer Science, 2024. Final project: the Bioinformatic Toolbox as a Flask web application.',
+      "CS50's Web Programming with Python and JavaScript, 2024.",
+      "CS50's Introduction to Artificial Intelligence with Python, 2024."
+    ]
+  },
+  {
     period: '2017 - 2026',
     title: 'Dipl.-Ing. Biotechnology / Bioinformatics, BOKU',
     icon: {

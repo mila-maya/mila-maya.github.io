@@ -20,6 +20,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
       )}
 
       <h3 className={styles.title}>{project.title}</h3>
+      {project.origin && <p className={styles.origin}>{project.origin.summary}</p>}
       <p className={styles.description}>{project.description}</p>
 
       {project.technologies && project.technologies.length > 0 && (

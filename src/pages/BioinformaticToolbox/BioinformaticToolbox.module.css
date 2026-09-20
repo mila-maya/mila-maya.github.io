@@ -587,3 +587,41 @@
   margin-top: 1rem;
   flex-wrap: wrap;
 }
+
+/* Provenance: four years of the same idea, in three stages. */
+.origin {
+  margin-top: var(--space-md);
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--line);
+  max-width: var(--measure-prose);
+}
+
+.originLabel {
+  margin-bottom: var(--space-2xs);
+}
+
+.originList {
+  list-style: none;
+  display: grid;
+  gap: var(--space-2xs);
+}
+
+.originStage {
+  display: grid;
+  grid-template-columns: 3.2rem 1fr;
+  gap: var(--space-2xs);
+  font-size: var(--step--1);
+  color: var(--ink-muted);
+}
+
+.originYear {
+  font-family: var(--font-mono);
+  color: var(--accent);
+}
+
+@media (max-width: 560px) {
+  .originStage {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}

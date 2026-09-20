@@ -14,7 +14,16 @@ export interface BlogPost {
   category?: string;
 }
 
+/** Where a project came from, and how it got here. */
+export interface ProjectOrigin {
+  /** One line for the card. */
+  summary: string;
+  /** The stages it went through, oldest first. */
+  history?: { year: string; what: string }[];
+}
+
 export interface Project {
+  origin?: ProjectOrigin;
   title: string;
   slug: string;
   description: string;

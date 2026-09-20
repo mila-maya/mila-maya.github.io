@@ -6,6 +6,7 @@ export const projects: Project[] = [
   {
     title: 'Automated Taylorgram Processing',
     slug: 'taylor-board',
+    origin: 'Master thesis',
     description:
       'Master thesis. Taylor Board automates Taylor dispersion analysis end to end: raw instrument files, peak detection, Gaussian fitting, size calculation, and validity checks that keep results inside the Taylor regime.',
     technologies: ['Python', 'Signal Processing', 'Chromatography', 'Nanoparticle Sizing'],
@@ -20,6 +21,7 @@ export const projects: Project[] = [
   {
     title: 'Bioinformatic Toolbox',
     slug: 'bioinformatic-toolbox',
+    origin: 'Harvard CS50',
     description:
       'React one-page migration of the original Flask app: NCBI search, nucleotide translation, ESMFold prediction, and PDB retrieval with browser-based history and file exports.',
     technologies: ['React', 'TypeScript', 'Vite', 'Web APIs', 'Bioinformatics'],

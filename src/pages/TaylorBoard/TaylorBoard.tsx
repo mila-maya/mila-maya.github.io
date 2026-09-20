@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import SEO from '@components/common/SEO/SEO';
 import { pageMeta } from '@/config/routeMeta';
 import { siteConfig } from '@/config/site';
+import { sharingOrigin } from '@/services/facets';
 import styles from './TaylorBoard.module.css';
 
 /**
@@ -33,24 +34,8 @@ const HIGHLIGHTS = [
   },
 ];
 
-/** Everything already published that came out of this work. */
-const parts = [
-  {
-    to: '/blog/taylor-dispersion-analysis-general-theory',
-    label: 'The method',
-    hint: 'What Taylor dispersion measures, when the model holds and where it breaks.',
-  },
-  {
-    to: siteConfig.peakFindingPostUrl,
-    label: 'The algorithm',
-    hint: 'Peak detection and multi-Gaussian fitting, in three runnable steps.',
-  },
-  {
-    to: siteConfig.thesisWorkflowUrl,
-    label: 'The writing setup',
-    hint: 'The LaTeX and tooling this thesis was written with, and the template.',
-  },
-];
+/** Everything that shares this work's origin, asked for rather than listed. */
+const parts = sharingOrigin('Master thesis', 'taylor-board');
 
 const TaylorBoard = () => (
   <>
@@ -105,10 +90,10 @@ const TaylorBoard = () => (
         <p className={`label ${styles.partsLabel}`}>Published from this work</p>
         <ul className={styles.partList}>
           {parts.map((part) => (
-            <li key={part.to}>
-              <Link to={part.to} className={styles.part}>
-                <span className={styles.partLabel}>{part.label}</span>
-                <span className={styles.partHint}>{part.hint}</span>
+            <li key={part.slug}>
+              <Link to={part.href} className={styles.part}>
+                <span className={styles.partLabel}>{part.title}</span>
+                <span className={styles.partHint}>{part.summary}</span>
               </Link>
             </li>
           ))}

@@ -30,6 +30,7 @@ const BlogCard = ({ post }: BlogCardProps) => {
 
       <div className={styles.content}>
         <h3 className={styles.title}>{post.title}</h3>
+        {post.origin && <p className={styles.origin}>{post.origin}</p>}
 
         <div className={styles.meta}>
           <span>{post.author}</span>

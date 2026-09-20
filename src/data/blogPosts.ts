@@ -5,6 +5,7 @@ export const blogPosts: BlogPost[] = [
   {
     title: "Automatic Detection and Deconvolution of Overlapping Chromatographic Peaks",
     slug: "peak-detection-deconvolution-overlapping-chromatograms",
+    origin: "Master thesis",
     excerpt: "A runnable 3-step workflow for automatic peak detection and deconvolution of overlapping chromatographic peaks.",
     content: `This post presents a three-step runnable workflow for overlapping chromatograms, following maxima-first peak processing and adaptive deconvolution used in MOCCA-style analysis [<a href="#pf-ref-1">1</a>,<a href="#pf-ref-2">2</a>,<a href="#pf-ref-3">3</a>,<a href="#pf-ref-5">5</a>].
 
@@ -261,6 +262,7 @@ if selected_model is None:
   {
     title: "Taylor Dispersion Analysis: General Theory and Practical Limits",
     slug: "taylor-dispersion-analysis-general-theory",
+    origin: "Master thesis",
     excerpt: "A compact theory guide to Taylor Dispersion Analysis (TDA), from Taylor-Aris physics to validity criteria.",
     content: `This post summarizes the core theory of Taylor Dispersion Analysis and the physical assumptions used by the Taylor Board Dash app.
 
@@ -364,6 +366,7 @@ Even inside a valid Taylor-Aris pressure window, non-ideal effects can still bia
   {
     title: "The Thesis Setup I Wish I Had on Day One",
     slug: "getting-started-masters-thesis-workflow",
+    origin: "Master thesis",
     excerpt: "A practical setup for a code-heavy thesis: LaTeX, VS Code, and AI tools that actually help.",
     content: `When I started my computational master's thesis, I spent the first week just figuring out tooling. LaTeX errors, broken builds, files everywhere. I wished someone had handed me a working template and said "start here."
 

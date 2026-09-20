@@ -111,3 +111,12 @@
   border-color: var(--primary-hover);
   color: var(--accent-contrast);
 }
+
+/* Where it came from. An attribute the item carries, shown wherever it appears. */
+.origin {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--ink-faint);
+  margin-top: calc(var(--space-2xs) * -0.5);
+  margin-bottom: var(--space-2xs);
+}

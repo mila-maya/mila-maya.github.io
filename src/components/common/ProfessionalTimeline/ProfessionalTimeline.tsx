@@ -17,7 +17,7 @@ const ProfessionalTimeline = ({ items }: ProfessionalTimelineProps) => {
           <article key={`${item.period}-${item.title}`} className={styles.item}>
             <p className={styles.year} aria-label={item.period}>
               <span className={styles.yearStart}>{startYear}</span>
-              {endYear && <span className={styles.yearEnd}>&ndash;&#8201;{endYear}</span>}
+              {endYear && <span className={styles.yearEnd}>{endYear}</span>}
             </p>
             <div className={styles.marker}>
               <span className={styles.iconFrame}>

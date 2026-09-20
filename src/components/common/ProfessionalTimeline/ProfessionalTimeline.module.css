@@ -29,30 +29,32 @@
   align-items: start;
 }
 
+/* Both ends of the span carry the same weight, stacked and right aligned.
+   Monospace so the digits line up exactly down the column, and so the years
+   speak in the same voice as the labels elsewhere on the site. */
 .year {
-  padding-top: 1.1rem;
+  padding-top: 1.05rem;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 0.2rem;
-  line-height: 1;
+  gap: 0.12rem;
+  font-family: var(--font-mono);
+  font-size: 0.92rem;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums;
 }
 
 .yearStart {
-  font-size: 1.05rem;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  color: var(--accent);
-  font-weight: 800;
+  color: var(--ink-faint);
+  font-weight: 400;
 }
 
-/* The end of the span, quieter than the start so the column still scans as a
-   list of years rather than a list of ranges. */
+/* The end of a span is what a reader looks for - when a degree finished, how
+   long a role lasted - so it takes the accent. */
 .yearEnd {
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.02em;
-  color: var(--ink-faint);
+  color: var(--accent);
+  font-weight: 500;
   white-space: nowrap;
 }
 
@@ -130,18 +132,17 @@
   }
 
   .timeline::before {
-    left: 5.75rem;
+    left: 6.35rem;
   }
 
   .item {
-    grid-template-columns: 3.1rem 3.9rem minmax(0, 1fr);
+    grid-template-columns: 3.7rem 3.9rem minmax(0, 1fr);
     column-gap: 0.7rem;
   }
 
   .year {
-    padding-top: 0.95rem;
-    font-size: 0.82rem;
-    letter-spacing: 0.12em;
+    padding-top: 0.9rem;
+    font-size: 0.78rem;
   }
 
   .iconFrame {

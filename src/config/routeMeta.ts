@@ -1,7 +1,6 @@
 import { siteConfig } from './site';
 import { blogPosts } from '../data/blogPosts';
 import { books } from '../data/books';
-import { projects } from '../data/projects';
 import { toolboxWorkflows } from '../data/toolboxWorkflows';
 import { countWordCapitalised, listPhrase } from '../utils/counting';
 import type { BlogPost } from '../types/content.types';
@@ -33,11 +32,11 @@ export const pageMeta = {
   explore: {
     path: siteConfig.exploreUrl,
     title: 'Explore',
-    // Counted and named from the data. Written out by hand, this sentence said
-    // "Two projects" and would have kept saying it after the third was added.
-    description: `${countWordCapitalised(projects.length)} projects you can open and take apart: ${listPhrase(
-      projects.map((project) => project.title)
-    )}.`,
+    // Says what the room holds, not what is in it. Counting the projects was
+    // no better than writing "Two" by hand: the names are on the cards right
+    // below, and a sentence that lists them grows every time one is added.
+    description:
+      'Every project here opens up: the method it uses, the code behind it, and the work it came out of.',
   },
   peakFinding: {
     path: siteConfig.peakFindingUrl,

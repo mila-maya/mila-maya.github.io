@@ -117,3 +117,11 @@ five takeaways per book. The section reappears by itself once an entry has any.
   again, and the card answers the pointer. 2026-09-20.
 - **Two hero links sat on different lines.** .backLink carried a margin-top of
   its own on top of the row's. 2026-09-20.
+- **The Explore intro carried the project data.** Deriving the count and the
+  names from the array was still the wrong shape: the names are on the cards
+  right below, and the sentence grew with every project added. It now says what
+  the room holds and names nothing. 2026-09-20.
+- **The diploma entry was written here, not by her.** Replaced with her own
+  LinkedIn wording, read from her profile once she was signed in. The master
+  thesis bullet is left out because it has its own station now, which is what
+  her LinkedIn does too by sending it to Projects. 2026-09-20.

@@ -102,13 +102,20 @@ export const professionalTimeline: TimelineItem[] = [
   },
   {
     period: '2017 - 2026',
-    title: 'Dipl.-Ing. Biotechnology / Bioinformatics, BOKU',
+    // Title and bullets are her own, taken from her LinkedIn education entry.
+    // The master thesis bullet is not repeated here: it has its own station,
+    // the same reason her LinkedIn sends it to Projects instead.
+    title: 'Diplom-Ingenieurin, Biotechnology with emphasis in Bioinformatics, BOKU',
     icon: {
       src: '/images/logos/boku.svg',
       alt: 'BOKU University logo'
     },
     detail:
-      'Master programme in biotechnology at the University of Natural Resources and Life Sciences, with the emphasis on bioinformatics.'
+      'Diploma studies at BOKU University, with the emphasis on bioinformatics.',
+    bullets: [
+      'Python: built and optimized scripts for data analysis and automation in bioinformatics contexts (Advanced Programming with Python; Introduction to Programming).',
+      'R / Statistics: analyzed and visualized high-dimensional datasets using PCA and clustering (Multivariate Statistics with R; Statistics with R; Applied Mathematics & Biostatistics).'
+    ]
   },
   {
     period: '2012 - 2017',
